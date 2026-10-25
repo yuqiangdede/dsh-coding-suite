@@ -1,0 +1,1 @@
+{"version":3,"file":"skill-provider.d.ts","sourceRoot":"","sources":["../../src/skill-provider.ts"],"names":[],"mappings":"AAAA;;;;;GAKG;AAOH,OAAO,KAAK,EAAE,OAAO,EAAE,MAAM,qBAAqB,CAAA;AAIlD,oCAAoC;AACpC,MAAM,WAAW,sBAAsB;IACrC,0EAA0E;IAC1E,QAAQ,CAAC,SAAS,CAAC,EAAE,MAAM,CAAA;CAC5B;AAeD;;;;;;GAMG;AACH,wBAAgB,yBAAyB,CAAC,GAAG,EAAE,OAAO,EAAE,MAAM,GAAE,sBAA2B,GAAG,MAAM,IAAI,CAsDvG"}
