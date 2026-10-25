@@ -32,9 +32,13 @@
       "types": "./lib/workflow/types/index.d.ts",
       "default": "./lib/workflow/index.js"
     },
+    "./cordis.patch.yml": "./cordis.patch.yml",
     "./package.json": "./package.json"
   },
   "dsh": {
+    "bundle": {
+      "patch": "./cordis.patch.yml"
+    },
     "client": {
       "inject": [
         "@deepseek-ai/dsh-api-remotes",
@@ -50,7 +54,8 @@
   },
   "files": [
     "assets/**/*",
-    "lib/**/*"
+    "lib/**/*",
+    "cordis.patch.yml"
   ],
   "license": "MIT",
   "peerDependencies": {
