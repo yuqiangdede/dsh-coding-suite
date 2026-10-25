@@ -59,6 +59,26 @@ plugins:
   - name: 'dsh-coding-suite/todo-progress-guard'
 ```
 
+#### Linked local checkout
+
+When a profile links this repository directly (the plugin manager's local-path install), imports resolve from this checkout's own `node_modules`. Install the runtime dependencies once after cloning or changing them, then restart DSH or toggle the plugin off and on:
+
+```sh
+pnpm install --prod
+```
+
+The shared DSH packages are declared as peer dependencies, so the running Host supplies its own copies. Without the dependency install, the Host reports that `lib/index.js` cannot import `@deepseek-ai/schemastery`.
+
+#### Client UI buttons are missing
+
+DSH keys each browser plugin by its package name, so the built `lib/client.js` must register `dsh-coding-suite` and not the retired scoped name. A linked install also never receives the application-owned `remote.codingWorkflow` namespace, so the client must mount without it. Check the shipped bundle, then reload:
+
+```sh
+node scripts/verify-client-bundle.mjs
+```
+
+After rebuilding or editing `lib/`, quit and reopen DSH, or toggle the plugin off and on in the Plugins page; refreshing the page alone does not re-read the bundle. The launcher renders above the composer once a session is open. Without the Host Remote, the action buttons still appear and only the workflow panel stays hidden.
+
 ---
 
 ## 中文说明
@@ -112,6 +132,26 @@ plugins:
 plugins:
   - name: 'dsh-coding-suite/todo-progress-guard'
 ```
+
+#### 本地 link 安装
+
+如果 profile 直接 link 本仓库（即插件管理器的本地路径安装方式），模块会从本仓库自己的 `node_modules` 解析。首次克隆或依赖变更后，请安装一次运行时依赖，然后重启 DSH 或将插件关闭再开启：
+
+```sh
+pnpm install --prod
+```
+
+DSH 共享包已声明为 peerDependencies，运行时会使用 Host 自带的副本。若未安装依赖，Host 会报错称 `lib/index.js` 无法导入 `@deepseek-ai/schemastery`。
+
+#### 看不到输入框上方的按钮
+
+DSH 按包名索引浏览器插件，因此构建出的 `lib/client.js` 必须注册为 `dsh-coding-suite`，不能沿用旧的 scope 名称。link 安装也不会得到应用内置的 `remote.codingWorkflow` 命名空间，客户端必须在它缺席时仍能挂载。先检查产物，再重新加载：
+
+```sh
+node scripts/verify-client-bundle.mjs
+```
+
+改完 `lib/` 后，请完全退出并重启 DSH，或在「插件」页把插件关闭再开启；仅刷新页面不会重新读取 bundle。打开一个会话后，按钮显示在输入框上方。缺少 Host Remote 时，动作按钮仍会显示，只有工作流面板保持隐藏。
 
 ### 目录结构
 

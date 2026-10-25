@@ -57,7 +57,7 @@ declare module '@deepseek-ai/dsh-client-ui-slots' {
     mattSkillLauncher: LauncherLocaleKey
   }
 }
-export const inject = ['locale', 'slots','sessions','remote','remote.skills','remote.goals','remote.codingWorkflow','configForms']
+export const inject = ['locale', 'slots','sessions','remote','remote.skills','remote.goals','configForms']
 export function apply(ctx: ClientContext): void {
   ctx.effect(() => ctx.locale.register('mattSkillLauncher', { zh, en }), 'launcher dictionaries')
   const t = ctx.locale.bind('mattSkillLauncher')
@@ -70,21 +70,34 @@ export function apply(ctx: ClientContext): void {
   ctx.slots.inject('conversation.input.dock', () => ctx.slots.register({
     name: 'conversation.input.dock', locale: 'mattSkillLauncher', id: 'matt-skill-launcher', order: 1,
     inject: (sessionId): LauncherInjected => {
+      // A linked standalone install does not receive the application's generated
+      // `remote.codingWorkflow` contribution; the dock must still mount without it.
+      const workflowRemote = ctx.remote.codingWorkflow
       const workflow = createCodingWorkflowSource({
         read: async () => {
           const binding = ctx.sessions.binding(sessionId)
           if (binding === undefined || binding.session.getSnapshot().openState !== 'open') {
             return { ok: false, error: { code: 'session-unavailable', message: 'Session unavailable' } }
           }
-          return ctx.remote.codingWorkflow.get(sessionId)
+          if (workflowRemote === undefined) {
+            return { ok: false, error: { code: 'workflow-unavailable', message: 'Coding workflow remote unavailable' } }
+          }
+          return workflowRemote.get(sessionId)
         },
-        subscribeChange: listener => ctx.remote.$on('coding-workflow/changed', (change) => {
-          if (change.sessionId === sessionId) listener(change)
-        }),
+        subscribeChange: listener => {
+          try {
+            return ctx.remote.$on('coding-workflow/changed', (change) => {
+              if (change.sessionId === sessionId) listener(change)
+            })
+          } catch {
+            return () => {}
+          }
+        },
         subscribeReset: listener => ctx.on('connection/reset', listener),
       })
       // Every command carries the revision it read, so a stale panel fails instead of overwriting a newer task.
       const command = async (action: (item: WorkItem) => Promise<RemoteResult<WorkItem>>): Promise<WorkflowCommandResult> => {
+        if (workflowRemote === undefined) return { ok: false, message: 'Coding workflow remote unavailable' }
         const item = workflow.getSnapshot().item
         if (item === null) return { ok: false, message: 'No current task' }
         try {
@@ -98,11 +111,11 @@ export function apply(ctx: ClientContext): void {
         hooks: { actionForm: form, workflow },
         todoStaleMs: deployment.todoStaleMs,
         workflowCommands: {
-          approve: decision => command(item => ctx.remote.codingWorkflow.approve(sessionId, item.taskId, item.revision, decision)),
-          pause: () => command(item => ctx.remote.codingWorkflow.pause(sessionId, item.taskId, item.revision)),
-          resume: () => command(item => ctx.remote.codingWorkflow.resume(sessionId, item.taskId, item.revision)),
-          cancel: reason => command(item => ctx.remote.codingWorkflow.cancel(sessionId, item.taskId, item.revision, reason)),
-          setMode: mode => command(item => ctx.remote.codingWorkflow.setMode(sessionId, item.taskId, item.revision, mode)),
+          approve: decision => command(item => workflowRemote.approve(sessionId, item.taskId, item.revision, decision)),
+          pause: () => command(item => workflowRemote.pause(sessionId, item.taskId, item.revision)),
+          resume: () => command(item => workflowRemote.resume(sessionId, item.taskId, item.revision)),
+          cancel: reason => command(item => workflowRemote.cancel(sessionId, item.taskId, item.revision, reason)),
+          setMode: mode => command(item => workflowRemote.setMode(sessionId, item.taskId, item.revision, mode)),
         },
         pauseWorkflow: async (goalRef) => {
           const binding = ctx.sessions.binding(sessionId)
