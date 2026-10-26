@@ -3,7 +3,7 @@ import { resolve, join } from 'node:path'
 import { describe, it, expect } from 'vitest'
 import { DEFAULT_ACTIONS } from '../src/client/actions.ts'
 
-const root = resolve(import.meta.dirname, '../../../../.dsh/skills')
+const root = resolve(import.meta.dirname, '../assets/skills')
 
 describe('bundled coding skills', () => {
   it('provides every default launcher skill with matching invocation metadata', () => {

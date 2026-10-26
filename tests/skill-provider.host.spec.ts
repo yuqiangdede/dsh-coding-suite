@@ -31,6 +31,11 @@ describe('coding suite bundled skills provider', () => {
     expect(catalog.length).toBeGreaterThanOrEqual(28)
 
     const skillNames = catalog.map(s => s.name)
+    expect(skillNames).toContain('project-runtime-acceptance')
+    const health = await ctx.skills.get('project-runtime-acceptance')
+    expect(health?.content).toContain('静态只读')
+    expect(health?.resourceBase).toMatchObject({ kind: 'directory' })
+    expect(health?.invocation).toEqual({ modelInvocable: true, userInvocable: true })
     expect(skillNames).toContain('ask-matt')
     expect(skillNames).toContain('diagnosing-bugs')
     expect(skillNames).toContain('code-review')

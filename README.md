@@ -114,6 +114,14 @@ After rebuilding or editing `lib/`, quit and reopen DSH, or toggle the plugin of
 4. **待办任务同步守卫 (Todo Progress Guard)**
    - 智能监控活跃的待办任务，当执行进展超时未同步至上下文时自动发起柔性提醒。
 
+### 健康验收
+
+新增「健康验收」Skill 按钮，绑定内置 `project-runtime-acceptance`，默认进行全量静态只读验收，覆盖数据库、任务、缓存、API 等12领域，输出资产覆盖率、源码证据及整改建议，不改业务代码、不操作生产环境。
+
+技能、规则、报告模板与候选扫描器已随插件固化，无需解压或另行安装。已有自定义按钮配置请在按钮设置中点击「补齐缺失预设（待保存）」并保存；默认新配置直接显示快捷按钮。报告写入位置需先确认。详见 [技能说明](assets/skills/project-runtime-acceptance/README.md) 与 [验收约定](docs/pocket/requirements/health-acceptance.md)。
+
+按钮表重建：`node --experimental-transform-types scripts/build-action-bundle.mjs`。加载更新后的插件后使用；不会自动向会话发送请求。
+
 ### 安装与配置
 
 在 DSH 的配置文件（如 `cordis.yml`）中添加插件：

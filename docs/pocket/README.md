@@ -27,6 +27,8 @@ Only link to files that actually exist. No legacy paths are pending migration.
 
 ## Current state
 
+- [健康验收按钮与内置技能](requirements/health-acceptance.md) — accepted；默认静态只读、资源固化与旧按钮配置兼容。
+
 - [Windows PowerShell execution guidance](requirements/windows-powershell-guidance.md) — accepted; Windows-only prompt rules and on-demand diagnosis, with no execution-policy changes.
 
 Create category documents and `meta/glossary.md` lazily when a confirmed fact needs a home; do not scaffold empty folders.

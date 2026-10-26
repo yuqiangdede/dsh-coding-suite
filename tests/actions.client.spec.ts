@@ -13,9 +13,9 @@ describe('mattpocock-DSH CodingAction document', () => {
   it('shows the workflow shortcuts and leaves every other button under More', () => {
     const actions = parseActions(undefined)
     expect(actions.filter(a => a.pinned).map(a => a.id))
-      .toEqual(['discussion', 'spec', 'execute', 'bug', 'review', 'doc-supplement', 'commit', 'review-fix', 'compile'])
+      .toEqual(['discussion', 'spec', 'execute', 'bug', 'review', 'health-acceptance', 'doc-supplement', 'commit', 'review-fix', 'compile'])
     expect(actions.filter(a => a.pinned).sort((a, b) => displayOrder(a) - displayOrder(b)).map(a => a.id))
-      .toEqual(['discussion', 'spec', 'execute', 'bug', 'review', 'review-fix', 'compile', 'commit', 'doc-supplement'])
+      .toEqual(['discussion', 'spec', 'execute', 'bug', 'review', 'health-acceptance', 'review-fix', 'compile', 'commit', 'doc-supplement'])
     expect(actions.filter(a => !a.pinned).map(a => a.id))
       .toContain('ask')
     expect(actions.find(a => a.id === 'ask')?.skillId).toBe('ask-matt')
