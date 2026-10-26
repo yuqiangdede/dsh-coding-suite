@@ -1,8 +1,14 @@
 import { describe, expect, it } from 'vitest'
 import { chatEntries, recommend, withEvidence, type ChatEntry } from '../src/client/contextual-actions.ts'
+import { DEFAULT_ACTIONS } from '../src/client/actions.ts'
 
 const user = (text: string, seq = 1): ChatEntry => ({ role: 'user', text, seq })
 const assistant = (text: string, seq = 2, failed = false): ChatEntry => ({ role: 'assistant', text, seq, failed })
+const button = (id: string) => {
+  const action = DEFAULT_ACTIONS.find(candidate => candidate.id === id)
+  if (!action) throw new Error('missing default action ' + id)
+  return action
+}
 
 describe('Skill Launcher contextual recommendations', () => {
   it('reads only the latest completed DSH legacy exchange in sequence order', () => {
@@ -91,10 +97,11 @@ describe('Skill Launcher contextual recommendations', () => {
     expect(recommend([user('请代码审查'), assistant('闲聊')])).toBeNull()
   })
 
-  it('adds the earlier exchange only when repairing review findings', () => {
+  it('references the original report without copying the earlier exchange', () => {
     const exchange = [user('请代码审查'), assistant('审查结果：P1 src/a.ts:20 空指针问题')]
     const repaired = withEvidence('修复问题', null, 'review-fix', exchange)
-    expect(repaired).toContain('src/a.ts:20')
+    expect(repaired).not.toContain('src/a.ts:20')
+    expect(repaired).toContain('以原报告为准，不遗漏、不扩大范围')
     expect(repaired).toContain('问题编号')
     for (const actionId of ['execute', 'compile', 'commit', 'review', 'handoff', 'discussion', 'api-docs']) {
       const draft = withEvidence('任务', null, actionId, exchange)
@@ -103,7 +110,7 @@ describe('Skill Launcher contextual recommendations', () => {
       expect(draft).not.toContain('摘录仅供参考')
     }
     const result = recommend(exchange)
-    expect(withEvidence('修复问题', result, 'review-fix')).toContain('src/a.ts:20')
+    expect(withEvidence('修复问题', result, 'review-fix')).not.toContain('src/a.ts:20')
     expect(withEvidence('编译', result, 'compile')).not.toContain('src/a.ts:20')
   })
   it.each([
@@ -123,8 +130,8 @@ describe('Skill Launcher contextual recommendations', () => {
     expect(text).toContain('未完成项')
     expect(text).not.toContain('specs/task.md')
     expect(text).not.toContain('P1 src/a.ts:20')
-    expect(withEvidence('修复问题', null, 'review-fix', entries)).toContain('specs/task.md')
-    expect(withEvidence('修复问题', null, 'review-fix', entries)).toContain('逐项核实')
+    expect(withEvidence('修复问题', null, 'review-fix', entries)).not.toContain('specs/task.md')
+    expect(withEvidence('修复问题', null, 'review-fix', entries)).toContain('逐项修复全部明确问题')
     expect(withEvidence('提交', null, 'commit', entries)).toContain('分类汇总')
     expect(withEvidence('自定义', null, 'custom', entries)).toBe('自定义')
   })
@@ -143,14 +150,58 @@ describe('Skill Launcher contextual recommendations', () => {
     expect(supplement).not.toContain('【上一阶段对话摘录')
     expect(withEvidence('Task', null, 'execute', [], true)).toContain('Do not update product documents')
   })
-  it('marks truncated evidence, preserves receiving requirements and supports English', () => {
-    const entries = [user('开始'), assistant('x'.repeat(6000))]
-    const draft = withEvidence('fix', null, 'review-fix', entries, true)
-    expect(draft).toContain('Excerpt truncated')
-    expect(draft).toContain('finding IDs')
-    expect(draft.length).toBeLessThan(6000)
+  it('references long reports in either language without copying or truncating them', () => {
+    const entries = [user('request-marker'.repeat(200)), assistant('report-marker'.repeat(600))]
+    for (const english of [false, true]) {
+      const draft = withEvidence('fix', null, 'review-fix', entries, english)
+      expect(draft).not.toContain('request-marker')
+      expect(draft).not.toContain('report-marker')
+      expect(draft).not.toContain('截断')
+      expect(draft).not.toContain('truncated')
+      expect(draft).toContain(english ? 'previous review report' : '上一轮审查报告')
+      expect(draft).toContain(english ? 'finding IDs' : '问题编号')
+      expect(draft.length).toBeLessThan(1000)
+    }
   })
   it('does not use earlier evidence as the current action intent', () => {
     expect(recommend([user('帮我看别的问题\n\n【上一阶段对话摘录】\n代码审查'), assistant('审查结果：P1 src/a.ts:20')])).toBeNull()
+  })
+  it('routes a real repair draft by button id instead of its review keywords', () => {
+    const review: ChatEntry[] = [
+      user('/code-review 只审查正确性、数据安全、并发和可维护性', 1),
+      assistant('代码审查报告（只读）：R-01 P1 src/a.ts:20 空指针；R-02 P2 越权访问', 2),
+    ]
+    const draft = withEvidence(button('review-fix').prompt, recommend(review, false, DEFAULT_ACTIONS), 'review-fix', review)
+    const repaired = recommend([
+      user(draft, 3),
+      assistant('修复完成：R-01（P1）已修复 src/a.ts:20，R-02 已补权限校验；回归 21/21 通过', 4),
+    ], false, DEFAULT_ACTIONS)
+    expect(repaired?.ids).toEqual(['compile', 'review'])
+    expect(repaired?.reason).toBe('reasonRepairReady')
+    expect(recommend(review, false, DEFAULT_ACTIONS)?.ids).toEqual(['review-fix'])
+  })
+  it('keeps the repair button only when the reply still reports unresolved findings', () => {
+    const report = '已修复 R-01（P1）src/a.ts:20；R-07 未修复，需要产品确认权限模型；回归 18/21 通过'
+    expect(recommend([
+      user(withEvidence(button('review-fix').prompt, null, 'review-fix', []), 3),
+      assistant(report, 4),
+    ], false, DEFAULT_ACTIONS)?.ids).toEqual(['review-fix'])
+  })
+  it('does not guess a stage for a button that declares no successor', () => {
+    const commit = withEvidence(button('commit').prompt, null, 'commit', [])
+    expect(recommend([
+      user(commit, 5),
+      assistant('提交完成：P1 修复已入库，diff +12/-3', 6),
+    ], false, DEFAULT_ACTIONS)).toBeNull()
+  })
+  it('keeps keyword fallback for hand-typed requests', () => {
+    expect(recommend([
+      user('请代码审查', 7),
+      assistant('审查结果：P1 src/a.ts:20 空指针问题', 8),
+    ], false, DEFAULT_ACTIONS)?.ids).toEqual(['review-fix'])
+    expect(recommend([
+      user('请代码审查', 7),
+      assistant('审查结果：P1 src/a.ts:20 空指针问题', 8),
+    ])?.ids).toEqual(['review-fix'])
   })
 })

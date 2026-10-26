@@ -73,6 +73,7 @@ export const zh = {
   'reasonReviewFindings': '代码审查发现待修复问题',
   'reasonReviewClean': '代码审查未发现问题',
   'reasonRequirementsReady': '需求结论可固化',
+  'specPrerequisite': '请先完成需求讨论或可视化讨论并形成结论。',
   'reasonSpecReady': '规格可用于拆分工单',
   'reasonPlanReady': '已有实施工单',
   'reasonResearchReady': '研究结论可用于需求讨论',
@@ -182,6 +183,7 @@ export const en: Record<LauncherLocaleKey, string> = {
   'reasonReviewFindings': 'Code review found issues to fix',
   'reasonReviewClean': 'Code review found no issues',
   'reasonRequirementsReady': 'Requirements are ready to formalize',
+  'specPrerequisite': 'Finish a requirements or visual discussion with a conclusion first.',
   'reasonSpecReady': 'The specification is ready for ticket breakdown',
   'reasonPlanReady': 'Implementation tickets are available',
   'reasonResearchReady': 'Research can inform requirements discussion',
@@ -225,7 +227,7 @@ export const receivingInstructions: Readonly<Record<string, readonly [string, st
   tdd: ['接收目标行为和验收标准，先复现失败，再逐步实现和验证；记录实际执行结果。', 'Receive target behavior and acceptance criteria; reproduce failure, implement incrementally and record actual checks.'],
   bug: ['接收复现步骤、错误原文、相关文件和失败命令，先建立稳定复现。', 'Receive reproduction steps, original errors, affected files and failing commands; establish a reliable reproduction first.'],
   review: ['核实审查范围与基准、当前 diff、规格或工单及验证记录；输出问题编号、优先级、文件位置、影响和验证要求。', 'Verify review scope and base, current diff, spec or ticket and checks; report finding IDs, priorities, locations, impact and verification requirements.'],
-  'review-fix': ['先归纳审查问题编号、优先级、文件位置、问题及验证要求；逐项核实、修复并回报已修复、未修复及验证结果，不用泛化摘要代替问题清单。', 'List review finding IDs, priorities, locations, defects and required checks; verify and fix each, reporting resolved and unresolved items with results. Preserve concrete findings.'],
+  'review-fix': ['请依据当前对话上一轮审查报告，逐项修复全部明确问题，保留问题编号并验证；以原报告为准，不遗漏、不扩大范围。', 'Use the previous review report in this conversation to fix every explicit finding, preserve finding IDs and verify each fix; follow the original report without omissions or scope expansion.'],
   compile: ['核实实际改动及项目检查入口；分别报告已执行且通过、已执行但失败、未执行和环境限制。', 'Verify actual changes and project check entry points; distinguish passed, failed, not run and environment-blocked checks.'],
   commit: ['核对 diff、暂存范围和未解决的审查问题；不执行编译或测试。提交后按目录或模块分类汇总新增、删除行数和文件数，并给出提交标识。', 'Verify the diff, staged scope and unresolved findings; run no build or tests. After committing, summarize added, deleted and file counts by directory or module with the commit identifier.'],
   continue: ['核实原始任务、已有产物、磁盘 diff、已完成和未完成事项及阻塞，从可靠检查点恢复；不得重新执行已成功的外部操作。', 'Verify the original task, artifacts, disk diff, completed and pending work and blockers; resume from a reliable checkpoint without repeating successful external operations.'],
@@ -245,20 +247,4 @@ export const documentReceiving = ['接收目标读者、资料路径、已确认
 /** Document policy shared by the code-writing actions, Chinese then English. */
 export const codingDocPolicy = ['编码阶段不更新产品资料文档（需求、总体设计、概要设计、数据库设计、接口文档）；完成后只列出受影响的现有文档，并提示使用「补充文档」按钮；不自行更新。README 和 JSDoc 仍按仓库规则随代码更新。', 'Do not update product documents (requirements, system design, high-level design, database design or interface documents) during coding. After finishing, list the affected existing documents and point to the Supplement Docs button; do not update them yourself. README and JSDoc still follow repository rules.'] as const
 
-/** Localized framing for bounded conversation excerpts. */
-export const draftContextCopy = {
-  zh: {
-    truncated: '\n[摘录已截断，请查阅原文。]',
-    heading: '\n\n【上一阶段对话摘录，请核对实际文件】\n',
-    request: '请求：',
-    result: '结果：',
-    verify: '\n摘录仅供参考。请核实产物和当前改动，缺失证据明确报告；推荐不代表任务完成、检查通过或获得提交及推送授权。',
-  },
-  en: {
-    truncated: '\n[Excerpt truncated; consult the original.]',
-    heading: '\n\n【Previous exchange excerpts — verify against source files】\n',
-    request: 'Request: ',
-    result: 'Result: ',
-    verify: '\nTreat excerpts as reference material. Verify artifacts and current changes; report missing evidence. A recommendation does not establish completion, passing checks or permission to commit or push.',
-  },
-} as const
+

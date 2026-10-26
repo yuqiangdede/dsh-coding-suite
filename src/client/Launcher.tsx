@@ -2,7 +2,7 @@ import { useEffect, useId, useMemo, useRef, useState } from 'react'
 import type { InjectFace, PropsLocale, PropsRuntime } from '@deepseek-ai/dsh-client-ui-slots'
 import { parseActions, actionErrorKey, presentDefaultActions, displayOrder, type CodingAction } from './actions.ts'
 import type { LauncherInjected } from './index.ts'
-import { chatEntries, recommend, withEvidence } from './contextual-actions.ts'
+import { chatEntries, recommend, requirementsReady, withEvidence } from './contextual-actions.ts'
 import { WorkflowPanel } from './WorkflowPanel.tsx'
 import css from './Launcher.module.css'
 type Props = PropsRuntime<'conversation.input.dock'> & PropsLocale<'mattSkillLauncher'> & InjectFace<LauncherInjected>
@@ -33,8 +33,6 @@ export function Launcher({
   const unchangedMs = Date.now() - planChangedAt
   const planMayBeStale = watching && unchangedMs >= todoStaleMs
   const unchangedMinutes = Math.ceil(unchangedMs / 60000)
-  const entries = sessionRunning ? [] : chatEntries(chat)
-  const recommendation = recommend(entries)
   const morePanelId = useId()
   const [moreOpen, setMoreOpen] = useState(false)
   const [pending, setPending] = useState(false)
@@ -51,6 +49,12 @@ export function Launcher({
   try { actions = parseActions(snapshot.value?.actionsJson) } catch (error) { invalid = explain(error) }
   actions = snapshot.value?.actionsJson ? actions : presentDefaultActions(actions, t('defaultLocale') === 'en')
   const enabledActions = actions.filter(a => a.enabled).sort((a, b) => displayOrder(a) - displayOrder(b))
+  // Buttons travel with their own prompt, so the request can be attributed by id
+  // instead of guessing the stage from keywords inside that prompt.
+  const entries = sessionRunning ? [] : chatEntries(chat)
+  const recommendation = recommend(entries, sessionRunning, enabledActions)
+  const specReady = requirementsReady(chat, sessionRunning, actions)
+  const stageBlocked = (action: CodingAction) => action.id === 'spec' && !specReady
   const recommendedActions = recommendation
     ? enabledActions.filter(action => recommendation.ids.includes(action.id))
     : []
@@ -61,7 +65,7 @@ export function Launcher({
   const moreRecommended = recommendedActions.some(a => !a.pinned)
   const available = input.phase === 'plain' && !pending && snapshot.status === 'ready'
   const insert = async (action: CodingAction) => {
-    if (!available) return
+    if (!available || stageBlocked(action)) return
     setNotice('')
     const span = inputActions.captureInsertion()
     if (span.start !== span.end) { setNotice(t('selection')); return }
@@ -105,8 +109,8 @@ export function Launcher({
       if (alive.current) setPending(false)
     }
   }
-  const render = (a: CodingAction) => <button type="button" key={a.id} disabled={!available} className={visibleRecommendation?.ids.includes(a.id) ? css.recommended : css.action}
-    title={a.description + '\n' + a.example + (visibleRecommendation?.ids.includes(a.id) ? '\n' + t('recommendationTooltip').replace('{reason}', t(visibleRecommendation.reason)) : '')} onClick={() => { void insert(a) }}>{a.label}</button>
+  const render = (a: CodingAction) => <button type="button" key={a.id} disabled={!available || stageBlocked(a)} className={visibleRecommendation?.ids.includes(a.id) ? css.recommended : css.action}
+    title={a.description + '\n' + a.example + (stageBlocked(a) ? '\n' + t('specPrerequisite') : '') + (visibleRecommendation?.ids.includes(a.id) ? '\n' + t('recommendationTooltip').replace('{reason}', t(visibleRecommendation.reason)) : '')} onClick={() => { void insert(a) }}>{a.label}</button>
   const item = workflow.item
   return <div className={css.root} data-matt-skill-launcher>
     {item !== null && <WorkflowPanel item={item} decision={decision} pending={pending}
