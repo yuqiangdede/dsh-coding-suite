@@ -200,8 +200,8 @@ const links: readonly {
   { trigger: /domain-modeling|领域建模/i, actionIds: ['domain'], success: /术语(已|表)|建模完成|glossary.*(updated|complete)/i, ids: ['discussion'], reason: 'reasonDomainReady' },
   { trigger: /\/handoff\b|上下文交接/i, actionIds: ['handoff'], success: /交接文档|handoff.*\.md/i, ids: ['continue'], reason: 'reasonHandoffReady' },
 ]
-/** Stopped or failed turn outcomes; bare 失败 and error: text describe findings, not turn state. */
-const failures = /中断|无法继续|未完成|(?:测试|构建|编译)失败|tests? failed|build failed/i
+/** Match explicit task outcomes, not pending follow-ups or scenarios mentioned in a completion report. */
+const failures = /(?:请求|任务|执行|操作|回合|扫描|走读|审查)(?:过程|进行到一半)?(?:被|已|意外)?中断|无法继续|(?:实现|开发|修复|任务)(?:尚|仍|还)?未完成|(?:测试|构建|编译)失败|tests? failed|build failed/i
 const negative = /没有(发现|检测到).{0,12}(问题|缺陷)|未发现.{0,12}(问题|缺陷)|no (issues|findings|defects)/i
 const positiveFinding = new RegExp(findingEvidence, 'i')
 /** Repair replies that still carry open findings; only these may send the work back to repair. */
