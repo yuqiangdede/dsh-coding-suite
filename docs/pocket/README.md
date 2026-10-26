@@ -30,9 +30,11 @@ Only link to files that actually exist. No legacy paths are pending migration.
 
 - [健康验收按钮与内置技能](requirements/health-acceptance.md) — accepted；默认静态只读、资源固化与旧按钮配置兼容。
 
+- [补充文档按钮的增补来源](requirements/doc-supplement-sources.md) — accepted；默认本会话，可改为指定时间段或版本号之后的已提交代码改动。
+
 - [Windows PowerShell execution guidance](requirements/windows-powershell-guidance.md) — accepted; Windows-only prompt rules and on-demand diagnosis, with no execution-policy changes.
 
-- [固化需求按钮的前置条件](requirements/spec-action-gate.md) — accepted；讨论结论解锁、会话隔离与失败处理。
+- [固化需求按钮可直接使用](requirements/spec-action-free.md) — accepted；取消讨论结论门槛与置灰，仅保留通用禁用规则。
 
 Create category documents and `meta/glossary.md` lazily when a confirmed fact needs a home; do not scaffold empty folders.
 

@@ -81,7 +81,6 @@ export const zh = {
   'reasonReviewFindings': '代码审查发现待修复问题',
   'reasonReviewClean': '代码审查未发现问题',
   'reasonRequirementsReady': '需求结论可固化',
-  'specPrerequisite': '请先完成需求讨论或可视化讨论并形成结论。',
   'reasonSpecReady': '规格可用于拆分工单',
   'reasonPlanReady': '已有实施工单',
   'reasonResearchReady': '研究结论可用于需求讨论',
@@ -199,7 +198,6 @@ export const en: Record<LauncherLocaleKey, string> = {
   'reasonReviewFindings': 'Code review found issues to fix',
   'reasonReviewClean': 'Code review found no issues',
   'reasonRequirementsReady': 'Requirements are ready to formalize',
-  'specPrerequisite': 'Finish a requirements or visual discussion with a conclusion first.',
   'reasonSpecReady': 'The specification is ready for ticket breakdown',
   'reasonPlanReady': 'Implementation tickets are available',
   'reasonResearchReady': 'Research can inform requirements discussion',
@@ -254,7 +252,10 @@ export const receivingInstructions: Readonly<Record<string, readonly [string, st
   retro: ['接收原任务、决策、失败记录、审查问题和验证结果；区分事实、原因假设及改进建议，不把一次结果推广为事实。', 'Receive the original task, decisions, failures, findings and checks; distinguish facts, causal hypotheses and improvement proposals.'],
   handoff: ['交接目标、当前阶段、规格及工单链接、关键决策、代码状态、实际验证、问题编号、未完成项、阻塞和下一步；引用已有产物，不复制全文，移除敏感信息。', 'Hand off the goal, phase, spec and ticket links, decisions, code state, checks, finding IDs, pending work, blockers and next steps; reference existing artifacts and redact secrets.'],
   image: ['接收已确认页面需求、截图或设计文档、交互状态和视觉约束；保留资料来源及待确认项。', 'Receive confirmed screen requirements, screenshots or design docs, interaction states and visual constraints; retain sources and open questions.'],
-  'doc-supplement': ['接收本会话已确认的结论、未决问题和资料路径；只增量补充现有需求、总体设计、概要设计、数据库和接口文档，缺失文档只列出，数据库/接口须对照实际 SQL、迁移或源码核实，无法核实的标“待确认”；不改代码、不提交。', 'Receive this session\'s confirmed conclusions, open questions and document paths; supplement existing requirements, system design, high-level design, database and interface documents in place; list missing documents; verify database and interface claims against actual SQL, migrations or source; mark unverifiable content as pending; do not edit code or commit.'],
+  'doc-supplement': [
+    `接收补充来源（本会话，或指定时间段/版本号之后的代码改动范围）、已确认结论、未决问题和资料路径；按来源核对会话结论或提交/差异，只增量补充现有需求、总体设计、概要设计、数据库和接口文档，缺失文档只列出，数据库/接口须对照实际 SQL、迁移或源码核实，无法核实的标“待确认”；不改代码、不提交。`,
+    `Receive the supplement source (this session, or code changes in a specified time range or after a specified version), confirmed conclusions, open questions and document paths; verify session conclusions or commits/diffs, supplement existing requirements, system design, high-level design, database and interface documents in place, list missing documents, verify database and interface claims against actual SQL, migrations or source, mark unverifiable content as pending, and do not edit code or commit.`,
+  ],
 }
 
 /** Receiving instructions shared by document actions, Chinese then English. */

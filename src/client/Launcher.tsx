@@ -2,7 +2,7 @@ import { useEffect, useMemo, useRef, useState } from 'react'
 import type { InjectFace, PropsLocale, PropsRuntime } from '@deepseek-ai/dsh-client-ui-slots'
 import { parseActions, actionErrorKey, presentDefaultActions, displayOrder, type CodingAction } from './actions.ts'
 import type { LauncherInjected } from './index.ts'
-import { chatEntries, recommend, requirementsReady, withEvidence } from './contextual-actions.ts'
+import { chatEntries, recommend, withEvidence } from './contextual-actions.ts'
 import { WorkflowPanel } from './WorkflowPanel.tsx'
 import { LAUNCHER_GROUPS, actionsForGroup, defaultLauncherLayout, parseLauncherLayout, type OptionalGroupId } from './launcher-layout.ts'
 import css from './Launcher.module.css'
@@ -56,8 +56,6 @@ export function Launcher({
   // instead of guessing the stage from keywords inside that prompt.
   const entries = sessionRunning ? [] : chatEntries(chat)
   const recommendation = recommend(entries, sessionRunning, enabledActions)
-  const specReady = requirementsReady(chat, sessionRunning, actions)
-  const stageBlocked = (action: CodingAction) => action.id === 'spec' && !specReady
   const recommendedActions = recommendation
     ? enabledActions.filter(action => recommendation.ids.includes(action.id))
     : []
@@ -82,7 +80,7 @@ export function Launcher({
   }
   const available = input.phase === 'plain' && !pending && snapshot.status === 'ready'
   const insert = async (action: CodingAction) => {
-    if (!available || stageBlocked(action)) return
+    if (!available) return
     setNotice('')
     const span = inputActions.captureInsertion()
     if (span.start !== span.end) { setNotice(t('selection')); return }
@@ -133,8 +131,8 @@ export function Launcher({
     if (a.id === 'docx' && a.label === 'MD 转 Word') return 'MD转Word'
     return a.label
   }
-  const render = (a: CodingAction) => <button type="button" key={a.id} disabled={!available || stageBlocked(a)} className={visibleRecommendation?.ids.includes(a.id) ? css.recommended : css.action}
-    title={a.description + '\n' + a.example + (stageBlocked(a) ? '\n' + t('specPrerequisite') : '') + (visibleRecommendation?.ids.includes(a.id) ? '\n' + t('recommendationTooltip').replace('{reason}', t(visibleRecommendation.reason)) : '')} onClick={() => { void insert(a) }}>{displayLabel(a)}</button>
+  const render = (a: CodingAction) => <button type="button" key={a.id} disabled={!available} className={visibleRecommendation?.ids.includes(a.id) ? css.recommended : css.action}
+    title={a.description + '\n' + a.example + (visibleRecommendation?.ids.includes(a.id) ? '\n' + t('recommendationTooltip').replace('{reason}', t(visibleRecommendation.reason)) : '')} onClick={() => { void insert(a) }}>{displayLabel(a)}</button>
   const item = workflow.item
   return <div className={css.root} data-matt-skill-launcher>
     {item !== null && <WorkflowPanel item={item} decision={decision} pending={pending}

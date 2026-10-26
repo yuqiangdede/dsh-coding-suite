@@ -13,7 +13,7 @@
   "scripts": {
     "pack": "npm pack",
     "verify:bundle": "node scripts/verify-client-bundle.mjs",
-    "test:spec-gate": "node --experimental-transform-types --test --test-isolation=none tests/spec-gate.node.test.mjs"
+    "test:spec-action": "node --experimental-transform-types --test --test-isolation=none tests/spec-action.node.test.mjs"
   },
   "main": "lib/index.js",
   "types": "lib/types/index.d.ts",

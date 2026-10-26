@@ -144,7 +144,7 @@
 | [database / 数据库设计](<../../../src/client/actions.ts#L36>) | skill / database-design-doc | 170 | 表字段、关系和约束，不迁移 |
 | [doc-merge / 文档融合](<../../../src/client/actions.ts#L37>) | skill / component-doc-merge | 180 | 既有事实去重归并、保留来源 |
 | [docx / MD 转 Word](<../../../src/client/actions.ts#L38>) | skill / markdown-to-docx | 190 | 按模板转换，核对完整性与一致性 |
-| [doc-supplement / 补充文档 ★](<../../../src/client/actions.ts#L39>) | prompt | 195 | 只增量补现有产品文档，缺失先询问，SQL/接口对照源码 |
+| [doc-supplement / 补充文档 ★](<../../../src/client/actions.ts#L52>) | prompt | 195 | 默认补本会话；可按指定时间段或版本号之后的已提交改动补，缺失先询问，SQL/接口对照源码 |
 | [continue / 继续](<../../../src/client/actions.ts#L44>) | prompt | 240 | 核磁盘和检查点，不重复成功操作 |
 | [domain / 领域建模](<../../../src/client/actions.ts#L45>) | skill / domain-modeling | 250 | 术语关系和决策，不实现 |
 | [research / 资料研究](<../../../src/client/actions.ts#L46>) | skill / research | 260 | 查证一手资料并记录缺口 |
@@ -154,7 +154,7 @@
 
 没有默认按钮的 7 个内置 Skill：codebase-design、coding-workflow、grilling、pocket-maintenance、pr、writing-for-agents、windows-powershell（入口见第 3～4 节）。无按钮不代表不可调用。
 
-`spec` 另有[讨论结论门禁](<../requirements/spec-action-gate.md>)，仅约束按钮，不禁止用户手输 `/to-spec`；更新 prompt 时还需验证意图匹配、结论识别和会话隔离。
+`spec` 按钮按[可直接使用规则](<../requirements/spec-action-free.md>)处理：不再要求讨论结论或置灰，只受通用禁用规则约束，也不禁止用户手输 `/to-spec`；更新 prompt 时仍需验证推荐意图匹配。
 
 ## 6. 用户自己的提示词：默认值、已保存配置、导出备份要分开
 
@@ -200,10 +200,11 @@
 
 [包导出配置](<../../../package.json#L18-L38>)的主要运行入口是 [Host 产物](<../../../lib/index.js>)、[浏览器 bundle](<../../../lib/client.js>)、[守卫产物](<../../../lib/todo-progress-guard.js>)及[工作流产物](<../../../lib/workflow/index.js>)。仅修改源码不代表已运行新版。发布白名单含资产、编译产物、脚本和 patch，未包含源码树。
 
-- [按钮表重建脚本](<../../../scripts/build-action-bundle.mjs>)只把 `DEFAULT_ACTIONS` 和英文展示表写入现成浏览器 bundle，**不更新逻辑、接收指令、CSS、Host 或类型产物**。
-- 可在确认只需同步按钮表且环境支持时执行下列命令；本次只写管理文档，未执行重建：
+- [按钮表重建脚本](<../../../scripts/build-action-bundle.mjs>)只把 `DEFAULT_ACTIONS`、英文展示表和 `receivingInstructions` 接收指令表写入现成浏览器 bundle，**不更新其他逻辑、CSS、Host 或类型产物**。
+- 可在确认只需同步按钮/接收指令表且环境支持时执行下列命令；`--check` 只校验不写入。首次盘点未执行重建，doc-supplement 来源扩展已按同一脚本同步 bundle 并记录在第 8.1 节：
 
 ```powershell
+node --experimental-transform-types scripts/build-action-bundle.mjs --check
 node --experimental-transform-types scripts/build-action-bundle.mjs
 node scripts/verify-client-bundle.mjs
 ```
@@ -224,6 +225,9 @@ node scripts/verify-client-bundle.mjs
 | 2026-10-26 10:48 | 首次基线后的外部变化 | 188 个文件重新校验，187 个一致，仅[健康验收说明](<../../../assets/skills/project-runtime-acceptance/README.md>)指纹变化；已重新读取该文件 | 保留 10:43 首次基线不变 | 已知历史差异，不把原基线冒充为最新内容快照 |
 | 2026-10-26 | 开发按钮等现有改动 | [开发 prompt](<../../../src/client/actions.ts#L24>)现含开发前确认排查能力要求；基线捕获当前工作树 | HEAD + 未提交内容 | 不推断所有既有修改的作者/发生时间；需维护者补原因 |
 | 2026-10-26 | 本台账与[首次基线](<baselines/skills-prompts-2026-10-26.json>) | 静态盘点，31 Skill / 30 按钮 / 188 个文件指纹 | `inventory-20261026-01` | 未更新上游版本、未修改运行提示词或用户设置、未提交 |
+| 2026-10-26 | ACTION:doc-supplement + RECEIVING:doc-supplement | 来源扩展为“本会话（默认）或指定时间段/版本号之后的已提交代码改动”；同步默认提示词、接收指令、英文展示和发布 bundle；见[需求](<../requirements/doc-supplement-sources.md>) | 当前工作树（未提交），`local-20261026-02` | 已修改；静态断言、Node 回归测试、`node --check`、bundle 注册与分组渲染校验通过；未提交 |
+
+本次修改使首次基线中的 `src/client/actions.ts`、`src/client/locales.ts`、`lib/client.js` 等指纹变化；首次基线保持原样，不作为最新内容快照。已保存的用户按钮配置不会被自动替换。
 
 ### 8.2 每次修改/升级追加一条
 

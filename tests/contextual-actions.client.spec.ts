@@ -146,8 +146,11 @@ describe('Skill Launcher contextual recommendations', () => {
     }
     const supplement = withEvidence('补充', null, 'doc-supplement')
     expect(supplement).toContain('增量补充')
+    expect(supplement).toContain('时间段')
+    expect(supplement).toContain('版本')
     expect(supplement).toContain('待确认')
     expect(supplement).not.toContain('【上一阶段对话摘录')
+    expect(withEvidence('Supplement', null, 'doc-supplement', [], true)).toContain('time range')
     expect(withEvidence('Task', null, 'execute', [], true)).toContain('Do not update product documents')
   })
   it('references long reports in either language without copying or truncating them', () => {

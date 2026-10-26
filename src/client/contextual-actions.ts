@@ -69,12 +69,11 @@ function textBlocks(value: unknown): string {
 }
 
 /**
- * Read the latest completed exchange, or the visible history for session gates.
+ * Read at most the latest completed user/assistant exchange from a Chat view.
  * @param view - Chat view snapshot or another registered view snapshot.
- * @param all - Include all visible user/assistant and error nodes, even an unanswered request.
- * @returns Text entries in source order, excluding tool output.
+ * @returns The latest text exchange in sequence order, excluding tool output.
  */
-export function chatEntries(view: unknown, all = false): ChatEntry[] {
+export function chatEntries(view: unknown): ChatEntry[] {
   const snapshot = record(view)
   if (!snapshot) return []
   const legacy = record(snapshot.legacy)
@@ -90,8 +89,8 @@ export function chatEntries(view: unknown, all = false): ChatEntry[] {
     const data = record(wrapper.data) ?? wrapper
     const node = record(data.node) ?? record(data.message) ?? data
     const kind = node.kind ?? node.role ?? wrapper.kind
-    if (!all && kind === 'user' && !assistantFound) return []
-    if (kind === 'turn-error' && (all || !assistantFound)) {
+    if (kind === 'user' && !assistantFound) return []
+    if (kind === 'turn-error' && !assistantFound) {
       entries.push({
         role: 'assistant',
         text: typeof node.message === 'string' ? node.message : '',
@@ -99,7 +98,7 @@ export function chatEntries(view: unknown, all = false): ChatEntry[] {
         failed: true,
       })
       assistantFound = true
-    } else if (kind === 'assistant' && (all || !assistantFound)) {
+    } else if (kind === 'assistant' && !assistantFound) {
       const text = typeof node.text === 'string' ? node.text : textBlocks(node.blocks)
       if (text.trim()) {
         entries.push({
@@ -110,7 +109,7 @@ export function chatEntries(view: unknown, all = false): ChatEntry[] {
         })
         assistantFound = true
       }
-    } else if (kind === 'user' && (all || (assistantFound && !userFound))) {
+    } else if (kind === 'user' && assistantFound && !userFound) {
       const text = typeof node.text === 'string' ? node.text : textBlocks(node.content)
       if (text.trim()) {
         entries.push({
@@ -121,45 +120,9 @@ export function chatEntries(view: unknown, all = false): ChatEntry[] {
         userFound = true
       }
     }
-    if (!all && assistantFound && userFound) break
+    if (assistantFound && userFound) break
   }
   return entries.reverse()
-}
-
-/**
- * Reconstruct the session's discussion gate from visible history, including follow-up
- * answers. No component-local latch: switching sessions or reloading cannot leak readiness.
- */
-export function requirementsReady(view: unknown, running = false, actions: readonly ActionSignature[] = []): boolean {
-  if (running) return false
-  let discussion: ChatEntry | undefined
-  let response: ChatEntry | undefined
-  let turnFailed = false
-  const concluded = () => discussion !== undefined && response !== undefined && !turnFailed
-    && /需求(?:已确认|明确|确定)|(?:需求|讨论)(?:结果|结论)\s*[:：]|confirmed requirements/i.test(response.text)
-    && !/吗[？?]|是否.{0,16}(?:确认|明确)|(?:尚无|暂无|没有|未形成|尚未形成)讨论结论|(?:尚待|仍待|尚未|未|待)确认|请(?:先)?确认|尚不明确|not (?:yet )?confirmed|的意思|翻译|translation/i.test(response.text)
-    && recommend([discussion, response], false, actions)?.reason === 'reasonRequirementsReady'
-  for (const entry of chatEntries(view, true)) {
-    if (entry.role === 'user') {
-      // Accept a conclusion only after all assistant/error nodes in its turn are known.
-      if (concluded()) return true
-      response = undefined
-      turnFailed = false
-      const request = (entry.text.split('\n\n【')[0] ?? entry.text).trim()
-      const intent = actionIntent(request, actions)
-      const stage = links.find(link => intent === null ? link.trigger.test(request) : link.actionIds?.includes(intent))
-      if (stage?.reason === 'reasonRequirementsReady') {
-        discussion = entry
-      } else if (intent !== null || (stage !== undefined && /^(?:请|帮我|开始|执行|进行)/.test(request)) || /^\/[a-z][a-z-]*(?=\s|$)/.test(request)
-        || /翻译|translate|另一个问题|换个话题/i.test(request)) {
-        discussion = undefined
-      }
-    } else {
-      response = entry
-      turnFailed ||= entry.failed === true
-    }
-  }
-  return concluded()
 }
 
 /** Defect evidence naming a severity or a file/line beside the problem. */

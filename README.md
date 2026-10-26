@@ -36,6 +36,7 @@
    - Live visual workflow panel tracking the active session's work item stage chip.
    - One-click workflow commands: Approve, Pause, Resume, Cancel, Mode switch.
    - Customizable quick actions launcher with full export/import settings form.
+   - Supplement Docs defaults to the current session and can instead use committed code changes in a specified time range or after a specified version/tag/commit.
 
 4. **Todo Progress Guard**
    - Non-intrusive reminder system that alerts the model when active tasks have uncommitted progress or stale plans.
@@ -120,6 +121,7 @@ After rebuilding or editing `lib/`, quit and reopen DSH, or toggle the plugin of
 
 - **常用**固定显示，默认包含 Bug排查、需求讨论、开发、代码审查、修复、编译、提交代码、继续。
 - **需求开发**默认显示；其他两组默认隐藏，可在工具栏直接点击分组按钮切换显示状态。
+- 「补充文档」默认把本会话已确认结论补进现有产品文档；发送前可把草稿中的“来源”改为指定时间段或指定版本号/标签/提交之后，改按该范围的已提交代码改动记录补充。详见 [补充文档来源约定](docs/pocket/requirements/doc-supplement-sources.md)。
 - 「按钮设置」允许管理每组显隐、常用按钮成员及原有 Skill/提示词；保存和导入导出 JSON 同时包含布局。
 - 同一按钮可在不同分组出现，但始终引用同一个 action ID；隐藏分类不会禁用 Skill。
 - 升级时保留原有已保存提示词及启用状态，旧自定义常用列表优先保留，旧默认快捷列表自动映射为新的八个常用按钮。
@@ -132,7 +134,7 @@ After rebuilding or editing `lib/`, quit and reopen DSH, or toggle the plugin of
 
 技能、规则、报告模板与候选扫描器已随插件固化，无需解压或另行安装。已有自定义按钮配置请在按钮设置中点击「补齐缺失预设（待保存）」并保存；默认新配置直接显示快捷按钮。报告写入位置需先确认。详见 [技能说明](assets/skills/project-runtime-acceptance/README.md) 与 [验收约定](docs/pocket/requirements/health-acceptance.md)。
 
-按钮表重建：`node --experimental-transform-types scripts/build-action-bundle.mjs`。加载更新后的插件后使用；不会自动向会话发送请求。
+按钮表与接收指令重建：`node --experimental-transform-types scripts/build-action-bundle.mjs`。加载更新后的插件后使用；不会自动向会话发送请求。
 
 ### 安装与配置
 

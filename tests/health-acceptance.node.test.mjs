@@ -1,11 +1,12 @@
 import { test } from 'node:test'
 import assert from 'node:assert/strict'
 import { DEFAULT_ACTIONS, ENGLISH_DEFAULT_PRESENTATION, parseActions, encodeActions, missingDefaultActions, presentDefaultActions } from '../src/client/actions.ts'
+import { receivingInstructions } from '../src/client/locales.ts'
 import { readFileSync, existsSync } from 'node:fs'
 
 test('shipped browser action tables match the source presets', () => {
   const bundle = readFileSync(new URL('../lib/client.js', import.meta.url), 'utf8')
-  for (const [name, value] of Object.entries({ DEFAULT_ACTIONS, ENGLISH_DEFAULT_PRESENTATION })) {
+  for (const [name, value] of Object.entries({ DEFAULT_ACTIONS, ENGLISH_DEFAULT_PRESENTATION, receivingInstructions })) {
     const pattern = new RegExp(`\\t\\tconst ${name} = ([\\s\\S]*?\\n\\t\\t[\\]}]);`, 'g')
     const matches = [...bundle.matchAll(pattern)]
     assert.equal(matches.length, 1, name)

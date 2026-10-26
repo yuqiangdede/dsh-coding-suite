@@ -22,6 +22,7 @@ const mod = registered[0].factory(name => {
 })
 const mounts = []
 const mutations = []
+let inserted = ''
 const form = {
   status: 'ready', writable: true, revision: 7,
   value: {},
@@ -51,7 +52,7 @@ const tree = mount.component({
   useWorkflow: selector => selector({ item: null }),
   inputActions: {
     captureInsertion: () => ({ start: 0, end: 0 }),
-    insertText: () => true,
+    insertText: (text) => { inserted = text; return true },
     persistDraft: () => {},
   },
 })
@@ -73,6 +74,13 @@ assert.equal(buttons.filter(x => x.props.children === 'Bug排查').length, 1)
 assert.equal(buttons.filter(x => x.props.children === '需求讨论').length, 2)
 assert.equal(buttons.filter(x => x.props.children === '修复').length, 2)
 assert.equal(buttons.filter(x => x.props.children === '继续').length, 1)
+const supplement = buttons.find(x => x.props.children === '补充文档')
+assert(supplement, 'Supplement Docs button missing')
+supplement.props.onClick()
+assert(inserted.includes('来源：本会话'), 'supplement draft must default to this session')
+assert(inserted.includes('时间段'), 'supplement draft must offer a time range')
+assert(inserted.includes('版本'), 'supplement draft must offer a version baseline')
+assert(inserted.includes('接收补充来源'), 'supplement draft must include receiving instructions')
 toggles[1].props.onClick()
 await Promise.resolve()
 assert.equal(mutations.length, 1)
@@ -80,4 +88,4 @@ const [operations, revision] = mutations[0]
 assert.equal(revision, 7)
 assert.deepEqual(operations[0].path, ['layoutJson'])
 assert.equal(JSON.parse(operations[0].value).visibleGroups.documents, true)
-console.log('OK grouped launcher: fixed common row, business groups, and persisted visibility toggle')
+console.log('OK grouped launcher: fixed common row, business groups, persisted visibility toggle, and supplement draft sources')
