@@ -1,0 +1,43 @@
+name: Windows launcher bundle check
+on:
+  push:
+    branches:
+      - feat/launcher-action-groups
+
+permissions:
+  contents: write
+
+jobs:
+  bundle:
+    if: "!startsWith(github.event.head_commit.message, 'chore(bundle):')"
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Install isolated TypeScript compiler
+        shell: pwsh
+        run: npm install --prefix .build-tools --no-save --no-package-lock typescript@5.9.3
+      - name: Rebuild shipped bundles
+        shell: pwsh
+        run: node scripts/rebuild-launcher-bundle.mjs
+      - name: Verify browser and host bundles
+        shell: pwsh
+        run: |
+          node --check lib/client.js
+          node --check lib/index.js
+          node scripts/verify-client-bundle.mjs
+      - name: Commit generated runtime files
+        shell: pwsh
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add lib/client.js lib/index.js lib/types/client/index.d.ts
+          git diff --cached --quiet
+          if ($LASTEXITCODE -ne 0) {
+            git commit -m "chore(bundle): synchronize launcher runtime"
+            git push origin HEAD:${{ github.ref_name }}
+          }
