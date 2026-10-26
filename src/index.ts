@@ -18,6 +18,7 @@ import {
 } from './workflow/index.ts'
 import { LAUNCHER_CONFIG_GLOBAL, LauncherDeploymentFields, type LauncherDeployment } from './config.ts'
 import { registerCodingSuiteSkills, type CodingSuiteSkillConfig } from './skill-provider.ts'
+import { registerWindowsPowerShellGuidance } from './windows-powershell.ts'
 
 export type * from './workflow/index.ts'
 export * from './skill-provider.ts'
@@ -62,6 +63,9 @@ export function apply(ctx: Context, config: CodingSuiteConfig): void {
       ...(config.assetRoot !== undefined ? { assetRoot: config.assetRoot } : {}),
     }))
   })
+
+  // Windows-only model guidance; scoped registration is reclaimed on plugin unload.
+  ctx.inject(['systemPrompt'], (child) => registerWindowsPowerShellGuidance(child))
 
   // 3. Mount Launcher Settings & Index Injections
   ctx.on('webserver/index-inject', (table) => {

@@ -27,7 +27,9 @@ Only link to files that actually exist. No legacy paths are pending migration.
 
 ## Current state
 
-Only this index and `meta/knowledge-policy.md` exist. Create category documents and `meta/glossary.md` lazily when a confirmed fact needs a home; do not scaffold empty folders.
+- [Windows PowerShell execution guidance](requirements/windows-powershell-guidance.md) — accepted; Windows-only prompt rules and on-demand diagnosis, with no execution-policy changes.
+
+Create category documents and `meta/glossary.md` lazily when a confirmed fact needs a home; do not scaffold empty folders.
 
 ## Maintenance
 
