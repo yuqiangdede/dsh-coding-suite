@@ -23,7 +23,9 @@ jobs:
         run: npm install --prefix .build-tools --no-save --no-package-lock typescript@5.9.3
       - name: Rebuild shipped bundles
         shell: pwsh
-        run: node scripts/rebuild-launcher-bundle.mjs
+        run: |
+          node scripts/rebuild-launcher-bundle.mjs
+          node --experimental-transform-types scripts/build-action-bundle.mjs
       - name: Verify browser and host bundles
         shell: pwsh
         run: |
