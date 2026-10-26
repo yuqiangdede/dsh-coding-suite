@@ -30,6 +30,7 @@ jobs:
           node --check lib/client.js
           node --check lib/index.js
           node scripts/verify-client-bundle.mjs
+          node --experimental-strip-types --test tests/launcher-layout.node.test.mjs
       - name: Commit generated runtime files
         shell: pwsh
         run: |
