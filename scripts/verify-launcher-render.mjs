@@ -1,7 +1,6 @@
 /** Smoke-test the shipped DSH browser factory and the interactive group controls. */
 import assert from 'node:assert/strict'
 import { readFileSync } from 'node:fs'
-import { pathToFileURL } from 'node:url'
 
 const jsx = (type, props, key) => ({ type, props: props ?? {}, key })
 const reactJsx = { jsx, jsxs: jsx, Fragment: Symbol.for('react.fragment') }
@@ -14,7 +13,7 @@ const react = {
 }
 const registered = []
 globalThis.window = { __ModuleLoader__: { load: entry => registered.push(entry) } }
-await import(pathToFileURL(new URL('../lib/client.js', import.meta.url).pathname).href)
+await import(new URL('../lib/client.js', import.meta.url).href)
 assert.equal(registered.length, 1)
 const mod = registered[0].factory(name => {
   if (name === 'react') return react
