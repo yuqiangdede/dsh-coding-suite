@@ -2,15 +2,17 @@ import { useEffect, useRef, useState } from 'react'
 import type { InjectFace, PropsLocale, PropsRuntime } from '@deepseek-ai/dsh-client-ui-slots'
 import { DEFAULT_ACTIONS, parseActions, encodeActions, actionErrorKey, presentDefaultActions, missingDefaultActions, type CodingAction } from './actions.ts'
 import type { LauncherSettingsInjected } from './index.ts'
+import { LAUNCHER_GROUPS, defaultLauncherLayout, exportLauncherConfiguration, importedLauncherLayout, parseLauncherLayout, type LauncherLayout, type OptionalGroupId } from './launcher-layout.ts'
 import css from './Settings.module.css'
 type Props = PropsRuntime<'settings.section'> & PropsLocale<'mattSkillLauncher'> & InjectFace<LauncherSettingsInjected>
-export function LauncherSettings({ useActionForm, saveActions, t }: Props) {
+export function LauncherSettings({ useActionForm, saveConfiguration, t }: Props) {
   const form = useActionForm(x => x)
   const explain = (error: unknown) => {
     const key = actionErrorKey(error)
     return key ? t(key) : String(error)
   }
   const [draft, setDraft] = useState<CodingAction[]>([])
+  const [layout, setLayout] = useState<LauncherLayout>(() => defaultLauncherLayout([]))
   const [dirty, setDirty] = useState(false)
   const [busy, setBusy] = useState(false)
   const [error, setError] = useState('')
@@ -19,10 +21,28 @@ export function LauncherSettings({ useActionForm, saveActions, t }: Props) {
   useEffect(() => {
     if (dirty) return
     revision.current = form.revision
-    try { setDraft(form.value?.actionsJson ? parseActions(form.value.actionsJson) : presentDefaultActions(parseActions(undefined), t('defaultLocale') === 'en')); setError('') }
-    catch (err) { setError(t('corrupt') + explain(err)) }
-  }, [form.value?.actionsJson, form.revision, dirty])
+    try {
+      const actions = form.value?.actionsJson ? parseActions(form.value.actionsJson) : presentDefaultActions(parseActions(undefined), t('defaultLocale') === 'en')
+      setDraft(actions)
+      setLayout(parseLauncherLayout(form.value?.layoutJson, actions, Boolean(form.value?.actionsJson)))
+      setError('')
+    } catch (err) { setError(t('corrupt') + explain(err)) }
+  }, [form.value?.actionsJson, form.value?.layoutJson, form.revision, dirty])
   const change = (id: string, patch: Partial<CodingAction>) => { setDraft(xs=>xs.map(x=>x.id===id?{ ...x,...patch }:x)); setDirty(true) }
+  const showGroup = (id: OptionalGroupId, visible: boolean) => {
+    setLayout(current => ({ ...current, visibleGroups: { ...current.visibleGroups, [id]: visible } }))
+    setDirty(true)
+  }
+  const toggleCommon = (id: string, checked: boolean) => {
+    setLayout(current => ({
+      ...current,
+      commonActionIds: checked
+        ? [...current.commonActionIds.filter(value => value !== id), id]
+        : current.commonActionIds.filter(value => value !== id),
+    }))
+    setDraft(actions => actions.map(action => action.id === id ? { ...action, pinned: checked } : action))
+    setDirty(true)
+  }
   const add = (kind: 'skill'|'prompt') => {
     setDraft(xs=>[...xs,{ id:'custom-'+Date.now().toString(36),label:t('newButton'),kind,...(kind==='skill' ? { skillId:'example-skill' } : {}),prompt:'',enabled:true,order:xs.reduce((n,x)=>Math.max(n,x.order),0)+10,description:'',example:'' }]); setDirty(true)
   }
@@ -32,22 +52,31 @@ export function LauncherSettings({ useActionForm, saveActions, t }: Props) {
     setDraft(xs => [...xs, ...missingDefaultActions(xs)])
     setDirty(true)
   }
-  const cancel = () => { try { setDraft(form.value?.actionsJson ? parseActions(form.value.actionsJson) : presentDefaultActions(parseActions(undefined), t('defaultLocale') === 'en')); setDirty(false); setError('') } catch(err) { setError(explain(err)) } }
+  const cancel = () => {
+    try {
+      const actions = form.value?.actionsJson ? parseActions(form.value.actionsJson) : presentDefaultActions(parseActions(undefined), t('defaultLocale') === 'en')
+      setDraft(actions)
+      setLayout(parseLauncherLayout(form.value?.layoutJson, actions, Boolean(form.value?.actionsJson)))
+      setDirty(false)
+      setError('')
+    } catch (err) { setError(explain(err)) }
+  }
   const save = async () => {
     if (busy || !dirty) return
     if (form.status !== 'ready' || !form.writable || form.revision === undefined) { setError(t('readonly')); return }
     if (revision.current !== form.revision) { setError(t('conflict')); return }
     try {
       const normalized = parseActions(encodeActions(draft))
+      const normalizedLayout = parseLauncherLayout(JSON.stringify(layout), normalized, true)
       setBusy(true)
-      if (!await saveActions(encodeActions(normalized), revision.current)) { setError(t('rejected')); return }
-      setDraft(normalized); setDirty(false); setError('')
+      if (!await saveConfiguration(encodeActions(normalized), JSON.stringify(normalizedLayout), revision.current)) { setError(t('rejected')); return }
+      setDraft(normalized); setLayout(normalizedLayout); setDirty(false); setError('')
     } catch(err) { setError(t('unsaved')+explain(err)) }
     finally { setBusy(false) }
   }
   const exportJson = () => {
     try {
-      const file = new Blob([encodeActions(parseActions(encodeActions(draft)))],{ type:'application/json;charset=utf-8' })
+      const file = new Blob([exportLauncherConfiguration(encodeActions(parseActions(encodeActions(draft))), layout)],{ type:'application/json;charset=utf-8' })
       const href = URL.createObjectURL(file), a = document.createElement('a')
       a.href = href; a.download = 'mattpocock-dsh-actions.json'; document.body.appendChild(a); a.click(); a.remove()
       URL.revokeObjectURL(href)
@@ -56,11 +85,21 @@ export function LauncherSettings({ useActionForm, saveActions, t }: Props) {
   return <section className={css.root}>
     <h2>{t('title')}</h2><p>{t('intro')}</p>
     <fieldset disabled={busy} style={{ border: 0, padding: 0, margin: 0, minWidth: 0 }}>
+      <section className={css.layoutSection}>
+        <h3>{t('groupVisibility')}</h3>
+        <div className={css.groupSettingRow}>
+          <label><input type="checkbox" checked disabled />{t('groupCommon')} · {t('groupAlwaysVisible')}</label>
+          {LAUNCHER_GROUPS.map(group =>
+            <label key={group.id}><input type="checkbox" checked={layout.visibleGroups[group.id]}
+              onChange={event => showGroup(group.id, event.target.checked)}/>{t(group.label)}</label>)}
+        </div>
+        <small>{t('groupConfigHelp')}</small>
+      </section>
       {(['skill','prompt'] as const).map(kind=><section key={kind}>
         <div className={css.head}><h3>{kind==='skill'?t('skillRow'):t('promptRow')}</h3><button type="button" onClick={()=>{ add(kind) }}>{t('add')}</button></div>
         {draft.filter(a=>a.kind===kind).sort((a,b)=>a.order-b.order).map(a=><div className={css.card} key={a.id}>
           <div className={css.row}>
-            <label><input type="checkbox" checked={a.pinned ?? false} onChange={(e)=>{ change(a.id,{ pinned: e.target.checked }) }}/>{t('showButton')}</label>
+            <label><input type="checkbox" checked={layout.commonActionIds.includes(a.id)} onChange={(e)=>{ toggleCommon(a.id, e.target.checked) }}/>{t('showButton')}</label>
             <label><input type="checkbox" checked={a.enabled} onChange={(e)=>{ change(a.id,{ enabled:e.target.checked }) }}/>{t('enabled')}</label>
             <label>{t('buttonName')}<input value={a.label} onChange={(e)=>{ change(a.id,{ label:e.target.value }) }}/></label>
             {kind==='skill'&&<label>{t('skillId')}<input value={a.skillId??''} onChange={(e)=>{ change(a.id,{ skillId:e.target.value }) }}/></label>}
@@ -74,7 +113,7 @@ export function LauncherSettings({ useActionForm, saveActions, t }: Props) {
       </section>)}
       <details><summary>{t('importTitle')}</summary>
         <textarea rows={6} value={importJson} onChange={(e)=>{ setImportJson(e.target.value) }}/>
-        <button type="button" onClick={()=>{try{setDraft(parseActions(importJson));setDirty(true);setError('')}catch(err){setError(t('importFailed')+explain(err))}}}>{t('import')}</button>
+        <button type="button" onClick={()=>{try{const imported=parseActions(importJson);setLayout(importedLauncherLayout(importJson,imported,layout));setDraft(imported);setDirty(true);setError('')}catch(err){setError(t('importFailed')+explain(err))}}}>{t('import')}</button>
       </details>
     </fieldset>
     <div className={css.footer}>
@@ -84,7 +123,7 @@ export function LauncherSettings({ useActionForm, saveActions, t }: Props) {
         <div className={css.footerActions}>
           <button type="button" disabled={busy||missingDefaultActions(draft).length===0} onClick={fillMissing}>{t('fillMissing')}</button>
           <button type="button" disabled={busy} onClick={exportJson}>{t('export')}</button>
-          <button type="button" disabled={busy} onClick={()=>{setDraft(presentDefaultActions(DEFAULT_ACTIONS.map(x=>({ ...x })), t('defaultLocale') === 'en'));setDirty(true)}}>{t('reset')}</button>
+          <button type="button" disabled={busy} onClick={()=>{setDraft(presentDefaultActions(DEFAULT_ACTIONS.map(x=>({ ...x })), t('defaultLocale') === 'en'));setLayout(defaultLauncherLayout(DEFAULT_ACTIONS));setDirty(true)}}>{t('reset')}</button>
           <button type="button" onClick={cancel} disabled={!dirty||busy}>{t('cancel')}</button>
           <button type="button" onClick={()=>{void save()}} disabled={!dirty||busy||!form.writable}>{busy?t('saving'):t('save')}</button>
         </div>
