@@ -126,8 +126,15 @@ export function Launcher({
       if (alive.current) setPending(false)
     }
   }
+  // Presentation-only aliases for stored, unchanged legacy preset labels.
+  const displayLabel = (a: CodingAction): string => {
+    if (a.id === 'review-fix' && a.label === '修复审核问题') return '修复'
+    if (a.id === 'bug' && a.label === 'Bug 排查') return 'Bug排查'
+    if (a.id === 'docx' && a.label === 'MD 转 Word') return 'MD转Word'
+    return a.label
+  }
   const render = (a: CodingAction) => <button type="button" key={a.id} disabled={!available || stageBlocked(a)} className={visibleRecommendation?.ids.includes(a.id) ? css.recommended : css.action}
-    title={a.description + '\n' + a.example + (stageBlocked(a) ? '\n' + t('specPrerequisite') : '') + (visibleRecommendation?.ids.includes(a.id) ? '\n' + t('recommendationTooltip').replace('{reason}', t(visibleRecommendation.reason)) : '')} onClick={() => { void insert(a) }}>{a.label}</button>
+    title={a.description + '\n' + a.example + (stageBlocked(a) ? '\n' + t('specPrerequisite') : '') + (visibleRecommendation?.ids.includes(a.id) ? '\n' + t('recommendationTooltip').replace('{reason}', t(visibleRecommendation.reason)) : '')} onClick={() => { void insert(a) }}>{displayLabel(a)}</button>
   const item = workflow.item
   return <div className={css.root} data-matt-skill-launcher>
     {item !== null && <WorkflowPanel item={item} decision={decision} pending={pending}
@@ -158,7 +165,7 @@ export function Launcher({
           <div className={css.row}>{group.actions.map(render)}</div>
         </div>)}
     </>}
-    {visibleRecommendation && <div className={css.hint} aria-live="polite">{t('recommendationHint').replace('{actions}', recommendedActions.map(action => action.label).join(t('recommendationSeparator'))).replace('{reason}', t(visibleRecommendation.reason))}</div>}
+    {visibleRecommendation && <div className={css.hint} aria-live="polite">{t('recommendationHint').replace('{actions}', recommendedActions.map(displayLabel).join(t('recommendationSeparator'))).replace('{reason}', t(visibleRecommendation.reason))}</div>}
     {watching && <div className={`${css.progressWarning} ${planMayBeStale ? css.progressWarningActive : ''}`} role="status">
       {planMayBeStale ? t('todoStale').replace('{minutes}', String(unchangedMinutes)) : null}
     </div>}
