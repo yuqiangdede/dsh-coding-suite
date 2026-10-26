@@ -2,8 +2,7 @@ import type { CodingAction } from './actions.ts'
 
 /** Visual-only groups. One action ID may be referenced by several groups. */
 export const LAUNCHER_GROUPS = [
-  { id: 'development', label: 'groupDevelopment', actionIds: ['discussion', 'visual', 'spec', 'plan', 'execute', 'review', 'review-fix', 'compile', 'doc-supplement', 'health-acceptance', 'commit'] },
-  { id: 'bugfix', label: 'groupBugfix', actionIds: ['bug', 'review-fix', 'compile', 'commit'] },
+  { id: 'development', label: 'groupDevelopment', actionIds: ['discussion', 'visual', 'spec', 'plan', 'execute', 'review', 'review-fix', 'compile', 'health-acceptance', 'commit', 'doc-supplement'] },
   { id: 'documents', label: 'groupDocuments', actionIds: ['api-docs', 'requirements', 'overview', 'outline', 'database', 'doc-merge', 'docx'] },
   { id: 'others', label: 'groupOthers', actionIds: ['initialize', 'ask', 'health-acceptance', 'doc-supplement', 'tdd', 'prototype', 'architecture', 'domain', 'research', 'retro', 'handoff', 'image'] },
 ] as const
@@ -19,7 +18,7 @@ export interface LauncherLayout {
 }
 
 const defaultVisibility: Record<OptionalGroupId, boolean> = {
-  development: true, bugfix: false, documents: false, others: false,
+  development: true, documents: false, others: false,
 }
 const actionIdPattern = /^[a-z0-9][a-z0-9-]{0,63}$/
 
@@ -57,7 +56,6 @@ export function parseLauncherLayout(
     schemaVersion: 1,
     visibleGroups: {
       development: obj.development as boolean,
-      bugfix: obj.bugfix as boolean,
       documents: obj.documents as boolean,
       others: obj.others as boolean,
     },

@@ -7,26 +7,27 @@ import {
 
 describe('launcher business groups', () => {
   const actions = parseActions(undefined)
-  it('uses the requested five groups in fixed order, without copying action definitions', () => {
+  it('uses the requested four groups in fixed order, without copying action definitions', () => {
     const layout = defaultLauncherLayout(actions)
     expect(layout.commonActionIds).toEqual([...DEFAULT_COMMON_IDS])
-    expect(LAUNCHER_GROUPS.map(group => group.id)).toEqual(['development', 'bugfix', 'documents', 'others'])
-    expect(LAUNCHER_GROUPS.map(group => group.actionIds.length)).toEqual([11, 4, 7, 12])
+    expect(LAUNCHER_GROUPS.map(group => group.id)).toEqual(['development', 'documents', 'others'])
+    expect(LAUNCHER_GROUPS.map(group => group.actionIds.length)).toEqual([11, 7, 12])
     expect(actionsForGroup('common', actions, layout).map(a => a.id)).toEqual([...DEFAULT_COMMON_IDS])
     expect(actionsForGroup('development', actions, layout).map(a => a.id)).toEqual([
       'discussion', 'visual', 'spec', 'plan', 'execute', 'review', 'review-fix',
       'compile', 'doc-supplement', 'health-acceptance', 'commit',
     ])
-    expect(actionsForGroup('bugfix', actions, layout).map(a => a.id)).toEqual(['bug', 'review-fix', 'compile', 'commit'])
     expect(actionsForGroup('documents', actions, layout)).toHaveLength(7)
     expect(actionsForGroup('others', actions, layout)).toHaveLength(12)
     expect(actionsForGroup('common', actions, layout)[0]).toBe(actions.find(a => a.id === 'bug'))
   })
   it('defaults only development to visible and preserves independent group switches', () => {
     const initial = parseLauncherLayout(undefined, actions)
-    expect(initial.visibleGroups).toEqual({ development: true, bugfix: false, documents: false, others: false })
-    const changed = { ...initial, visibleGroups: { ...initial.visibleGroups, bugfix: true, development: false } }
+    expect(initial.visibleGroups).toEqual({ development: true, documents: false, others: false })
+    const changed = { ...initial, visibleGroups: { ...initial.visibleGroups, documents: true, development: false } }
     expect(parseLauncherLayout(JSON.stringify(changed), actions)).toEqual(changed)
+    const legacy = { ...changed, visibleGroups: { ...changed.visibleGroups, bugfix: true } }
+    expect(parseLauncherLayout(JSON.stringify(legacy), actions)).toEqual(changed)
   })
   it('migrates the original pinned preset to the eight requested common buttons', () => {
     expect(defaultLauncherLayout(actions, true).commonActionIds).toEqual([...DEFAULT_COMMON_IDS])
@@ -37,7 +38,6 @@ describe('launcher business groups', () => {
     const layout = defaultLauncherLayout(actions)
     const disabled = actions.map(a => a.id === 'commit' ? { ...a, enabled: false } : a)
     expect(actionsForGroup('common', disabled, layout).map(a => a.id)).not.toContain('commit')
-    expect(actionsForGroup('bugfix', disabled, layout).map(a => a.id)).not.toContain('commit')
     const extra = { ...actions[0]!, id: 'my-custom', label: '自定义', enabled: true }
     expect(actionsForGroup('others', [...actions, extra], layout).at(-1)).toBe(extra)
   })
@@ -53,8 +53,8 @@ describe('launcher business groups', () => {
     '{broken json',
     '{}',
     '{"schemaVersion":2,"visibleGroups":{},"commonActionIds":[]}',
-    '{"schemaVersion":1,"visibleGroups":{"development":true,"bugfix":false,"documents":false,"others":false},"commonActionIds":["bug","bug"]}',
-    '{"schemaVersion":1,"visibleGroups":{"development":true,"bugfix":null,"documents":false,"others":false},"commonActionIds":[]}',
+    '{"schemaVersion":1,"visibleGroups":{"development":true,"documents":false,"others":false},"commonActionIds":["bug","bug"]}',
+    '{"schemaVersion":1,"visibleGroups":{"development":null,"documents":false,"others":false},"commonActionIds":[]}',
   ])('rejects corrupt saved layout: %s', source => {
     expect(() => parseLauncherLayout(source, actions)).toThrow()
   })

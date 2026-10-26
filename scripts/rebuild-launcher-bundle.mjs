@@ -83,6 +83,8 @@ function appendCss(prefix, sourceFile, variable, mapName, classes) {
 }
 
 function injectLocale() {
+  // Remove the retired Bug fixes group label from both bundled dictionaries.
+  bundle = bundle.replace(/\n\s*"groupBugfix": "[^"]*",/g, '')
   // A second build starts from the already bundled dictionaries.
   if (bundle.includes('"groupVisibility": "显示分组"')) return
   const locales = read('src/client/locales.ts')
@@ -91,7 +93,7 @@ function injectLocale() {
   const sources = [locales.slice(0, enStart), locales.slice(enStart)]
   const keys = [
     'showButton', 'groupVisibility', 'groupCommon', 'groupDevelopment',
-    'groupBugfix', 'groupDocuments', 'groupOthers', 'groupAlwaysVisible',
+    'groupDocuments', 'groupOthers', 'groupAlwaysVisible',
     'groupConfigHelp', 'hideGroup', 'intro',
   ]
   for (let lang = 0; lang < sources.length; lang++) {
