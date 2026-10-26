@@ -7,6 +7,7 @@ import type { CodingWorkflowSnapshot } from './workflow-source.ts';
 /** Host-persisted launcher configuration. */
 export interface ActionSettings {
     actionsJson?: string;
+    layoutJson?: string;
 }
 /** Settings form and revision-checked save operation. */
 export interface LauncherSettingsInjected {
@@ -14,6 +15,7 @@ export interface LauncherSettingsInjected {
         actionForm: ConfigForm<ActionSettings>;
     };
     saveActions: (json: string, revision?: number) => Promise<boolean>;
+    saveConfiguration: (actionsJson: string, layoutJson: string, revision?: number) => Promise<boolean>;
 }
 /** Outcome of one launcher-initiated workflow command. */
 export interface WorkflowCommandResult {
@@ -31,6 +33,7 @@ export interface LauncherInjected {
         workflow: HostObservable<CodingWorkflowSnapshot>;
     };
     fetchSkillNames: () => Promise<readonly string[]>;
+    saveLayout: (json: string, revision?: number) => Promise<boolean>;
     pauseWorkflow: (ref: GoalRef) => Promise<{
         readonly ok: true;
     } | {
