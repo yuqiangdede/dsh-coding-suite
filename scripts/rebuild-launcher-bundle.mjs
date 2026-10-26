@@ -67,15 +67,24 @@ function appendCss(prefix, sourceFile, variable, mapName, classes) {
   const regex = new RegExp('(const ' + variable.replace('$', '\\$') + ' = )("(?:\\\\.|[^"\\\\])*")(;)')
   const hit = regex.exec(bundle)
   if (!hit) throw new Error('Embedded stylesheet missing: ' + variable)
-  bundle = bundle.replace(hit[0], hit[1] + JSON.stringify(JSON.parse(hit[2]) + text) + hit[3])
+  let originalCss = JSON.parse(hit[2])
+  const prior = originalCss.indexOf('.' + prefix + '_' + (prefix === 'xbJU_q' ? 'groupToggles' : 'layoutSection'))
+  if (prior >= 0) originalCss = originalCss.slice(0, prior)
+  bundle = bundle.replace(hit[0], hit[1] + JSON.stringify(originalCss + text) + hit[3])
   const map = new RegExp('(var ' + mapName + ' = \\{)([\\s\\S]*?)(\\n\\t\\t\\};)')
   const section = map.exec(bundle)
   if (!section) throw new Error('Embedded CSS map missing: ' + mapName)
   const additions = classes.map(name => '\n\t\t\t"' + name + '": "' + prefix + '_' + name + '"').join(',')
-  bundle = bundle.replace(section[0], section[1] + section[2] + ',' + additions + section[3])
+  let originalMap = section[2]
+  for (const name of classes) {
+    originalMap = originalMap.replace(',\n\t\t\t"' + name + '": "' + prefix + '_' + name + '"', '')
+  }
+  bundle = bundle.replace(section[0], section[1] + originalMap + ',' + additions + section[3])
 }
 
 function injectLocale() {
+  // A second build starts from the already bundled dictionaries.
+  if (bundle.includes('"groupVisibility": "显示分组"')) return
   const locales = read('src/client/locales.ts')
   const enStart = locales.indexOf('export const en:')
   if (enStart < 0) throw new Error('Missing en locale block')
@@ -109,6 +118,13 @@ injectLocale()
 // The helpers must be evaluated before either component reads them.
 const helpers = compile('src/client/launcher-layout.ts', '')
 const settingsMarker = '\t\t//#region lib/types/client/Launcher.js\n'
+const previousHelper = '\t\t//#region lib/types/client/launcher-layout.js\n'
+if (bundle.includes(previousHelper)) {
+  const i = bundle.indexOf(previousHelper)
+  const end = bundle.indexOf('\t\t//#endregion', i + previousHelper.length)
+  if (end < 0) throw new Error('Unterminated launcher layout region')
+  bundle = bundle.slice(0, i) + bundle.slice(end + '\t\t//#endregion\n'.length)
+}
 bundle = expectReplace(bundle, settingsMarker,
   '\t\t//#region lib/types/client/launcher-layout.js\n' +
   helpers.trimEnd().split('\n').map(line => '\t\t' + line).join('\n') +
@@ -123,33 +139,39 @@ appendCss('v7HIVa', 'src/client/Settings.module.css', 'css', 'Settings_module_cs
   'layoutSection', 'groupSettingRow',
 ])
 const injectAnchor = 'todoStaleMs: deployment.todoStaleMs,'
-bundle = expectReplace(bundle, injectAnchor,
-  injectAnchor + '\n\t\t\t\t\tsaveLayout: (json, rev) => form.mutate([{ op: "set", path: ["layoutJson"], value: json }], rev),',
-  'launcher form injection')
-const settingsAnchor = 'saveActions: (json, rev) => form.mutate([{'
-const pos = bundle.lastIndexOf(settingsAnchor)
-if (pos < 0) throw new Error('Settings injection missing')
-const close = bundle.indexOf('}], rev)', pos)
-if (close < 0) throw new Error('Settings injection end missing')
-const closeEnd = close + '}], rev)'.length
-bundle = bundle.slice(0, closeEnd) + ',\n\t\t\t\t\tsaveConfiguration: (actionsJson, layoutJson, rev) => form.mutate([{ op: "set", path: ["actionsJson"], value: actionsJson }, { op: "set", path: ["layoutJson"], value: layoutJson }], rev)' + bundle.slice(closeEnd)
+if (!bundle.includes('saveLayout: (json, rev) =>')) {
+  bundle = expectReplace(bundle, injectAnchor,
+    injectAnchor + '\n\t\t\t\t\tsaveLayout: (json, rev) => form.mutate([{ op: "set", path: ["layoutJson"], value: json }], rev),',
+    'launcher form injection')
+}
+if (!bundle.includes('saveConfiguration: (actionsJson, layoutJson, rev) =>')) {
+  const settingsAnchor = 'saveActions: (json, rev) => form.mutate([{'
+  const pos = bundle.lastIndexOf(settingsAnchor)
+  if (pos < 0) throw new Error('Settings injection missing')
+  const close = bundle.indexOf('}], rev)', pos)
+  if (close < 0) throw new Error('Settings injection end missing')
+  const closeEnd = close + '}], rev)'.length
+  bundle = bundle.slice(0, closeEnd) + ',\n\t\t\t\t\tsaveConfiguration: (actionsJson, layoutJson, rev) => form.mutate([{ op: "set", path: ["actionsJson"], value: actionsJson }, { op: "set", path: ["layoutJson"], value: layoutJson }], rev)' + bundle.slice(closeEnd)
+}
 // Old sourcemaps cannot be trusted after a targeted bundle rebuild.
 bundle = bundle.replace(/\n\/\/# sourceMappingURL=client\.js\.map\s*$/, '\n')
 write('lib/client.js', bundle)
 
 let host = read('lib/index.js')
-host = expectReplace(host, 'actionsJson: z.string().volatile(),',
-  'actionsJson: z.string().volatile(),\n\tlayoutJson: z.string().volatile(),', 'host config')
+if (!host.includes('layoutJson: z.string().volatile()')) {
+  host = expectReplace(host, 'actionsJson: z.string().volatile(),',
+    'actionsJson: z.string().volatile(),\n\tlayoutJson: z.string().volatile(),', 'host config')
+}
 write('lib/index.js', host)
 
 let declarations = read('lib/types/client/index.d.ts')
-declarations = expectReplace(declarations, '    actionsJson?: string;',
+if (!declarations.includes('layoutJson?: string;')) declarations = expectReplace(declarations, '    actionsJson?: string;',
   '    actionsJson?: string;\n    layoutJson?: string;', 'declaration config')
-declarations = expectReplace(declarations,
+if (!declarations.includes('    saveConfiguration:')) declarations = expectReplace(declarations,
   '    saveActions: (json: string, revision?: number) => Promise<boolean>;',
   '    saveActions: (json: string, revision?: number) => Promise<boolean>;\n    saveConfiguration: (actionsJson: string, layoutJson: string, revision?: number) => Promise<boolean>;',
   'settings interface')
-declarations = expectReplace(declarations, '    fetchSkillNames: () => Promise<readonly string[]>;',
+if (!declarations.includes('    saveLayout:')) declarations = expectReplace(declarations, '    fetchSkillNames: () => Promise<readonly string[]>;',
   '    fetchSkillNames: () => Promise<readonly string[]>;\n    saveLayout: (json: string, revision?: number) => Promise<boolean>;',
   'launcher interface')
 write('lib/types/client/index.d.ts', declarations)
