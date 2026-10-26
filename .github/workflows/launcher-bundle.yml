@@ -32,6 +32,7 @@ jobs:
           node --check lib/client.js
           node --check lib/index.js
           node scripts/verify-client-bundle.mjs
+          node scripts/verify-launcher-render.mjs
           node --experimental-transform-types --test tests/launcher-layout.node.test.mjs
       - name: Commit generated runtime files
         shell: pwsh
