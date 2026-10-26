@@ -15,7 +15,8 @@ const require = createRequire(import.meta.url)
 const ts = require(resolve(root, '.build-tools/node_modules/typescript'))
 const read = path => readFileSync(resolve(root, path), 'utf8')
 const write = (path, content) => writeFileSync(resolve(root, path), content)
-let bundle = read('lib/client.js')
+// Windows checkout may rewrite LF to CRLF; normalize before matching bundled regions.
+let bundle = read('lib/client.js').replace(/\r\n/g, '\n')
 
 function expectReplace(text, from, to, description) {
   if (!text.includes(from)) throw new Error('Bundle signature missing: ' + description)
