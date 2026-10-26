@@ -16,3 +16,9 @@
 .footerRow{display:flex;flex-wrap:wrap;align-items:center;gap:8px}
 .footerRow small{flex:1;min-width:120px;color:var(--dsw-alias-label-tertiary)}
 .footerActions{display:flex;flex-wrap:wrap;gap:8px;margin-left:auto}
+
+
+.layoutSection{display:flex;flex-direction:column;gap:8px;margin-bottom:14px;border:1px solid var(--dsw-alias-border-l2);border-radius:8px;padding:12px}
+.groupSettingRow{display:flex;flex-wrap:wrap;align-items:center;gap:12px}
+.groupSettingRow label{white-space:nowrap}
+.layoutSection small{color:var(--dsw-alias-label-secondary)}

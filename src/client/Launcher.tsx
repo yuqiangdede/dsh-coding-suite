@@ -1,14 +1,15 @@
-import { useEffect, useId, useMemo, useRef, useState } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
 import type { InjectFace, PropsLocale, PropsRuntime } from '@deepseek-ai/dsh-client-ui-slots'
 import { parseActions, actionErrorKey, presentDefaultActions, displayOrder, type CodingAction } from './actions.ts'
 import type { LauncherInjected } from './index.ts'
 import { chatEntries, recommend, requirementsReady, withEvidence } from './contextual-actions.ts'
 import { WorkflowPanel } from './WorkflowPanel.tsx'
+import { LAUNCHER_GROUPS, actionsForGroup, defaultLauncherLayout, parseLauncherLayout, type OptionalGroupId } from './launcher-layout.ts'
 import css from './Launcher.module.css'
 type Props = PropsRuntime<'conversation.input.dock'> & PropsLocale<'mattSkillLauncher'> & InjectFace<LauncherInjected>
 export function Launcher({
   useInput, useConversation, useSession, useProjection, inputActions, useActionForm, fetchSkillNames,
-  useWorkflow, workflowCommands, todoStaleMs, t,
+  useWorkflow, workflowCommands, saveLayout, todoStaleMs, t,
 }: Props) {
   const snapshot = useActionForm(x => x)
   const input = useInput(x => x)
@@ -33,8 +34,7 @@ export function Launcher({
   const unchangedMs = Date.now() - planChangedAt
   const planMayBeStale = watching && unchangedMs >= todoStaleMs
   const unchangedMinutes = Math.ceil(unchangedMs / 60000)
-  const morePanelId = useId()
-  const [moreOpen, setMoreOpen] = useState(false)
+  const [layoutSaving, setLayoutSaving] = useState(false)
   const [pending, setPending] = useState(false)
   const [notice, setNotice] = useState('')
   const [decision, setDecision] = useState('')
@@ -48,6 +48,9 @@ export function Launcher({
   let invalid = ''
   try { actions = parseActions(snapshot.value?.actionsJson) } catch (error) { invalid = explain(error) }
   actions = snapshot.value?.actionsJson ? actions : presentDefaultActions(actions, t('defaultLocale') === 'en')
+  let layout = defaultLauncherLayout(actions)
+  try { layout = parseLauncherLayout(snapshot.value?.layoutJson, actions, Boolean(snapshot.value?.actionsJson)) }
+  catch (error) { invalid = explain(error) }
   const enabledActions = actions.filter(a => a.enabled).sort((a, b) => displayOrder(a) - displayOrder(b))
   // Buttons travel with their own prompt, so the request can be attributed by id
   // instead of guessing the stage from keywords inside that prompt.
@@ -59,10 +62,24 @@ export function Launcher({
     ? enabledActions.filter(action => recommendation.ids.includes(action.id))
     : []
   const visibleRecommendation = recommendedActions.length ? recommendation : null
-  const shownActions = enabledActions.filter(a => a.pinned)
-  const moreActions = enabledActions.filter(a => !a.pinned)
+  const commonActions = actionsForGroup('common', enabledActions, layout)
+  const groups = LAUNCHER_GROUPS.map(group => ({
+    ...group,
+    actions: actionsForGroup(group.id, enabledActions, layout),
+  }))
   const hasActions = enabledActions.length > 0
-  const moreRecommended = recommendedActions.some(a => !a.pinned)
+  const groupHasRecommendation = (id: OptionalGroupId) =>
+    groups.some(group => group.id === id && group.actions.some(action => visibleRecommendation?.ids.includes(action.id)))
+  const toggleGroup = async (id: OptionalGroupId) => {
+    if (layoutSaving || snapshot.status !== 'ready' || !snapshot.writable || snapshot.revision === undefined) return
+    setLayoutSaving(true)
+    setNotice('')
+    try {
+      const next = { ...layout, visibleGroups: { ...layout.visibleGroups, [id]: !layout.visibleGroups[id] } }
+      if (!await saveLayout(JSON.stringify(next), snapshot.revision)) setNotice(t('rejected'))
+    } catch (error) { setNotice(t('unsaved') + explain(error)) }
+    finally { if (alive.current) setLayoutSaving(false) }
+  }
   const available = input.phase === 'plain' && !pending && snapshot.status === 'ready'
   const insert = async (action: CodingAction) => {
     if (!available || stageBlocked(action)) return
@@ -109,22 +126,46 @@ export function Launcher({
       if (alive.current) setPending(false)
     }
   }
+  // Presentation-only aliases for stored, unchanged legacy preset labels.
+  const displayLabel = (a: CodingAction): string => {
+    if (a.id === 'review-fix' && a.label === '修复审核问题') return '修复'
+    if (a.id === 'bug' && a.label === 'Bug 排查') return 'Bug排查'
+    if (a.id === 'docx' && a.label === 'MD 转 Word') return 'MD转Word'
+    return a.label
+  }
   const render = (a: CodingAction) => <button type="button" key={a.id} disabled={!available || stageBlocked(a)} className={visibleRecommendation?.ids.includes(a.id) ? css.recommended : css.action}
-    title={a.description + '\n' + a.example + (stageBlocked(a) ? '\n' + t('specPrerequisite') : '') + (visibleRecommendation?.ids.includes(a.id) ? '\n' + t('recommendationTooltip').replace('{reason}', t(visibleRecommendation.reason)) : '')} onClick={() => { void insert(a) }}>{a.label}</button>
+    title={a.description + '\n' + a.example + (stageBlocked(a) ? '\n' + t('specPrerequisite') : '') + (visibleRecommendation?.ids.includes(a.id) ? '\n' + t('recommendationTooltip').replace('{reason}', t(visibleRecommendation.reason)) : '')} onClick={() => { void insert(a) }}>{displayLabel(a)}</button>
   const item = workflow.item
   return <div className={css.root} data-matt-skill-launcher>
     {item !== null && <WorkflowPanel item={item} decision={decision} pending={pending}
       onDecision={setDecision} onAction={(action) => { void runWorkflow(action) }} t={t} />}
-    {hasActions && <div className={css.row}>
-      {shownActions.map(render)}
-      {moreActions.length > 0 && <button type="button" className={moreRecommended ? css.recommended : css.action}
-        aria-expanded={moreOpen} aria-controls={morePanelId}
-        onClick={() => { setMoreOpen(open => !open) }}>{t('more')}</button>}
-    </div>}
-    {moreActions.length > 0 && <div id={morePanelId} hidden={!moreOpen} className={css.morePanel}>
-      <div className={css.row}>{moreActions.map(render)}</div>
-    </div>}
-    {visibleRecommendation && <div className={css.hint} aria-live="polite">{t('recommendationHint').replace('{actions}', recommendedActions.map(action => action.label).join(t('recommendationSeparator'))).replace('{reason}', t(visibleRecommendation.reason))}</div>}
+    {hasActions && <>
+      <div className={css.groupToggles} role="group" aria-label={t('groupVisibility')}>
+        <span className={css.groupToggleLabel}>{t('groupVisibility')}</span>
+        {groups.map(group => <button key={group.id} type="button"
+          className={layout.visibleGroups[group.id] ? css.groupToggleActive : css.groupToggle}
+          aria-pressed={layout.visibleGroups[group.id]}
+          disabled={layoutSaving || snapshot.status !== 'ready' || !snapshot.writable}
+          onClick={() => { void toggleGroup(group.id) }}>
+          {t(group.label)}
+          {!layout.visibleGroups[group.id] && groupHasRecommendation(group.id) ? ' •' : ''}
+        </button>)}
+      </div>
+      <div className={css.actionGroup}>
+        <div className={css.groupHeader}><span>{t('groupCommon')}</span><span className={css.locked}>{t('groupAlwaysVisible')}</span></div>
+        <div className={css.row}>{commonActions.map(render)}</div>
+      </div>
+      {groups.filter(group => layout.visibleGroups[group.id] && group.actions.length > 0).map(group =>
+        <div className={css.actionGroup} key={group.id}>
+          <div className={css.groupHeader}>
+            <span>{t(group.label)}</span>
+            <button type="button" className={css.hideGroup} disabled={layoutSaving || !snapshot.writable}
+              onClick={() => { void toggleGroup(group.id) }}>{t('hideGroup')}</button>
+          </div>
+          <div className={css.row}>{group.actions.map(render)}</div>
+        </div>)}
+    </>}
+    {visibleRecommendation && <div className={css.hint} aria-live="polite">{t('recommendationHint').replace('{actions}', recommendedActions.map(displayLabel).join(t('recommendationSeparator'))).replace('{reason}', t(visibleRecommendation.reason))}</div>}
     {watching && <div className={`${css.progressWarning} ${planMayBeStale ? css.progressWarningActive : ''}`} role="status">
       {planMayBeStale ? t('todoStale').replace('{minutes}', String(unchangedMinutes)) : null}
     </div>}

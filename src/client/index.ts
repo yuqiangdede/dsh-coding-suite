@@ -18,11 +18,12 @@ import { LauncherSettings } from './Settings.tsx'
 import { createCodingWorkflowSource } from './workflow-source.ts'
 import type { CodingWorkflowSnapshot } from './workflow-source.ts'
 /** Host-persisted launcher configuration. */
-export interface ActionSettings { actionsJson?: string }
+export interface ActionSettings { actionsJson?: string; layoutJson?: string }
 /** Settings form and revision-checked save operation. */
 export interface LauncherSettingsInjected {
   hooks: { actionForm: ConfigForm<ActionSettings> }
   saveActions: (json:string, revision?:number)=>Promise<boolean>
+  saveConfiguration: (actionsJson: string, layoutJson: string, revision?: number) => Promise<boolean>
 }
 /** Outcome of one launcher-initiated workflow command. */
 export interface WorkflowCommandResult {
@@ -37,6 +38,7 @@ export type WorkflowMode = 'manual' | 'auto'
 export interface LauncherInjected {
   hooks: { actionForm: ConfigForm<ActionSettings>; workflow: HostObservable<CodingWorkflowSnapshot> }
   fetchSkillNames: ()=>Promise<readonly string[]>
+  saveLayout: (json: string, revision?: number) => Promise<boolean>
   pauseWorkflow: (ref: GoalRef) => Promise<{ readonly ok: true } | { readonly ok: false; readonly error: { readonly message: string } }>
   /** Revision-checked mutations of the current coding task. */
   workflowCommands: {
@@ -110,6 +112,7 @@ export function apply(ctx: ClientContext): void {
       return {
         hooks: { actionForm: form, workflow },
         todoStaleMs: deployment.todoStaleMs,
+        saveLayout: (json, rev) => form.mutate([{ op: 'set', path: ['layoutJson'], value: json }], rev),
         workflowCommands: {
           approve: decision => command(item => workflowRemote.approve(sessionId, item.taskId, item.revision, decision)),
           pause: () => command(item => workflowRemote.pause(sessionId, item.taskId, item.revision)),
@@ -145,6 +148,10 @@ export function apply(ctx: ClientContext): void {
     inject: (): LauncherSettingsInjected => ({
       hooks: { actionForm: form },
       saveActions: (json, rev)=>form.mutate([{ op:'set',path:['actionsJson'],value:json }],rev),
+      saveConfiguration: (actionsJson, layoutJson, rev) => form.mutate([
+        { op: 'set', path: ['actionsJson'], value: actionsJson },
+        { op: 'set', path: ['layoutJson'], value: layoutJson },
+      ], rev),
     }),
   }, LauncherSettings))
 }
