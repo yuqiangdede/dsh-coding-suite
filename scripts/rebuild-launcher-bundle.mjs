@@ -76,7 +76,7 @@ function appendCss(prefix, sourceFile, variable, mapName, classes) {
 
 function injectLocale() {
   const locales = read('src/client/locales.ts')
-  const enStart = locales.indexOf('export const en = {')
+  const enStart = locales.indexOf('export const en:')
   if (enStart < 0) throw new Error('Missing en locale block')
   const sources = [locales.slice(0, enStart), locales.slice(enStart)]
   const keys = [
