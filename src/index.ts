@@ -27,6 +27,8 @@ export * from './skill-provider.ts'
 export interface CodingSuiteConfig extends LauncherDeployment, WorkflowConfig, CodingSuiteSkillConfig {
   /** Versioned CodingAction document kept by DSH Settings. */
   actionsJson?: Volatile<string | undefined>
+  /** Versioned button layout, independent of action prompts and Skill IDs. */
+  layoutJson?: Volatile<string | undefined>
   /** Optional custom assets root directory for skills. */
   assetRoot?: string
 }
@@ -35,6 +37,7 @@ export type Config = CodingSuiteConfig
 
 export const Config = z.object({
   actionsJson: z.string().volatile(),
+  layoutJson: z.string().volatile(),
   todoStaleMs: LauncherDeploymentFields.todoStaleMs,
   verificationTimeoutMs: z.natural(),
   assetRoot: z.string(),
