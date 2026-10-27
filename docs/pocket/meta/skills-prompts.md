@@ -127,7 +127,7 @@
 | [visual / 可视化讨论](<../../../src/client/actions.ts#L28>) | skill / grill-with-ui | 15 | 只问答收敛界面决策并回写 |
 | [spec / 固化需求 ★](<../../../src/client/actions.ts#L22>) | skill / to-spec | 20 | 只写可验收规格，不拆单/实现 |
 | [plan / 拆分工单](<../../../src/client/actions.ts#L23>) | skill / to-tickets | 30 | 依赖、阻塞和独立验证，不编码 |
-| [execute / 开发 ★](<../../../src/client/actions.ts#L24>) | skill / implement | 40 | 先确认排查能力；按规格实现并跑相关测试，不完整编译/审查/提交 |
+| [execute / 编码 ★](<../../../src/client/actions.ts#L37>) | skill / implement | 40 | 先确认排查能力；按规格实现并跑相关测试，不完整编译/审查/提交 |
 | [bug / Bug 排查 ★](<../../../src/client/actions.ts#L25>) | skill / diagnosing-bugs | 50 | 复现、根因证据、最小修复及验证 |
 | [review / 代码审查 ★](<../../../src/client/actions.ts#L26>) | skill / code-review | 60 | 只输出带编号、优先级、位置、影响和验证的问题 |
 | [health-acceptance / 健康验收 ★](<../../../src/client/actions.ts#L27>) | skill / project-runtime-acceptance | 65 | 12 领域静态只读；先确认报告路径，修复另授权 |
@@ -226,6 +226,7 @@ node scripts/verify-client-bundle.mjs
 | 2026-10-26 | 开发按钮等现有改动 | [开发 prompt](<../../../src/client/actions.ts#L24>)现含开发前确认排查能力要求；基线捕获当前工作树 | HEAD + 未提交内容 | 不推断所有既有修改的作者/发生时间；需维护者补原因 |
 | 2026-10-26 | 本台账与[首次基线](<baselines/skills-prompts-2026-10-26.json>) | 静态盘点，31 Skill / 30 按钮 / 188 个文件指纹 | `inventory-20261026-01` | 未更新上游版本、未修改运行提示词或用户设置、未提交 |
 | 2026-10-26 | ACTION:doc-supplement + RECEIVING:doc-supplement | 来源扩展为“本会话（默认）或指定时间段/版本号之后的已提交代码改动”；同步默认提示词、接收指令、英文展示和发布 bundle；见[需求](<../requirements/doc-supplement-sources.md>) | 当前工作树（未提交），`local-20261026-02` | 已修改；静态断言、Node 回归测试、`node --check`、bundle 注册与分组渲染校验通过；未提交 |
+| 2026-10-27 | ACTION:execute 名称 | 按用户要求把默认按钮名称由「开发」改为「编码」；只改显示名称，prompt、绑定 Skill、排序和阶段边界未变，英文默认展示仍为 `Develop`；同步[默认按钮表](<../../../src/client/actions.ts#L37>)与发布 [bundle](<../../../lib/client.js>)；已保存配置不自动改名 | 当前工作树（未提交），`local-20261027-01` | 已修改；`build-action-bundle.mjs --check`、`verify-client-bundle.mjs`、`verify-launcher-render.mjs` 通过；未提交 |
 
 本次修改使首次基线中的 `src/client/actions.ts`、`src/client/locales.ts`、`lib/client.js` 等指纹变化；首次基线保持原样，不作为最新内容快照。已保存的用户按钮配置不会被自动替换。
 
