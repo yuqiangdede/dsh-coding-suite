@@ -154,7 +154,7 @@ const links: readonly {
   { trigger: /需求讨论|可视化讨论|grill.with/i, actionIds: ['discussion', 'visual'], success: /需求(已确认|结论|明确|确定)|讨论(结果|结论)|confirmed requirements/i, ids: ['spec'], reason: 'reasonRequirementsReady' },
   { trigger: /固化需求|to.spec/i, actionIds: ['spec'], success: /规格(已|文档|完成)|验收(标准|条件)|specification complete/i, ids: ['plan'], reason: 'reasonSpecReady' },
   { trigger: /拆分工单|to-tickets|制定计划|writing.plans/i, actionIds: ['plan'], success: /工单|计划(已|完成|任务|步骤)|implementation plan|tickets? (created|ready)/i, ids: ['execute'], reason: 'reasonPlanReady' },
-  { trigger: /执行开发|\/implement\b|^开发|executing.plans/i, actionIds: ['execute', 'tdd'], success: /实现(完成|完毕)|开发(完成|结束)|implementation completed/i, ids: ['compile', 'review'], reason: 'reasonImplementationReady' },
+  { trigger: /执行开发|\/implement\b|^开发|executing.plans/i, actionIds: ['execute', 'tdd'], success: /实现(完成|完毕)|开发(完成|结束)|已完成(?:实现|开发)|implementation completed/i, ids: ['compile', 'review'], reason: 'reasonImplementationReady' },
   { trigger: /修复|Bug 排查|diagnosing.bugs/i, actionIds: ['review-fix', 'bug'], success: /修复(?:完成|成功|已)|已(?:修复|解决)|问题(?:已解决|已修复)|fixed and verified/i, ids: ['compile', 'review'], reason: 'reasonRepairReady', failureIds: ['review-fix', 'bug'] },
   { trigger: /编译|构建|build/i, actionIds: ['compile'], success: /编译(成功|通过)|构建(成功|通过)|build (passed|succeeded)|0 errors/i, ids: ['commit'], reason: 'reasonBuildReady' },
   { trigger: /\/research\b|资料研究/i, actionIds: ['research'], success: /研究(完成|结论)|research (complete|findings)|资料来源/i, ids: ['discussion'], reason: 'reasonResearchReady' },
@@ -169,6 +169,16 @@ const negative = /没有(发现|检测到).{0,12}(问题|缺陷)|未发现.{0,12
 const positiveFinding = new RegExp(findingEvidence, 'i')
 /** Repair replies that still carry open findings; only these may send the work back to repair. */
 const unresolved = /(?:仍有|还有|剩余|未修复|未处理|待修复|未解决|部分修复)|remaining (?:issues|findings)|still (?:open|failing|unfixed)/i
+
+/** Ignore report labels and explicit empty lists, while retaining actual open findings. */
+function hasUnresolvedFindings(response: string): boolean {
+  const findings = response
+    .replace(/(?:以下|下面)(?:是|为)[^。\n：:]*未修复项[。\n]/g, '')
+    .replace(/(?:无|没有|不存在)(?:任何)?(?:未修复|未处理|待修复|未解决|剩余)(?:项|问题|缺陷)?/g, '')
+    .replace(/(?:未修复|未处理|待修复|未解决|剩余)(?:项|问题|缺陷)[：:]\s*(?:无|没有|0(?!\d)|none\b)/gi, '')
+    .replace(/^\s*(?:#{1,6}\s*)?(?:\*\*)?(?:[一二三四五六七八九十\d]+[、.．]\s*)?(?:未修复|未处理|待修复|未解决|剩余)(?:项|问题|缺陷)(?:\*\*)?[：:]?\s*$/gm, '')
+  return unresolved.test(findings)
+}
 
 /**
  * Attribute a request to the button that inserted it.
@@ -211,10 +221,16 @@ export function recommend(
   const request = /^\/[a-z][a-z-]*(?=\s|$)/.exec(requestText)?.[0] ?? requestText
   // 按钮插入的请求按自身签名归位；只有手打文本才回落到关键词表。
   const intent = actionIntent(requestText, actions)
-  const failed = assistant.failed === true || failures.test(response)
+  // Saved/custom repair prompts may differ from today's signature and mention reviews.
+  const repairRequest = intent === null && !request.startsWith('/')
+    && /^(?:请)?(?:只|仅)?修复|(?:请根据|请按|请逐项|逐项)[^。\n]*修复/.test(request)
+  // Negated outcomes are evidence of success, not failures of this turn.
+  const outcomeText = response.replace(/(?:未出现|没有出现|未发生|没有发生|未发现|没有|并无|不存在|无)(?:任何)?(?:测试|构建|编译)失败|\bno (?:tests? failed|build failed)\b/gi, '')
+  const failed = assistant.failed === true || failures.test(outcomeText)
   for (const link of links) {
+    if (repairRequest && link.reason !== 'reasonRepairReady') continue
     if (intent === null ? !link.trigger.test(request) : link.actionIds?.includes(intent) !== true) continue
-    if (link.reason === 'reasonRepairReady' && !failed && unresolved.test(response))
+    if (link.reason === 'reasonRepairReady' && !failed && hasUnresolvedFindings(response))
       return { ids: ['review-fix'], evidence: response.slice(0, 5000), reason: 'reasonReviewFindings' }
     if (!link.success.test(response)) {
       if (failed && link.failureIds) return { ids: link.failureIds, evidence: response.slice(0, 5000), reason: 'reasonPreviousFailed' }

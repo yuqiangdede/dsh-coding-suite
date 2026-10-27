@@ -28,6 +28,8 @@ Only link to files that actually exist. No legacy paths are pending migration.
 
 ## Current state
 
+- [修复完成后仍推荐修复](pitfalls/repair-recommendation.md) — accepted；修复请求归位及遗留问题栏目误判的修正规则。
+
 - [健康验收按钮与内置技能](requirements/health-acceptance.md) — accepted；默认静态只读、资源固化与旧按钮配置兼容。
 
 - [补充文档按钮的增补来源](requirements/doc-supplement-sources.md) — accepted；默认本会话，可改为指定时间段或版本号之后的已提交代码改动。
