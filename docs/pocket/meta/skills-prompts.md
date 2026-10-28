@@ -129,6 +129,7 @@
 | [plan / 拆分工单](<../../../src/client/actions.ts#L23>) | skill / to-tickets | 30 | 依赖、阻塞和独立验证，不编码 |
 | [execute / 编码 ★](<../../../src/client/actions.ts#L37>) | skill / implement | 40 | 先确认排查能力；按规格实现并跑相关测试，不完整编译/审查/提交 |
 | [bug / Bug 排查 ★](<../../../src/client/actions.ts#L25>) | skill / diagnosing-bugs | 50 | 复现、根因证据、最小修复及验证 |
+| [add-logs / 增加日志 ★](<../../../src/client/actions.ts>) | prompt | 55 | 针对具体问题临时加日志，脱敏/可控启停、TEMP-DIAG 标记、清理清单与本会话移除提醒；见[生命周期约定](<../requirements/temporary-logging.md>) |
 | [review / 代码审查 ★](<../../../src/client/actions.ts#L26>) | skill / code-review | 60 | 只输出带编号、优先级、位置、影响和验证的问题 |
 | [health-acceptance / 健康验收 ★](<../../../src/client/actions.ts#L27>) | skill / project-runtime-acceptance | 65 | 12 领域静态只读；先确认报告路径，修复另授权 |
 | [review-fix / 修复审核问题 ★](<../../../src/client/actions.ts#L42>) | prompt | 70 | 仅修明确审查问题/失败证据并回归 |
@@ -227,6 +228,7 @@ node scripts/verify-client-bundle.mjs
 | 2026-10-26 | 本台账与[首次基线](<baselines/skills-prompts-2026-10-26.json>) | 静态盘点，31 Skill / 30 按钮 / 188 个文件指纹 | `inventory-20261026-01` | 未更新上游版本、未修改运行提示词或用户设置、未提交 |
 | 2026-10-26 | ACTION:doc-supplement + RECEIVING:doc-supplement | 来源扩展为“本会话（默认）或指定时间段/版本号之后的已提交代码改动”；同步默认提示词、接收指令、英文展示和发布 bundle；见[需求](<../requirements/doc-supplement-sources.md>) | 当前工作树（未提交），`local-20261026-02` | 已修改；静态断言、Node 回归测试、`node --check`、bundle 注册与分组渲染校验通过；未提交 |
 | 2026-10-27 | ACTION:execute 名称 | 按用户要求把默认按钮名称由「开发」改为「编码」；只改显示名称，prompt、绑定 Skill、排序和阶段边界未变，英文默认展示仍为 `Develop`；同步[默认按钮表](<../../../src/client/actions.ts#L37>)与发布 [bundle](<../../../lib/client.js>)；已保存配置不自动改名 | 当前工作树（未提交），`local-20261027-01` | 已修改；`build-action-bundle.mjs --check`、`verify-client-bundle.mjs`、`verify-launcher-render.mjs` 通过；未提交 |
+| 2026-10-28 | ACTION:add-logs | 按用户要求新增“增加日志”纯提示词按钮，默认常用组紧邻 Bug排查、开发组可见；临时诊断日志要求脱敏、标记、清理清单及本会话移除提醒，不承诺后台/跨会话提醒；见[约定](<../requirements/temporary-logging.md>) | 本地新增，无上游升级，`local-20261028-02` | 用户已保存动作/布局不覆盖；源码、发布 bundle 与回归测试同步 |
 
 本次修改使首次基线中的 `src/client/actions.ts`、`src/client/locales.ts`、`lib/client.js` 等指纹变化；首次基线保持原样，不作为最新内容快照。已保存的用户按钮配置不会被自动替换。
 

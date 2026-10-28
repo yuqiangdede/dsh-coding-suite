@@ -2,13 +2,13 @@ import type { CodingAction } from './actions.ts'
 
 /** Visual-only groups. One action ID may be referenced by several groups. */
 export const LAUNCHER_GROUPS = [
-  { id: 'development', label: 'groupDevelopment', actionIds: ['discussion', 'visual', 'spec', 'plan', 'execute', 'review', 'review-fix', 'compile', 'health-acceptance', 'commit', 'doc-supplement'] },
+  { id: 'development', label: 'groupDevelopment', actionIds: ['discussion', 'visual', 'spec', 'plan', 'execute', 'add-logs', 'review', 'review-fix', 'compile', 'health-acceptance', 'commit', 'doc-supplement'] },
   { id: 'documents', label: 'groupDocuments', actionIds: ['api-docs', 'requirements', 'overview', 'outline', 'database', 'doc-merge', 'docx'] },
   { id: 'others', label: 'groupOthers', actionIds: ['initialize', 'ask', 'health-acceptance', 'doc-supplement', 'tdd', 'prototype', 'architecture', 'domain', 'research', 'retro', 'handoff', 'image'] },
 ] as const
 
 export type OptionalGroupId = typeof LAUNCHER_GROUPS[number]['id']
-export const DEFAULT_COMMON_IDS = ['bug', 'discussion', 'execute', 'review', 'review-fix', 'compile', 'commit', 'continue'] as const
+export const DEFAULT_COMMON_IDS = ['bug', 'add-logs', 'discussion', 'execute', 'review', 'review-fix', 'compile', 'commit', 'continue'] as const
 const LEGACY_DEFAULT_PINNED = ['discussion', 'spec', 'execute', 'bug', 'review', 'health-acceptance', 'doc-supplement', 'commit', 'review-fix', 'compile']
 
 export interface LauncherLayout {
@@ -24,8 +24,9 @@ const actionIdPattern = /^[a-z0-9][a-z0-9-]{0,63}$/
 
 export function defaultLauncherLayout(actions: readonly CodingAction[], hasSavedActions = false): LauncherLayout {
   const pinned = actions.filter(a => a.pinned).map(a => a.id)
-  const legacyDefaults = pinned.length === LEGACY_DEFAULT_PINNED.length &&
-    LEGACY_DEFAULT_PINNED.every(id => pinned.includes(id))
+  const presetPinned = pinned.filter(id => id !== 'add-logs')
+  const legacyDefaults = presetPinned.length === LEGACY_DEFAULT_PINNED.length &&
+    LEGACY_DEFAULT_PINNED.every(id => presetPinned.includes(id))
   // Preserve explicitly customized old pinned lists, except the original preset.
   const commonActionIds = hasSavedActions && !legacyDefaults
     ? pinned

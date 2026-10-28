@@ -28,6 +28,8 @@ Only link to files that actually exist. No legacy paths are pending migration.
 
 ## Current state
 
+- [增加日志按钮与临时诊断生命周期](requirements/temporary-logging.md) — accepted；针对具体问题最小加日志，临时标识、清理清单与本会话移除提醒，不承诺跨会话自动提醒。
+
 - [修复完成后仍推荐修复](pitfalls/repair-recommendation.md) — accepted；修复请求归位及遗留问题栏目误判的修正规则。
 
 - [健康验收按钮与内置技能](requirements/health-acceptance.md) — accepted；默认静态只读、资源固化与旧按钮配置兼容。

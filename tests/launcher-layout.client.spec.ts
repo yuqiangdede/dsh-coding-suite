@@ -11,11 +11,11 @@ describe('launcher business groups', () => {
     const layout = defaultLauncherLayout(actions)
     expect(layout.commonActionIds).toEqual([...DEFAULT_COMMON_IDS])
     expect(LAUNCHER_GROUPS.map(group => group.id)).toEqual(['development', 'documents', 'others'])
-    expect(LAUNCHER_GROUPS.map(group => group.actionIds.length)).toEqual([11, 7, 12])
+    expect(LAUNCHER_GROUPS.map(group => group.actionIds.length)).toEqual([12, 7, 12])
     expect(actionsForGroup('common', actions, layout).map(a => a.id)).toEqual([...DEFAULT_COMMON_IDS])
     expect(actionsForGroup('development', actions, layout).map(a => a.id)).toEqual([
-      'discussion', 'visual', 'spec', 'plan', 'execute', 'review', 'review-fix',
-      'compile', 'doc-supplement', 'health-acceptance', 'commit',
+      'discussion', 'visual', 'spec', 'plan', 'execute', 'add-logs', 'review', 'review-fix',
+      'compile', 'health-acceptance', 'commit', 'doc-supplement',
     ])
     expect(actionsForGroup('documents', actions, layout)).toHaveLength(7)
     expect(actionsForGroup('others', actions, layout)).toHaveLength(12)

@@ -27,6 +27,16 @@ const DOC_SUPPLEMENT_PROMPT = `补充文档。
 数据库/接口结论必须对照实际 SQL、迁移或源码核实，无法核实的标“待确认”；不改代码、不运行构建测试、不提交或推送。
 完成后列出使用的来源与边界（本会话，或时间段/版本范围及提交数）、改动的文件与章节、依据（提交号或源码位置）、未建立的文档和待确认项。`
 
+/** Temporary instrumentation is scoped to one issue and must carry its own cleanup handoff. */
+const ADD_LOGS_PROMPT = `请针对当前要复现排查的具体问题，增加最少量的临时诊断日志。
+先从本会话确认问题现象、预期与实际行为、触发条件/复现步骤、运行环境和需要验证的假设；信息不足时先询问，不猜测问题，不泛化为全项目日志改造。
+读取相关调用链和现有日志机制，说明每个日志点要验证什么，再仅在必要入口、关键分支、状态变化、异常出口或异步边界加日志；不修复业务逻辑、不做无关重构，不改变返回值、异常传播、时序或业务副作用。
+复用现有 logger、级别及关联 ID，记录足以区分假设的事件、必要状态和耗时；敏感字段必须脱敏，不记录口令、令牌、Cookie、完整请求/响应或用户隐私。避免循环刷屏、大对象序列化和额外 I/O，必要时限频或采样。
+所有新增日志用统一且针对本问题的 TEMP-DIAG 标识标记（注明临时用途及移除条件），优先复用已有调试开关且默认关闭；没有适用开关时采用最小局部控制并说明启停方法，不全局开启 debug，不擅自操作生产环境。日志参数求值也应受开关保护，避免关闭后仍产生开销或副作用。
+完成后输出：日志点及对应假设、复现步骤、如何临时开启/关闭和采集哪些脱敏日志、已执行的针对性验证及未验证项；未实际复现时不得声称已定位根因。不执行完整编译，不提交或推送。
+维护可搜索的清理清单：列出标识、文件位置、本次新增的日志/临时开关/配置及其移除方式，保留原有日志和用户其他改动。明确说明关闭开关不等于移除临时代码。
+完成本次加日志后，必须提醒用户：“这些是临时诊断日志，复现取证或问题排查结束后请移除，并恢复临时配置。”在本会话后续获得复现结果、定位/修复问题或结束排查时再次提醒用户，清理前确认范围，清理后做针对性验证。未确认清理前明确标为待清理，不声称已经移除；不承诺跨会话或后台自动提醒，交接时携带清理清单。`
+
 /** Initial editable actions supplied when no configuration is saved. */
 export const DEFAULT_ACTIONS: readonly CodingAction[] = [
   { id: 'initialize', label: '初始化', kind: 'skill', skillId: 'setup-matt-pocock-skills', prompt: '只核对当前项目的工程 Skills 配置，说明现状、缺失项和影响；不创建业务代码，不执行开发任务。需要修改配置或安装 Skill 前先征求确认。', enabled: true, order: 5, description: '首次为仓库配置工程 Skills，或核对现有配置是否完整时使用；只给出诊断和需要确认的改动清单，不写业务代码。', example: '例如：检查 Issue 跟踪、项目文档和代码审查约定是否齐全。' },
@@ -36,6 +46,7 @@ export const DEFAULT_ACTIONS: readonly CodingAction[] = [
   { id: 'plan', label: '拆分工单', kind: 'skill', skillId: 'to-tickets', prompt: '只按已确认规格拆分可独立验收的工单，标注依赖、阻塞关系和验证方法；不编码、不创建分支、不执行构建测试、不提交。', enabled: true, order: 30, description: '已有可验收规格、需要落地排期时使用；只拆分带依赖和验证方法的工单，不开始编码或提交。', example: '例如：把权限升级拆成迁移、接口和回滚三类工单。' },
   { id: 'execute', label: '编码', kind: 'skill', skillId: 'implement', prompt: '每个功能开发前，先确认是否配套排查能力；可通过后台日志或前端排查按钮展示排查路径及诊断信息，确认后纳入实现。只按已确认的规格或工单实现，并运行与改动直接相关的测试；不重新讨论需求，不做代码审查或代码走读，不执行完整项目编译，不提交（这些分别由对应按钮负责）。规格缺口或阻塞先停下说明。', enabled: true, pinned: true, order: 40, description: '规格或工单已确认、需要落地编码时使用；只改实现并跑相关测试，不做需求讨论、代码走读、完整编译或提交。', example: '例如：按工单完成接口改造并补充对应测试。' },
   { id: 'bug', label: 'Bug排查', kind: 'skill', skillId: 'diagnosing-bugs', prompt: '先建立稳定复现，定位根因并给出证据；只做最小修复和针对性验证，不做需求变更、代码审查或完整编译，不提交。根因未确认前不扩大改动范围。', enabled: true, pinned: true, order: 50, description: '功能异常、报错或测试失败但原因不明时使用；以复现和根因为主，只做最小修复与针对性验证，不做审查或提交。', example: '例如：定位会话状态偶发丢失的触发条件。' },
+  { id: 'add-logs', label: '增加日志', kind: 'prompt', prompt: ADD_LOGS_PROMPT, enabled: true, pinned: true, order: 55, description: '为复现排查某个具体问题临时增加最小诊断日志；要求脱敏、可控启停、记录清理清单，并在完成及本会话排查结束时提醒移除，不直接修复业务逻辑。', example: '例如：为偶发请求超时增加带关联 ID 的临时日志，取证后移除并恢复配置。' },
   { id: 'review', label: '代码审查', kind: 'skill', skillId: 'code-review', prompt: '只审查正确性、数据安全、并发和可维护性，输出有证据的问题清单：编号、优先级、文件位置、影响和验证方法；不修改代码、不执行修复、不提交，修复交给「修复审核问题」。', enabled: true, pinned: true, order: 60, description: '实现完成、准备合并前使用；只输出可核验的问题清单，不改代码、不做修复，发现问题后由修复审核问题处理。', example: '例如：检查权限判断、并发写入和错误处理。' },
   { id: 'health-acceptance', label: '健康验收', kind: 'skill', skillId: 'project-runtime-acceptance', prompt: '对当前项目进行全量静态只读运行健康验收，覆盖数据库生命周期、定时任务、缓存与 API 调用等 12 个领域；输出完整资产清单、覆盖率、有源码证据的 P0/P1/P2 问题、整改建议与未覆盖范围。先确认报告路径，未确认时在对话中输出；不修改业务代码或运行配置，不连接生产环境、不执行清理或压测，不提交或推送。需要修复时先取得单独授权。', enabled: true, pinned: true, order: 65, description: '上线前或改动后检查长期运行风险时使用；默认全量静态只读，给出资产覆盖率、证据与整改建议，不改代码、不操作生产环境。', example: '例如：检查表数据增长、定时任务冲突及缓存失效后的接口放大。' },
   { id: 'visual', label: '可视化讨论', kind: 'skill', skillId: 'grill-with-ui', prompt: '只通过交互式问答澄清已确认需求中的界面决策，并把结论写回当前对话；不修改代码、不做实现、不提交。', enabled: true, order: 15, description: '界面或交互存在多个待定选项时使用；只通过逐个问题收敛决策并回写结论，不进入实现。', example: '例如：逐个确认搜索面板的筛选条件和空态。' },
@@ -81,6 +92,7 @@ export const ENGLISH_DEFAULT_PRESENTATION: Readonly<Record<string, Pick<CodingAc
   'plan': { label: 'Split into Tickets', description: 'Use when an accepted specification needs implementation tickets; split independently verifiable work with dependencies, blockers and checks, without coding, branching or committing.', example: 'e.g. Split a permission upgrade into migration, API and rollback tickets.' },
   'execute': { label: 'Develop', description: 'Use when a specification or ticket is confirmed; implement and run only checks related to the change, without re-discussing requirements, reviewing or walking through code, running a full build or committing.', example: 'e.g. Implement the ticket interface change and its related tests.' },
   'bug': { label: 'Diagnose Bug', description: 'Use when a feature fails or errors without a known cause; establish a reproduction, locate the root cause and apply a minimal verified fix, without review, full builds or commits.', example: 'e.g. Find what makes session state disappear intermittently.' },
+  'add-logs': { label: 'Add Logs', description: 'Add minimal temporary diagnostic logs for one specific reproduction; require redaction, controlled activation, a cleanup checklist and removal reminders on completion and when this session ends diagnosis, without fixing business logic.', example: 'e.g. Trace intermittent request timeouts with a correlation ID, then remove the temporary logs and restore configuration.' },
   'review': { label: 'Code Review', description: 'Use before merging completed work; report evidence-backed findings with IDs, priorities, locations, impact and checks, without editing code or committing. Repair belongs to Fix Review Findings.', example: 'e.g. Check permission checks, concurrent writes and error handling.' },
   'health-acceptance': { label: 'Health Acceptance', description: 'Check long-running system risks before release or after changes; defaults to a full static read-only audit with asset coverage, evidence and remediation advice, without editing code or accessing production.', example: 'e.g. Check data growth, overlapping jobs and API amplification after cache expiry.' },
   'visual': { label: 'Visual Discussion', description: 'Use when screen or interaction decisions remain open; settle them through focused questions and write the outcome back to the conversation, without implementing anything.', example: 'e.g. Confirm filter conditions and the empty state for a search panel.' },
