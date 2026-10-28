@@ -53,6 +53,7 @@
   "files": [
     "assets/**/*",
     "lib/**/*",
+    "!lib/**/*.tsbuildinfo",
     "scripts/**/*",
     "cordis.patch.yml"
   ],

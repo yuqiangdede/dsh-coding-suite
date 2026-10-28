@@ -24,7 +24,7 @@ export function buildActionTables(source) {
 
 if (process.argv[1] !== undefined && import.meta.url === pathToFileURL(process.argv[1]).href) {
   const bundle = new URL('../lib/client.js', import.meta.url)
-  const current = readFileSync(bundle, 'utf8')
+  const current = readFileSync(bundle, 'utf8').replace(/\r\n/g, '\n')
   const next = buildActionTables(current)
   if (process.argv.includes('--check')) {
     if (next !== current) throw new Error('Bundled launcher tables are out of sync')

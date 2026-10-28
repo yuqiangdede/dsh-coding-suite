@@ -79,8 +79,7 @@ node scripts/verify-client-bundle.mjs
    - Pocket 知识库运维与共享工具链：`pocket-setup`、`pocket-reorganize`、证据登记表 (`evidence_registry.py`)、文档检索脚本等。
 
 2. **前端 UI 快速发射器**
-   - 实时呈现当前会话阶段指示器与状态徽标。
-   - 交互式控制：批准 (Approve)、暂停 (Pause)、恢复 (Resume)、取消 (Cancel)。
+   - 按场景分组展示快捷入口，并支持查看当前对话中识别出的按钮使用顺序。
    - 自定义技能动作发射器（支持导入/导出 JSON 配置表单）。
 
 4. **待办任务同步守卫 (Todo Progress Guard)**
