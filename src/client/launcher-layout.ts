@@ -3,7 +3,7 @@ import type { CodingAction } from './actions.ts'
 /** Visual-only groups. One action ID may be referenced by several groups. */
 export const LAUNCHER_GROUPS = [
   { id: 'requirements-analysis', label: 'groupRequirementsAnalysis', actionIds: ['product-development-pipeline', 'requirement-clarification', 'requirement-analysis', 'product-risk-gate', 'solution-design', 'product-module-gate', 'product-state-gate', 'product-exception-gate', 'product-prd-pages', 'product-consistency-gate', 'product-image-prompt'] },
-  { id: 'development', label: 'groupDevelopment', actionIds: ['discussion', 'visual', 'spec', 'plan', 'execute', 'add-logs', 'analyze-logs', 'review', 'review-fix', 'compile', 'health-acceptance', 'commit', 'doc-supplement', 'remote-debug'] },
+  { id: 'development', label: 'groupDevelopment', actionIds: ['discussion', 'visual', 'spec', 'plan', 'execute', 'bug', 'add-logs', 'analyze-logs', 'review', 'review-fix', 'compile', 'health-acceptance', 'commit', 'doc-supplement', 'remote-debug'] },
   { id: 'documents', label: 'groupDocuments', actionIds: ['api-docs', 'requirements', 'overview', 'outline', 'database', 'doc-merge', 'docx'] },
   { id: 'others', label: 'groupOthers', actionIds: ['initialize', 'ask', 'health-acceptance', 'doc-supplement', 'tdd', 'prototype', 'architecture', 'domain', 'research', 'retro', 'handoff', 'image', 'prd-writing', 'requirement-review'] },
 ] as const
@@ -68,6 +68,30 @@ export function parseLauncherLayout(
     },
     commonActionIds: ids as string[],
   }
+}
+
+/**
+ * Count how many leading buttons fit on one row. When the rest do not fit, the
+ * row also has to carry a More button, so reserve its width and the gap before
+ * it. Returns `widths.length` when everything fits and `0` when not even the
+ * first button fits next to More.
+ */
+export function fittedActionCount(
+  widths: readonly number[],
+  available: number,
+  gap: number,
+  moreWidth = 0,
+): number {
+  if (widths.length === 0) return 0
+  const total = widths.reduce((sum, width) => sum + width, 0) + gap * (widths.length - 1)
+  if (total <= available) return widths.length
+  let used = 0
+  for (let index = 0; index < widths.length; index++) {
+    const next = used + (index > 0 ? gap : 0) + widths[index]
+    if (next + gap + moreWidth > available) return index
+    used = next
+  }
+  return widths.length
 }
 
 export function actionsForGroup(

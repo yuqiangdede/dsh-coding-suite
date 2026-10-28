@@ -12,6 +12,7 @@ function loadLauncher() {
   const jsx = (type, props) => ({ type, props })
   const hooks = {
     useEffect() {},
+    useLayoutEffect() {},
     useId: () => 'test',
     useMemo: fn => fn(),
     useRef: value => ({ current: value }),

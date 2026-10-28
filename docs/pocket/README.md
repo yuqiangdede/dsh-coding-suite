@@ -32,7 +32,7 @@ Only link to files that actually exist. No legacy paths are pending migration.
 
 - [需求分组与产品研发流水线](requirements/requirements-analysis-group.md) — accepted；分组显示名为「需求」，以产品研发流水线为主干，11 个入口从需求澄清到最终 UI 生图提示词，保留阶段 Gate、回退、旧布局和自定义动作兼容。
 
-- [开发分组改名与更多按钮](requirements/launcher-overflow.md) — accepted；每组默认展示前 8 个，更多/收起独立展开，常用分组可控制显示并在页面内编辑成员。
+- [开发分组改名与更多按钮](requirements/launcher-overflow.md) — accepted；每组按可用宽度尽量展示，确实放不下才出现更多/收起（无测量环境回退前 8 个），常用分组可控制显示并在页面内编辑成员。
 
 - [增加日志按钮与临时诊断生命周期](requirements/temporary-logging.md) — accepted；针对具体问题最小加日志，临时标识、清理清单与本会话移除提醒，不承诺跨会话自动提醒。
 

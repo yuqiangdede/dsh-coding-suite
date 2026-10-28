@@ -39,7 +39,9 @@
 .groupToggleActive{composes:groupToggle;background:var(--dsw-alias-interactive-bg-hover);color:var(--dsw-alias-label-primary);font-weight:600}
 .groupToggle:focus-visible,.groupToggleActive:focus-visible,.hideGroup:focus-visible{outline:2px solid var(--dsw-alias-border-l2);outline-offset:2px}
 .groupToggle:disabled,.groupToggleActive:disabled,.hideGroup:disabled{opacity:.5;cursor:default}
-.actionGroup{display:flex;flex-direction:column;gap:4px}
+.actionGroup{display:flex;flex-direction:column;gap:4px;position:relative}
+/* Off-screen row used only to measure button widths; it must never take layout space. */
+.measureRow{position:absolute;top:0;left:-9999px;width:max-content;display:flex;flex-wrap:nowrap;gap:5px;visibility:hidden;pointer-events:none}
 .groupHeader{display:flex;align-items:center;justify-content:space-between;color:var(--dsw-alias-label-secondary);font-size:11px;font-weight:600;padding:0 2px}
 .locked{font-weight:400;font-size:10px;color:var(--dsw-alias-label-tertiary)}
 .hideGroup{border:0;background:transparent;color:var(--dsw-alias-label-secondary);font:inherit;font-weight:400;cursor:pointer;padding:1px 4px}

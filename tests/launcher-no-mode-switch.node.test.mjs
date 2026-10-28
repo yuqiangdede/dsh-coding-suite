@@ -19,7 +19,7 @@ function reactHooks() {
   let cursor = 0
   const state = [], refs = []
   const react = {
-    useEffect() {}, useMemo: fn => fn(),
+    useEffect() {}, useLayoutEffect() {}, useMemo: fn => fn(),
     useState(initial) { const i = cursor++; if (!(i in state)) state[i] = typeof initial === 'function' ? initial() : initial; return [state[i], value => { state[i] = typeof value === 'function' ? value(state[i]) : value }] },
     useRef(initial) { const i = cursor++; return refs[i] ??= { current: initial } },
   }

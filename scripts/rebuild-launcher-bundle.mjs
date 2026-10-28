@@ -63,7 +63,7 @@ function compile(path, alias) {
     .replace(/\b_jsx\b/g, 'react_jsx_runtime.jsx')
     .replace(/\b_jsxs\b/g, 'react_jsx_runtime.jsxs')
     .replace(/\b_Fragment\b/g, 'react_jsx_runtime.Fragment')
-    .replace(/\b(useState|useEffect|useRef|useMemo|useCallback)\(/g, (_match, name) => 'react.' + name + '(')
+    .replace(/\b(useState|useEffect|useLayoutEffect|useRef|useMemo|useCallback)\(/g, (_match, name) => 'react.' + name + '(')
     .replace(/\bcss\./g, alias + '.')
 }
 function replaceRegion(name, body) {
@@ -128,7 +128,7 @@ replaceRegion('Settings', compile('src/client/Settings.tsx', 'Settings_module_cs
 appendCss('xbJU_q', 'src/client/Launcher.module.css', 'css$1', 'Launcher_module_css_default', [
   'groupToggles', 'groupControls', 'groupToggleLabel', 'groupToggle', 'groupToggleActive',
   'actionGroup', 'groupHeader', 'locked', 'hideGroup', 'commonEditor', 'commonChoices', 'commonChoiceGroup', 'commonChoice',
-  'history', 'historyTitle', 'historyList', 'historyItem',
+  'measureRow', 'history', 'historyTitle', 'historyList', 'historyItem',
 ])
 appendCss('v7HIVa', 'src/client/Settings.module.css', 'css', 'Settings_module_css_default', [
   'layoutSection', 'groupSettingRow',

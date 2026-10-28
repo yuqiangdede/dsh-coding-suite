@@ -7,7 +7,7 @@ export declare const LAUNCHER_GROUPS: readonly [{
 }, {
     readonly id: "development";
     readonly label: "groupDevelopment";
-    readonly actionIds: readonly ["discussion", "visual", "spec", "plan", "execute", "add-logs", "analyze-logs", "review", "review-fix", "compile", "health-acceptance", "commit", "doc-supplement", "remote-debug"];
+    readonly actionIds: readonly ["discussion", "visual", "spec", "plan", "execute", "bug", "add-logs", "analyze-logs", "review", "review-fix", "compile", "health-acceptance", "commit", "doc-supplement", "remote-debug"];
 }, {
     readonly id: "documents";
     readonly label: "groupDocuments";
@@ -28,6 +28,13 @@ export interface LauncherLayout {
 export declare function defaultLauncherLayout(actions: readonly CodingAction[], hasSavedActions?: boolean): LauncherLayout;
 /** Reject damaged saved layout instead of silently losing user preferences. */
 export declare function parseLauncherLayout(source: string | undefined, actions: readonly CodingAction[], hasSavedActions?: boolean): LauncherLayout;
+/**
+ * Count how many leading buttons fit on one row. When the rest do not fit, the
+ * row also has to carry a More button, so reserve its width and the gap before
+ * it. Returns `widths.length` when everything fits and `0` when not even the
+ * first button fits next to More.
+ */
+export declare function fittedActionCount(widths: readonly number[], available: number, gap: number, moreWidth?: number): number;
 export declare function actionsForGroup(groupId: 'common' | OptionalGroupId, enabled: readonly CodingAction[], layout: LauncherLayout): CodingAction[];
 /** Export the full layout while keeping the v3 action document importable by older clients. */
 export declare function exportLauncherConfiguration(actionsDocument: string, layout: LauncherLayout): string;

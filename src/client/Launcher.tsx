@@ -1,10 +1,10 @@
-import { useEffect, useMemo, useRef, useState } from 'react'
+import { useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react'
 import type { InjectFace, PropsLocale, PropsRuntime } from '@deepseek-ai/dsh-client-ui-slots'
 import { parseActions, actionErrorKey, presentDefaultActions, displayOrder, type CodingAction } from './actions.ts'
 import type { LauncherInjected } from './index.ts'
 import { chatEntries, conversationHistory, recommend, withEvidence } from './contextual-actions.ts'
 import { WorkflowPanel } from './WorkflowPanel.tsx'
-import { LAUNCHER_GROUPS, actionsForGroup, defaultLauncherLayout, parseLauncherLayout, type GroupId } from './launcher-layout.ts'
+import { LAUNCHER_GROUPS, actionsForGroup, defaultLauncherLayout, fittedActionCount, parseLauncherLayout, type GroupId } from './launcher-layout.ts'
 import css from './Launcher.module.css'
 type Props = PropsRuntime<'conversation.input.dock'> & PropsLocale<'mattSkillLauncher'> & InjectFace<LauncherInjected>
 export function Launcher({
@@ -38,12 +38,16 @@ export function Launcher({
   const unchangedMinutes = Math.ceil(unchangedMs / 60000)
   const [historyExpanded, setHistoryExpanded] = useState(false)
   const [expandedGroups, setExpandedGroups] = useState<Record<string, boolean>>({})
+  // Measured per-row button budget; absent entries keep the fixed fallback.
+  const [groupLimits, setGroupLimits] = useState<Record<string, number>>({})
   const [layoutSaving, setLayoutSaving] = useState(false)
   const [commonEdit, setCommonEdit] = useState<{ ids: string[], revision: number } | null>(null)
   const [pending, setPending] = useState(false)
   const [notice, setNotice] = useState('')
   const [decision, setDecision] = useState('')
   const alive = useRef(true)
+  const groupRows = useRef<Record<string, HTMLDivElement | null>>({})
+  const groupProbes = useRef<Record<string, HTMLDivElement | null>>({})
   useEffect(() => { alive.current = true; return () => { alive.current = false } }, [])
   const explain = (error: unknown) => {
     const key = actionErrorKey(error)
@@ -77,6 +81,54 @@ export function Launcher({
   const editorGroups = groups.map(group => group.id === 'others'
     ? { ...group, actions: [...group.actions, ...enabledActions.filter(action => !groupedIds.has(action.id))] }
     : group)
+  // Presentation-only sizing: fill each row with the buttons that actually fit
+  // and collapse the rest into More. Membership, order and saved layout stay
+  // untouched; a host without a measurable DOM keeps the fixed fallback.
+  const measurable = typeof document !== 'undefined'
+  const measuredGroups = [
+    { id: 'common', actions: commonActions },
+    ...groups.filter(group => layout.visibleGroups[group.id] && group.actions.length > 0),
+  ]
+  useLayoutEffect(() => {
+    if (!measurable) return
+    const measure = () => {
+      const measured: Record<string, number> = {}
+      for (const group of measuredGroups) {
+        const row = groupRows.current[group.id]
+        const probe = groupProbes.current[group.id]
+        if (!row || !probe || group.actions.length === 0) continue
+        const buttons = Array.from(probe.querySelectorAll<HTMLElement>('[data-launcher-measure-action]'))
+        if (buttons.length !== group.actions.length) continue
+        const more = probe.querySelector<HTMLElement>('[data-launcher-measure-more]')
+        // A hidden or not-yet-laid-out dock keeps the fallback budget.
+        const rowWidth = row.getBoundingClientRect().width
+        if (rowWidth <= 0) continue
+        const style = window.getComputedStyle(row)
+        const gap = Number.parseFloat(style.columnGap) || Number.parseFloat(style.gap) || 5
+        // Fractional rect widths avoid accumulated rounding; keep one pixel of
+        // slack so layout rounding cannot push the More button onto a new line.
+        const fitted = fittedActionCount(
+          buttons.map(button => button.getBoundingClientRect().width),
+          rowWidth - 1,
+          gap,
+          more?.getBoundingClientRect().width ?? 0,
+        )
+        measured[group.id] = fitted >= group.actions.length ? group.actions.length : Math.max(1, fitted)
+      }
+      setGroupLimits(previous => {
+        let changed = false
+        for (const id of Object.keys(measured)) if (previous[id] !== measured[id]) changed = true
+        return changed ? { ...previous, ...measured } : previous
+      })
+    }
+    measure()
+    if (typeof ResizeObserver === 'undefined') return
+    const observer = new ResizeObserver(measure)
+    for (const row of Object.values(groupRows.current)) if (row) observer.observe(row)
+    // Font or label changes resize the probe before the row itself changes.
+    for (const probe of Object.values(groupProbes.current)) if (probe) observer.observe(probe)
+    return () => { observer.disconnect() }
+  })
   const hasActions = enabledActions.length > 0
   const groupHasRecommendation = (id: GroupId) =>
     (id === 'common' ? commonActions : groups.find(group => group.id === id)?.actions ?? []).some(action => visibleRecommendation?.ids.includes(action.id))
@@ -177,18 +229,28 @@ export function Launcher({
     title={a.description + '\n' + a.example + (visibleRecommendation?.ids.includes(a.id) ? '\n' + t('recommendationTooltip').replace('{reason}', t(visibleRecommendation.reason)) : '')} onClick={() => { void insert(a) }}>{displayLabel(a)}</button>
   // Expansion is local presentation state, independent of saved membership and action availability.
   const renderGroupActions = (id: string, label: string, members: CodingAction[]) => {
-    const limit = 8
+    const fallback = 8
+    const limit = Math.min(groupLimits[id] ?? fallback, members.length)
     const expanded = expandedGroups[id] === true
     const overflow = members.slice(limit)
     const hiddenRecommendation = !expanded && overflow.some(action => visibleRecommendation?.ids.includes(action.id))
     const toggleLabel = expanded ? t('collapse') : t('moreCount').replace('{count}', String(overflow.length))
-    return <div className={css.row}>
+    return <div className={css.row} data-launcher-row={id}
+      ref={element => { groupRows.current[id] = element }}>
       {(expanded ? members : members.slice(0, limit)).map(render)}
       {overflow.length > 0 && <button type="button" className={css.action} aria-expanded={expanded}
         aria-label={t('groupOverflowLabel').replace('{group}', label).replace('{action}', toggleLabel)}
         onClick={() => { setExpandedGroups(previous => ({ ...previous, [id]: !previous[id] })) }}>
         {toggleLabel + (hiddenRecommendation ? ' •' : '')}
       </button>}
+      {measurable && <div className={css.measureRow} data-launcher-measure={id} aria-hidden="true"
+        ref={element => { groupProbes.current[id] = element }}>
+        {members.map(action => <button key={action.id} type="button" disabled tabIndex={-1} className={css.action}
+          data-launcher-measure-action>{displayLabel(action)}</button>)}
+        <button type="button" disabled tabIndex={-1} className={css.action} data-launcher-measure-more>
+          {t('moreCount').replace('{count}', String(members.length)) + ' •'}
+        </button>
+      </div>}
     </div>
   }
   return <div className={css.root} data-matt-skill-launcher>

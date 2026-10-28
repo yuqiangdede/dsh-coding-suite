@@ -6,18 +6,24 @@ import { zh, en } from '../src/client/locales.ts'
 import { DEFAULT_ACTIONS, encodeActions } from '../src/client/actions.ts'
 import { conversationHistory } from '../src/client/contextual-actions.ts'
 
-function harness({ actions, layout, english = false } = {}) {
+function harness({ actions, layout, english = false, measured = false, rowWidth = 0, widths = [], moreWidth = 0 } = {}) {
   let registration, Launcher, cursor = 0
-  const state = [], refs = [], events = []
+  const state = [], refs = [], events = [], layoutEffects = []
+  const row = { clientWidth: rowWidth, getBoundingClientRect: () => ({ width: row.clientWidth }) }
   const jsx = (type, props) => ({ type, props })
   const react = {
     useEffect() {}, useMemo: fn => fn(),
+    useLayoutEffect(fn) { layoutEffects.push(fn) },
     useState(initial) { const i = cursor++; if (!(i in state)) state[i] = typeof initial === 'function' ? initial() : initial; return [state[i], value => { state[i] = typeof value === 'function' ? value(state[i]) : value }] },
     useRef(initial) { const i = cursor++; return refs[i] ??= { current: initial } },
   }
-  runInNewContext(readFileSync(new URL('../lib/client.js', import.meta.url), 'utf8'), {
-    window: { __ModuleLoader__: { load: value => { registration = value } } },
-  })
+  const sandbox = { window: { __ModuleLoader__: { load: value => { registration = value } } } }
+  if (measured) {
+    sandbox.window.getComputedStyle = () => ({ columnGap: '5px' })
+    sandbox.document = { querySelector: () => ({}) }
+    sandbox.ResizeObserver = class { observe() {} disconnect() {} }
+  }
+  runInNewContext(readFileSync(new URL('../lib/client.js', import.meta.url), 'utf8'), sandbox)
   const dictionary = english ? en : zh
   registration.factory(name => ({ react, 'react/jsx-runtime': { jsx, jsxs: jsx } })[name] ?? {}).apply({
     effect: fn => fn(), locale: { register() {}, bind: () => key => dictionary[key] ?? key },
@@ -29,21 +35,40 @@ function harness({ actions, layout, english = false } = {}) {
   })
   const config = { ...(actions ? { actionsJson: encodeActions(actions) } : {}), ...(layout ? { layoutJson: JSON.stringify(layout) } : {}) }
   const data = { config, messages: [], writable: false, revision: 1, saveOk: true, running: false }
-  const render = () => { cursor = 0; return Launcher({
-    useActionForm: fn => fn({ status: 'ready', value: data.config, writable: data.writable, revision: data.revision }),
-    useInput: fn => fn({ phase: 'plain', draft: '' }),
-    useConversation: fn => fn({ views: new Map([['chat', { messages: data.messages }]]) }),
-    useSession: fn => fn({ running: data.running }),
-    useWorkflow: fn => fn({ item: null }), useProjection: () => [],
-    inputActions: {
-      captureInsertion: () => ({ start: 0, end: 0 }),
-      insertText: text => { events.push(['insert', text]); return true },
-      persistDraft: () => events.push(['persist']),
-    },
-    fetchSkillNames: async () => DEFAULT_ACTIONS.filter(a => a.kind === 'skill').map(a => a.skillId),
-    saveLayout: async (json, revision) => { events.push(['save', json, revision]); if (data.saveOk) data.config.layoutJson = json; return data.saveOk },
-    todoStaleMs: 90000, t: key => dictionary[key] ?? key,
-  }) }
+  const assignRefs = node => {
+    if (!measured || !node || typeof node !== 'object') return
+    if (Array.isArray(node)) { node.forEach(assignRefs); return }
+    if (typeof node.props?.ref === 'function') {
+      if ('data-launcher-row' in node.props) node.props.ref(row)
+      else if ('data-launcher-measure' in node.props) node.props.ref({
+        querySelectorAll: () => widths.map(width => ({ getBoundingClientRect: () => ({ width }) })),
+        querySelector: () => ({ getBoundingClientRect: () => ({ width: moreWidth }) }),
+      })
+    }
+    assignRefs(node.props?.children)
+  }
+  const render = () => {
+    cursor = 0
+    layoutEffects.length = 0
+    const tree = Launcher({
+      useActionForm: fn => fn({ status: 'ready', value: data.config, writable: data.writable, revision: data.revision }),
+      useInput: fn => fn({ phase: 'plain', draft: '' }),
+      useConversation: fn => fn({ views: new Map([['chat', { messages: data.messages }]]) }),
+      useSession: fn => fn({ running: data.running }),
+      useWorkflow: fn => fn({ item: null }), useProjection: () => [],
+      inputActions: {
+        captureInsertion: () => ({ start: 0, end: 0 }),
+        insertText: text => { events.push(['insert', text]); return true },
+        persistDraft: () => events.push(['persist']),
+      },
+      fetchSkillNames: async () => DEFAULT_ACTIONS.filter(a => a.kind === 'skill').map(a => a.skillId),
+      saveLayout: async (json, revision) => { events.push(['save', json, revision]); if (data.saveOk) data.config.layoutJson = json; return data.saveOk },
+      todoStaleMs: 90000, t: key => dictionary[key] ?? key,
+    })
+    assignRefs(tree)
+    return tree
+  }
+  const flush = () => { for (const effect of layoutEffects.splice(0)) effect() }
   function nodes(node) {
     if (!node || typeof node !== 'object') return []
     if (Array.isArray(node)) return node.flatMap(nodes)
@@ -53,7 +78,7 @@ function harness({ actions, layout, english = false } = {}) {
   const buttons = id => nodes(group(id)).filter(n => n.type === 'button')
   const actionButtons = id => buttons(id).filter(n => typeof n.props.title === 'string' && n.props['aria-expanded'] === undefined)
   const overflow = id => buttons(id).find(n => typeof n.props['aria-expanded'] === 'boolean')
-  return { render, nodes, buttons, actionButtons, overflow, events, data }
+  return { render, flush, row, nodes, buttons, actionButtons, overflow, events, data }
 }
 
 const makeActions = count => Array.from({ length: count }, (_, i) => ({
@@ -181,18 +206,35 @@ test('default groups expand independently, preserve action order and retain over
   const h = harness()
   assert.equal(h.actionButtons('common').length, 8)
   assert.equal(h.actionButtons('development').length, 8)
-  assert.equal(h.overflow('development').props.children, '更多（6）')
+  assert.equal(h.overflow('development').props.children, '更多（7）')
   h.overflow('development').props.onClick()
-  assert.equal(h.actionButtons('development').length, 14)
+  assert.equal(h.actionButtons('development').length, 15)
   assert.equal(h.actionButtons('common').length, 8)
-  const developmentOrder = ['需求讨论', '可视化讨论', '固化需求', '拆分工单', '编码', '增加日志', '分析日志', '代码审查', '修复', '编译', '健康验收', '提交代码', '补充文档', '远程调试']
+  const developmentOrder = ['需求讨论', '可视化讨论', '固化需求', '拆分工单', '编码', 'Bug排查', '增加日志', '分析日志', '代码审查', '修复', '编译', '健康验收', '提交代码', '补充文档', '远程调试']
   assert.deepEqual(h.actionButtons('development').map(n => n.props.children), developmentOrder)
   h.overflow('development').props.onClick()
   h.data.messages = [{ role: 'user', text: '/implement' }, { role: 'assistant', text: '实现完成，测试通过' }]
   assert.match(h.overflow('development').props.children, /•/, 'hidden recommended Build remains discoverable')
   const english = harness({ english: true })
-  assert.equal(english.overflow('development').props.children, 'More (6)')
+  assert.equal(english.overflow('development').props.children, 'More (7)')
   assert.match(english.overflow('development').props['aria-label'], /Development/)
+})
+
+test('rows fill the available width and only collapse the buttons that do not fit', () => {
+  const widths = Array(15).fill(50)
+  const layout = { schemaVersion: 1, commonActionIds: [], visibleGroups: { common: false, 'requirements-analysis': false, development: true, documents: false, others: false } }
+  const h = harness({ measured: true, rowWidth: 600, widths, moreWidth: 70, layout })
+  h.render(); h.flush(); h.render()
+  assert.equal(h.actionButtons('development').length, 9)
+  assert.equal(h.overflow('development').props.children, '更多（6）')
+  h.row.clientWidth = 300
+  h.render(); h.flush(); h.render()
+  assert.equal(h.actionButtons('development').length, 4)
+  assert.equal(h.overflow('development').props.children, '更多（11）')
+  h.row.clientWidth = 1000
+  h.render(); h.flush(); h.render()
+  assert.equal(h.actionButtons('development').length, 15)
+  assert.equal(h.overflow('development'), undefined, 'no More when the whole row fits')
 })
 
 test('disabled actions do not count toward overflow and saved common ordering is preserved', () => {
@@ -250,7 +292,8 @@ test('common editor groups all enabled actions and synchronizes repeated members
   assert.ok(labels('requirements-analysis').includes('全流程'))
   assert.ok(labels('development').includes('健康验收'))
   assert.ok(labels('others').includes('健康验收'))
-  assert.ok(labels('others').includes('Bug排查'))
+  assert.ok(labels('development').includes('Bug排查'))
+  assert.ok(!labels('others').includes('Bug排查'))
   assert.ok(labels('others').includes('Action 0'))
   assert.ok(!labels('others').includes('Action 1'))
   const repeated = () => nodes().filter(n => n.type === 'label' && n.props.children[1] === '健康验收')

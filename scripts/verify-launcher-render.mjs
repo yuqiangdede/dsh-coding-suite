@@ -15,6 +15,7 @@ const react = {
   useRef: initial => ({ current: initial }),
   useMemo: fn => fn(),
   useEffect: () => {},
+  useLayoutEffect: () => {},
   useCallback: fn => fn,
 }
 const registered = []
@@ -82,7 +83,7 @@ assert.deepEqual(toggles.map(x => [x.props.children].flat().filter(value => type
 assert.deepEqual(toggles.map(x => x.props['aria-pressed']), [true, true, true, false, false])
 assert.equal(buttons.filter(x => x.props.children === '编码').length, 2)
 assert.equal(buttons.filter(x => x.props.children === '开发').length, 0)
-assert.equal(buttons.filter(x => x.props.children === 'Bug排查').length, 1)
+assert.equal(buttons.filter(x => x.props.children === 'Bug排查').length, 2, 'common and development both expose diagnosis')
 assert.equal(buttons.filter(x => x.props.children === '需求讨论').length, 2)
 assert.equal(buttons.filter(x => x.props.children === '修复').length, 1, 'development action starts collapsed')
 assert.equal(buttons.filter(x => x.props.children === '继续').length, 0, 'ninth Common action starts collapsed')

@@ -2,7 +2,7 @@ import assert from 'node:assert/strict'
 import test from 'node:test'
 import { DEFAULT_ACTIONS, encodeActions, parseActions } from '../src/client/actions.ts'
 import { DEFAULT_COMMON_IDS, LAUNCHER_GROUPS, actionsForGroup, defaultLauncherLayout,
-  parseLauncherLayout, exportLauncherConfiguration, importedLauncherLayout } from '../src/client/launcher-layout.ts'
+  fittedActionCount, parseLauncherLayout, exportLauncherConfiguration, importedLauncherLayout } from '../src/client/launcher-layout.ts'
 
 test('five group IDs, defaults, and ordered button references', () => {
   const layout = defaultLauncherLayout(DEFAULT_ACTIONS)
@@ -10,11 +10,22 @@ test('five group IDs, defaults, and ordered button references', () => {
   assert.deepEqual(Object.entries(layout.visibleGroups), [
     ['common', true], ['requirements-analysis', true], ['development', true], ['documents', false], ['others', false],
   ])
-  assert.deepEqual(LAUNCHER_GROUPS.map(g => g.actionIds.length), [11, 14, 7, 14])
+  assert.deepEqual(LAUNCHER_GROUPS.map(g => g.actionIds.length), [11, 15, 7, 14])
   assert.deepEqual(actionsForGroup('common', DEFAULT_ACTIONS, layout).map(a => a.id), [...DEFAULT_COMMON_IDS])
   assert.equal(actionsForGroup('documents', DEFAULT_ACTIONS, layout).length, 7)
   assert.equal(actionsForGroup('others', DEFAULT_ACTIONS, layout).length, 14)
   assert.equal(actionsForGroup('common', DEFAULT_ACTIONS, layout)[0], DEFAULT_ACTIONS.find(a => a.id === 'bug'))
+})
+
+test('fitted rows reserve the More button only when the remaining buttons do not fit', () => {
+  assert.equal(fittedActionCount([], 300, 5, 70), 0)
+  assert.equal(fittedActionCount([50, 50], 105, 5, 70), 2, 'exact fit needs no More')
+  assert.equal(fittedActionCount([50, 50, 50, 50], 215, 5, 70), 4, 'whole row fits')
+  assert.equal(fittedActionCount([50, 50, 50, 50], 200, 5, 70), 2, 'reserves gap and More width')
+  assert.equal(fittedActionCount([50, 50, 50, 50], 180, 5, 70), 2, 'exact room for two buttons plus More')
+  assert.equal(fittedActionCount([50, 50, 50, 50], 179, 5, 70), 1, 'one pixel short still reserves More')
+  assert.equal(fittedActionCount([50, 50], 40, 5, 70), 0, 'nothing fits beside More')
+  assert.equal(fittedActionCount([50, 50, 50], 100, 5, 0), 1, 'unknown More width still degrades')
 })
 
 test('legacy pinned values migrate without discarding customized common lists', () => {
