@@ -11,47 +11,21 @@
 
 ### Overview
 
-`dsh-coding-suite` is an all-in-one engineering enhancement suite for [DeepSeek Harness (DSH)](https://github.com/deepseek-ai/deepseek-harness). It combines an authoritative Host-enforced staged workflow, engineering and product requirements skills and Pocket specifications, an interactive Web/Desktop UI Launcher and panel, and an automated session progress guard.
+`dsh-coding-suite` is an all-in-one engineering enhancement suite for [DeepSeek Harness (DSH)](https://github.com/deepseek-ai/deepseek-harness). It combines an engineering and product requirements skills and Pocket specifications, an interactive Web/Desktop UI Launcher , and an automated session progress guard.
 
 ### Key Capabilities
 
-1. **Host-Authoritative Staged Workflow (S0 - S9)**
-   - **S0 (Init)**: Initialize work item and capture repository baseline snapshot.
-   - **S1 (Requirements)**: Formalize requirements and boundaries; supports explicit skipping for pure bugfixes.
-   - **S2 (Design)**: Architecture and approach design; supports explicit skipping for rapid fixes.
-   - **S3 (Test Spec)**: Specify test cases and verification checks prior to code changes.
-   - **S4 (Implement)**: Implement changes strictly constrained within declared boundary files.
-   - **S5 (Review)**: Perform peer-grade code reviews and capture structured findings.
-   - **S6 (Repair)**: Remediate any blocking review findings.
-   - **S7 (Verify)**: Execute planned test checks inside the sandbox.
-   - **S8 (Commit)**: Perform a single, verified Git commit staging only covered files.
-   - **S9 (Report)**: Record the delivery report with the commit, review findings, verification results and remaining risks.
-   - While a work item is active, tool guards reject recognized direct Git mutations in `bash`/`pwsh` and out-of-plan `write`/`edit` calls. This is not a general-purpose sandbox for arbitrary shell or script writes.
-
-2. **Bundled Engineering and Product Skills**
+1. **Bundled Engineering and Product Skills**
    - High-leverage skills from Matt Pocock: `code-review`, `codebase-design`, `diagnosing-bugs`, `domain-modeling`, `grilling`, `prototype`, `tdd`, `to-spec`, `to-tickets`, `writing-for-agents`, etc.
    - Enterprise documentation & reverse engineering: `requirements-spec`, `api-integration-docs`, `database-design-doc`, `component-doc-merge`, `markdown-to-docx`.
    - Pocket maintenance & shared toolchain: `pocket-setup`, `pocket-reorganize`, `evidence_registry`, document QA scripts.
 
-3. **Client UI Launcher & Workflow Panel**
-   - Live visual workflow panel tracking the active session's work item stage chip.
-   - Workflow commands for an existing work item: Approve, Pause, Resume and Cancel.
+2. **Client UI Launcher**
    - Customizable quick actions launcher with full export/import settings form.
    - Supplement Docs defaults to the current session and can instead use committed code changes in a specified time range or after a specified version/tag/commit.
 
 4. **Todo Progress Guard**
    - Non-intrusive reminder system that alerts the model when active tasks have uncommitted progress or stale plans.
-
-### When the Host workflow is used
-
-“Host-authoritative” means the Host persists the work item and validates stage transitions against evidence and the actual repository; the model's completion claims alone do not advance it.
-
-- **Default buttons are single-stage actions**, not an automatic pipeline. For example, Coding invokes `implement`; Review, Build and Commit have their own scopes. Clicking them does not automatically create a Host work item.
-- **Requirements** follows `product-development-pipeline`: its **Requirements Pipeline** entry guides clarification through analysis, design, every gate, PRD/review, page specifications and UI image prompts. Individual stages can also be invoked separately. Prompts are the default endpoint; image generation and production coding require explicit requests. Existing configurations can add the new presets in settings and enable the new group. See the [requirements contract](docs/pocket/requirements/requirements-analysis-group.md).
-- The agent chooses the route using the objective, context and code evidence: **Bug** means reproduce → root cause → regression test/minimal fix; **Feature or behavior-contract change** means requirements → specification/design → plan → implement. Ambiguity requires clarification. Only a proven unchanged-contract bug may explicitly skip S1/S2 with reasons; both routes require review, real test/build verification, local commit and delivery report.
-- With the `coding_workflow` tool available, the agent starts a work item using `action=start` and advances it through evidence gates. Missing Host tools stop the request rather than silently substituting another authority. A paused or blocked task continues only after an explicit resume. See the [Skill instructions](assets/skills/coding-workflow/SKILL.md).
-- The plugin mounts the [Host service](src/workflow/index.ts) from its [entry point](src/index.ts). The [tool](src/workflow/tool.ts) drives transitions, and the [guard](src/workflow/guard.ts) applies to the calling session's active work item. Without an active work item, these task-specific guard rules do not apply.
-- The launcher shows a workflow panel only when it can read a work item through `remote.codingWorkflow`. Linked standalone installs without that Remote still show ordinary action buttons, but not the workflow panel; a hidden panel alone does not prove the Host tool is unavailable.
 
 ### Installation
 
@@ -84,13 +58,11 @@ The shared DSH packages are declared as peer dependencies, so the running Host s
 
 #### Client UI buttons are missing
 
-DSH keys each browser plugin by its package name, so the built `lib/client.js` must register `dsh-coding-suite` and not the retired scoped name. A linked install also never receives the application-owned `remote.codingWorkflow` namespace, so the client must mount without it. Check the shipped bundle, then reload:
 
 ```sh
 node scripts/verify-client-bundle.mjs
 ```
 
-After rebuilding or editing `lib/`, quit and reopen DSH, or toggle the plugin off and on in the Plugins page; refreshing the page alone does not re-read the bundle. The launcher renders above the composer once a session is open. Without the Host Remote, the action buttons still appear and only the workflow panel stays hidden.
 
 ---
 
@@ -98,45 +70,21 @@ After rebuilding or editing `lib/`, quit and reopen DSH, or toggle the plugin of
 
 ### 概述
 
-`dsh-coding-suite` 是专为 [DeepSeek Harness (DSH)](https://github.com/deepseek-ai/deepseek-harness) 打造的一体化工程增强套件插件。它将 Host 端权威阶段化工作流、工程与产品需求技能与 Pocket 规范、Web/桌面端交互式发射器与工作流面板，以及待办进度守卫深度融为一体。
 
 ### 核心功能
 
-1. **Host 权威阶段化开发工作流 (S0 ~ S9)**
-   - **S0 (初始化)**: 初始化任务条目并记录初始 Git 仓库快照。
-   - **S1 (需求分析)**: 明确需求范围与改动边界；对于快速修复场景支持显式跳过 (Skip)。
-   - **S2 (方案设计)**: 制定技术方案并进行设计评审；对于简单 Bug 可显式跳过。
-   - **S3 (测试规约)**: 在编码前确立验证命令与测试用例。
-   - **S4 (代码实现)**: 在严格限定的文件边界内执行代码实现。
-   - **S5 (代码审查)**: 对比实现产物，记录结构化审查发现 (Findings)。
-   - **S6 (修复改进)**: 针对审查不合规项执行闭环修复。
-   - **S7 (沙箱验证)**: 在隔离沙箱中执行预定的验证检查。
-   - **S8 (验证提交)**: 仅暂存并提交受验证保护的文件，生成原子 Git 提交。
-   - **S9 (交付报告)**: 记录提交标识、审查发现、实际验证结果及剩余风险。
-   - 活跃工作项下，工具守卫拦截 `bash`/`pwsh` 中可识别的直接 Git 变更操作，以及 `write`/`edit` 超出计划文件范围的调用；不等同于对任意 Shell 或脚本写入的通用沙箱隔离。
-
-2. **内置工程、产品需求技能与规范**
+1. **内置工程、产品需求技能与规范**
    - Matt Pocock 经典工程技能：`code-review`、`codebase-design`、`diagnosing-bugs`、`domain-modeling`、`grilling`、`prototype`、`tdd`、`to-spec`、`to-tickets`、`writing-for-agents` 等。
    - 文档与逆向工程体系：`requirements-spec`（逆向需求生成）、`api-integration-docs`、`database-design-doc`、`markdown-to-docx` 等。
    - Pocket 知识库运维与共享工具链：`pocket-setup`、`pocket-reorganize`、证据登记表 (`evidence_registry.py`)、文档检索脚本等。
 
-3. **前端 UI 任务面板与快速发射器**
+2. **前端 UI 快速发射器**
    - 实时呈现当前会话阶段指示器与状态徽标。
    - 交互式控制：批准 (Approve)、暂停 (Pause)、恢复 (Resume)、取消 (Cancel)。
    - 自定义技能动作发射器（支持导入/导出 JSON 配置表单）。
 
 4. **待办任务同步守卫 (Todo Progress Guard)**
    - 智能监控活跃的待办任务，当执行进展超时未同步至上下文时自动发起柔性提醒。
-
-### Host 工作流何时生效
-
-“Host 权威”是指工作项由宿主持久化，并根据证据与真实仓库状态校验阶段推进；不能仅凭模型声称“已完成”就通过。
-
-- **默认按钮是单阶段动作，不是自动流水线**。例如「编码」调用 `implement`，「代码审查」「编译」「提交代码」各有职责；点击这些按钮不会自动创建 Host 工作项。
-- Agent 根据目标、上下文和代码证据判断链路：**Bug 修复**先复现 → 定位根因 → 回归测试与最小修复；**需求开发或行为约定变化**先澄清需求 → 规格与设计 → 实施计划 → 实现。分类不清先询问。仅恢复既有约定的 Bug 可分别带理由显式跳过 S1/S2；两条链路都必须审查、执行真实 test/build 验证，再本地提交并交付报告。
-- `coding_workflow` 工具可用时，Agent 通过 `action=start` 创建工作项，并通过工具逐阶段登记证据。缺少 Host 工具时停止说明，不静默替换权威。暂停或阻塞的任务只有在显式继续后才恢复。详见 [Skill 操作规程](assets/skills/coding-workflow/SKILL.md)。
-- 插件[入口](src/index.ts)挂载 [Host 服务](src/workflow/index.ts)，由[模型工具](src/workflow/tool.ts)推进阶段，[工具守卫](src/workflow/guard.ts)约束调用会话的活跃工作项；没有活跃工作项时，不施加这套任务专属守卫规则。
-- 前端只有通过 `remote.codingWorkflow` 读取到工作项时才显示工作流面板。本地 link 安装缺少该 Remote 时，普通动作按钮仍可显示，但不显示工作流面板；不能仅凭面板隐藏就认定 Host 工具不可用。
 
 ### 五组工作入口
 
@@ -192,13 +140,11 @@ DSH 共享包已声明为 peerDependencies，运行时会使用 Host 自带的�
 
 #### 看不到输入框上方的按钮
 
-DSH 按包名索引浏览器插件，因此构建出的 `lib/client.js` 必须注册为 `dsh-coding-suite`，不能沿用旧的 scope 名称。link 安装也不会得到应用内置的 `remote.codingWorkflow` 命名空间，客户端必须在它缺席时仍能挂载。先检查产物，再重新加载：
 
 ```sh
 node scripts/verify-client-bundle.mjs
 ```
 
-改完 `lib/` 后，请完全退出并重启 DSH，或在「插件」页把插件关闭再开启；仅刷新页面不会重新读取 bundle。打开一个会话后，按钮显示在输入框上方。缺少 Host Remote 时，动作按钮仍会显示，只有工作流面板保持隐藏。
 
 ### 目录结构
 
@@ -206,10 +152,7 @@ node scripts/verify-client-bundle.mjs
 dsh-coding-suite/
 ├── assets/
 │   └── skills/           # 28 个工程技能及共享工具、Pocket 规范
-├── lib/                  # 预编译产物 (Host/Client/Workflow/Guard)
 ├── src/
-│   ├── client/           # 前端 Web/桌面端发射器与工作流面板
-│   ├── workflow/         # 阶段化工作流引擎核心与沙箱验证
 │   ├── index.ts          # 插件 Host 主入口
 │   ├── skill-provider.ts # 技能注册服务
 │   ├── todo-progress-guard.ts # 待办守护插件
