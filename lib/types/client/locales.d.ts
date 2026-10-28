@@ -2,6 +2,10 @@
 /** Simplified Chinese copy. */
 export declare const zh: {
     readonly more: "更多";
+    readonly moreCount: "更多（{count}）";
+    readonly collapse: "收起";
+    readonly groupOverflowLabel: "{group}：{action}";
+    readonly groupDevelopment: "开发";
     readonly workflowMode: "编码模式";
     readonly goalStatus: "自动任务 Goal 状态";
     readonly goalNotStage: "阶段详细进度待接入";

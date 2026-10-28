@@ -4,8 +4,14 @@ import { readFileSync } from 'node:fs'
 
 const jsx = (type, props, key) => ({ type, props: props ?? {}, key })
 const reactJsx = { jsx, jsxs: jsx, Fragment: Symbol.for('react.fragment') }
+let cursor = 0
+const state = []
 const react = {
-  useState: initial => [typeof initial === 'function' ? initial() : initial, () => {}],
+  useState: initial => {
+    const index = cursor++
+    if (!(index in state)) state[index] = typeof initial === 'function' ? initial() : initial
+    return [state[index], value => { state[index] = typeof value === 'function' ? value(state[index]) : value }]
+  },
   useRef: initial => ({ current: initial }),
   useMemo: fn => fn(),
   useEffect: () => {},
@@ -41,7 +47,7 @@ mod.apply(ctx)
 const mount = mounts.find(x => x.options.name === 'conversation.input.dock')
 assert(mount)
 const injected = mount.options.inject('test-session')
-const tree = mount.component({
+const render = () => { cursor = 0; return mount.component({
   ...injected,
   t: key => key,
   useActionForm: selector => selector(form),
@@ -55,7 +61,8 @@ const tree = mount.component({
     insertText: (text) => { inserted = text; return true },
     persistDraft: () => {},
   },
-})
+}) }
+const tree = render()
 const nodes = []
 function visit(value) {
   if (Array.isArray(value)) return value.forEach(visit)
@@ -75,8 +82,14 @@ assert.equal(buttons.filter(x => x.props.children === '开发').length, 0)
 assert.equal(buttons.filter(x => x.props.children === 'Bug排查').length, 1)
 assert.equal(buttons.filter(x => x.props.children === '需求讨论').length, 2)
 assert.equal(buttons.filter(x => x.props.children === '修复').length, 2)
-assert.equal(buttons.filter(x => x.props.children === '继续').length, 1)
-const supplement = buttons.find(x => x.props.children === '补充文档')
+assert.equal(buttons.filter(x => x.props.children === '继续').length, 0, 'ninth Common action starts collapsed')
+const overflow = buttons.filter(x => x.props['aria-expanded'] === false)
+assert.equal(overflow.length, 2, 'Common and Development both offer More')
+for (const button of overflow) button.props.onClick()
+nodes.length = 0
+visit(render())
+assert.equal(nodes.filter(x => x.type === 'button' && x.props.children === '继续').length, 1)
+const supplement = nodes.find(x => x.type === 'button' && x.props.children === '补充文档')
 assert(supplement, 'Supplement Docs button missing')
 supplement.props.onClick()
 assert(inserted.includes('来源：本会话'), 'supplement draft must default to this session')

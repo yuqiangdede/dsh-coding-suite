@@ -2,6 +2,9 @@
 /** Simplified Chinese copy. */
 export const zh = {
   'more': '更多',
+  'moreCount': '更多（{count}）',
+  'collapse': '收起',
+  'groupOverflowLabel': '{group}：{action}',
   'workflowMode': '编码模式',
   'goalStatus': '自动任务 Goal 状态',
   'goalNotStage': '阶段详细进度待接入',
@@ -18,7 +21,7 @@ export const zh = {
   'showButton': '加入常用',
   'groupVisibility': '显示分组',
   'groupCommon': '常用',
-  'groupDevelopment': '需求开发',
+  'groupDevelopment': '开发',
   'groupDocuments': '文档编写',
   'groupOthers': '其他',
   'groupAlwaysVisible': '始终显示',
@@ -119,6 +122,9 @@ export type LauncherLocaleKey = keyof typeof zh
 /** English copy with the same keys. */
 export const en: Record<LauncherLocaleKey, string> = {
   'more': 'More',
+  'moreCount': 'More ({count})',
+  'collapse': 'Show less',
+  'groupOverflowLabel': '{group}: {action}',
   'workflowMode': 'Coding mode',
   'goalStatus': 'Automatic task Goal status',
   'goalNotStage': 'Detailed stage progress not yet available',
@@ -135,7 +141,7 @@ export const en: Record<LauncherLocaleKey, string> = {
   'showButton': 'Add to common',
   'groupVisibility': 'Visible groups',
   'groupCommon': 'Common',
-  'groupDevelopment': 'Feature development',
+  'groupDevelopment': 'Development',
   'groupDocuments': 'Documentation',
   'groupOthers': 'Others',
   'groupAlwaysVisible': 'Always visible',

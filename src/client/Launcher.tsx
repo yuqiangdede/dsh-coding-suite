@@ -34,6 +34,7 @@ export function Launcher({
   const unchangedMs = Date.now() - planChangedAt
   const planMayBeStale = watching && unchangedMs >= todoStaleMs
   const unchangedMinutes = Math.ceil(unchangedMs / 60000)
+  const [expandedGroups, setExpandedGroups] = useState<Record<string, boolean>>({})
   const [layoutSaving, setLayoutSaving] = useState(false)
   const [pending, setPending] = useState(false)
   const [notice, setNotice] = useState('')
@@ -134,6 +135,22 @@ export function Launcher({
   const render = (a: CodingAction) => <button type="button" key={a.id} disabled={!available} className={visibleRecommendation?.ids.includes(a.id) ? css.recommended : css.action}
     title={a.description + '\n' + a.example + (visibleRecommendation?.ids.includes(a.id) ? '\n' + t('recommendationTooltip').replace('{reason}', t(visibleRecommendation.reason)) : '')} onClick={() => { void insert(a) }}>{displayLabel(a)}</button>
   const item = workflow.item
+  // Expansion is local presentation state, independent of saved membership and action availability.
+  const renderGroupActions = (id: string, label: string, members: CodingAction[]) => {
+    const limit = 8
+    const expanded = expandedGroups[id] === true
+    const overflow = members.slice(limit)
+    const hiddenRecommendation = !expanded && overflow.some(action => visibleRecommendation?.ids.includes(action.id))
+    const toggleLabel = expanded ? t('collapse') : t('moreCount').replace('{count}', String(overflow.length))
+    return <div className={css.row}>
+      {(expanded ? members : members.slice(0, limit)).map(render)}
+      {overflow.length > 0 && <button type="button" className={css.action} aria-expanded={expanded}
+        aria-label={t('groupOverflowLabel').replace('{group}', label).replace('{action}', toggleLabel)}
+        onClick={() => { setExpandedGroups(previous => ({ ...previous, [id]: !previous[id] })) }}>
+        {toggleLabel + (hiddenRecommendation ? ' •' : '')}
+      </button>}
+    </div>
+  }
   return <div className={css.root} data-matt-skill-launcher>
     {item !== null && <WorkflowPanel item={item} decision={decision} pending={pending}
       onDecision={setDecision} onAction={(action) => { void runWorkflow(action) }} t={t} />}
@@ -149,18 +166,18 @@ export function Launcher({
           {!layout.visibleGroups[group.id] && groupHasRecommendation(group.id) ? ' •' : ''}
         </button>)}
       </div>
-      <div className={css.actionGroup}>
+      <div className={css.actionGroup} data-launcher-group="common">
         <div className={css.groupHeader}><span>{t('groupCommon')}</span><span className={css.locked}>{t('groupAlwaysVisible')}</span></div>
-        <div className={css.row}>{commonActions.map(render)}</div>
+        {renderGroupActions('common', t('groupCommon'), commonActions)}
       </div>
       {groups.filter(group => layout.visibleGroups[group.id] && group.actions.length > 0).map(group =>
-        <div className={css.actionGroup} key={group.id}>
+        <div className={css.actionGroup} key={group.id} data-launcher-group={group.id}>
           <div className={css.groupHeader}>
             <span>{t(group.label)}</span>
             <button type="button" className={css.hideGroup} disabled={layoutSaving || !snapshot.writable}
               onClick={() => { void toggleGroup(group.id) }}>{t('hideGroup')}</button>
           </div>
-          <div className={css.row}>{group.actions.map(render)}</div>
+          {renderGroupActions(group.id, t(group.label), group.actions)}
         </div>)}
     </>}
     {visibleRecommendation && <div className={css.hint} aria-live="polite">{t('recommendationHint').replace('{actions}', recommendedActions.map(displayLabel).join(t('recommendationSeparator'))).replace('{reason}', t(visibleRecommendation.reason))}</div>}
