@@ -11,3 +11,5 @@ Pocket (`docs/pocket/`) is canonical; no legacy glossary or ADR authority is ret
 ### Project knowledge (Pocket)
 
 Before working on project requirements, design, or code, read `docs/pocket/README.md` and its task-specific pointers; see `docs/pocket/meta/knowledge-policy.md` for canonical ownership, update, and maintenance rules. New or changed decisions belong in the location the Pocket index records as authoritative (Pocket, or a retained legacy authority pending migration), not solely in chat. If source, existing docs, or task instructions conflict, report the discrepancy rather than silently rewriting requirements.
+
+When introducing or adapting any prompt, Skill, or its bundled prompt resources, record the provenance for each asset in `docs/pocket/meta/skills-prompts.md` or its linked source manifest, following its provenance rules. Keep unknown information explicitly unknown and update the record when upgrading the source.

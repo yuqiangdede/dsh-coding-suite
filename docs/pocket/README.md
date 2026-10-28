@@ -28,6 +28,8 @@ Only link to files that actually exist. No legacy paths are pending migration.
 
 ## Current state
 
+- [可选代码图谱导航](requirements/graphify-navigation.md) — accepted；初始化只诊断，显式建图、刷新或查询，默认本地代码提取，无后台监听。
+
 - [对话中的按钮使用顺序](requirements/conversation-action-history.md) — accepted；输入区按当前对话已发送消息展示识别出的按钮和自由对话，保留顺序并说明识别限制。
 
 - [需求分组与产品研发流水线](requirements/requirements-analysis-group.md) — accepted；分组显示名为「需求」，以产品研发流水线为主干，11 个入口从需求澄清到最终 UI 生图提示词，保留阶段 Gate、回退、旧布局和自定义动作兼容。

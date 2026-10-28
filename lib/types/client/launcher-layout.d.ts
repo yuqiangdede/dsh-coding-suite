@@ -15,7 +15,7 @@ export declare const LAUNCHER_GROUPS: readonly [{
 }, {
     readonly id: "others";
     readonly label: "groupOthers";
-    readonly actionIds: readonly ["initialize", "ask", "health-acceptance", "doc-supplement", "tdd", "prototype", "architecture", "domain", "research", "retro", "handoff", "image", "prd-writing", "requirement-review"];
+    readonly actionIds: readonly ["initialize", "graphify-navigation", "ask", "health-acceptance", "doc-supplement", "tdd", "prototype", "architecture", "domain", "research", "retro", "handoff", "image", "prd-writing", "requirement-review"];
 }];
 export type OptionalGroupId = typeof LAUNCHER_GROUPS[number]['id'];
 export type GroupId = 'common' | OptionalGroupId;

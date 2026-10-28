@@ -28,6 +28,7 @@ Look at the current repo to understand its starting state. Read whatever exists;
 - `docs/adr/` and any `src/*/docs/adr/` directories
 - `docs/agents/`: does this skill's prior output already exist?
 - `docs/pocket/`: does its README, knowledge policy, active requirements, design, or ADRs already exist? Identify which location is currently authoritative before changing paths.
+- Optional Graphify code navigation: check whether the `graphify` executable and `graphify-out/graph.json` exist. Report availability and offer the `graphify-navigation` skill for explicit setup; do not install, build, start a watcher, or modify hooks as part of this diagnostic.
 - `.scratch/`: a sign that a local-markdown issue tracker convention is already in use
 - Is the `triage` skill installed? (a `triage` skill folder alongside this one, or `triage` in your available skills.) This decides whether Section B runs at all.
 - Monorepo signals: a `pnpm-workspace.yaml`, a `workspaces` field in `package.json`, or a populated `packages/*` with its own `src/`. These are present only in a genuinely large multi-package repo; their absence means single-context, which is almost every repo.
