@@ -28,7 +28,7 @@ Only link to files that actually exist. No legacy paths are pending migration.
 
 ## Current state
 
-- [可选代码图谱导航](requirements/graphify-navigation.md) — accepted；初始化只诊断，显式建图、刷新或查询，默认本地代码提取，无后台监听。
+- [可选代码图谱导航](requirements/graphify-navigation.md) — accepted；初始化只诊断，按钮发送后建图或刷新，默认本地代码提取，无后台监听。
 
 - [对话中的按钮使用顺序](requirements/conversation-action-history.md) — accepted；输入区按当前对话已发送消息展示识别出的按钮和自由对话，保留顺序并说明识别限制。
 

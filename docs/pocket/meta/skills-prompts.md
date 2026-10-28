@@ -360,3 +360,7 @@ git status --short
 ### 2026-10-28：交互生成按钮
 
 状态：implemented；用户要求将原「交互提示词」改为「交互生成」，直接生成网页。保留 action ID `image`、纯提示词类型、位置和配置兼容；默认指令先检查现有项目及设计系统，实现适用交互状态、响应式和基本无障碍，并验证与报告。视觉质量原则参考 [Hallmark](https://github.com/Nutlope/hallmark) v2.0.0，检查时上游提交 `65b5e4090ed95ee3dc2ff7db55b69aef8c5ff7b5`（MIT）；未导入其 Skill、主题、脚本或强制网页构建流程。需求流水线 `product-image-prompt` 仍是独立的生图提示词阶段。已保存的按钮字段不会自动覆盖，用户需在设置中更新或恢复对应预设。
+
+### 2026-10-29：代码图谱建图与更新入口
+
+按用户要求，本地改写 `ACTION:graphify-navigation` 默认提示词并新增 `ACTION:graphify-refresh`，调整本地维护的 `SKILL:graphify-navigation` 以执行按钮请求；用户发送后建图或刷新，刷新时缺图则创建。来源为用户需求及本仓库原有资产，上游 Graphify 仅为外部 CLI 参考，未复制上游提示词或代码；上游版本及许可核验状态不变。修改前基线为 Git HEAD 对应资产，内容历史由 Git 保存；新按钮本地编写，项目许可见仓库 LICENSE。已保存按钮配置不自动覆盖，需在设置中更新旧提示词并添加缺失按钮；不启动后台监听。

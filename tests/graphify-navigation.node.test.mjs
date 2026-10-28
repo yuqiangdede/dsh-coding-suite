@@ -9,12 +9,17 @@ test('graph navigation is discoverable without changing existing saved actions',
   assert.equal(action?.skillId, 'graphify-navigation')
   assert.equal(action?.enabled, true)
   assert.ok(LAUNCHER_GROUPS.find(g => g.id === 'others').actionIds.includes(action.id))
-  const saved = DEFAULT_ACTIONS.filter(a => a.id !== action.id).map(a => ({ ...a }))
+  const refresh = DEFAULT_ACTIONS.find(a => a.id === 'graphify-refresh')
+  assert.equal(refresh?.skillId, 'graphify-navigation')
+  assert.ok(LAUNCHER_GROUPS.find(g => g.id === 'others').actionIds.includes(refresh.id))
+  assert.match(action.prompt, /直接建图/)
+  assert.match(refresh.prompt, /不存在则直接创建/)
+  const saved = DEFAULT_ACTIONS.filter(a => a.id !== action.id && a.id !== refresh.id).map(a => ({ ...a }))
   assert.deepEqual(parseActions(encodeActions(saved)), saved)
-  assert.deepEqual(missingDefaultActions(saved).map(a => a.id), [action.id])
+  assert.deepEqual(missingDefaultActions(saved).map(a => a.id), [action.id, refresh.id])
 })
 
-test('bundled skill requires explicit operations and keeps the code-only boundary', () => {
+test('bundled skill executes button operations and keeps the code-only boundary', () => {
   const skill = readFileSync(new URL('../assets/skills/graphify-navigation/SKILL.md', import.meta.url), 'utf8')
   assert.match(skill, /graphify extract \. --code-only/)
   assert.match(actionPrompt(), /自动安装官方 graphifyy/)
