@@ -15,6 +15,9 @@ const root = fileURLToPath(new URL('..', import.meta.url))
 const pkg = JSON.parse(readFileSync(new URL('../package.json', import.meta.url), 'utf8'))
 const bundlePath = new URL('../lib/client.js', import.meta.url)
 const bundleSource = readFileSync(bundlePath, 'utf8')
+const hostSource = readFileSync(new URL('../lib/index.js', import.meta.url), 'utf8')
+assert.doesNotMatch(bundleSource, /codingWorkflow|workflowCommands|WorkflowPanel/, 'browser bundle must not contain the retired workflow')
+assert.doesNotMatch(hostSource, /CodingWorkflowService|verificationTimeoutMs/, 'Host bundle must not load the retired workflow')
 
 const registered = []
 globalThis.window = {
