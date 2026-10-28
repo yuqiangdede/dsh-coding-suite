@@ -6,16 +6,11 @@ import type { ConfigForm } from '@deepseek-ai/dsh-client-ui-settings/client'
 import type {} from '@deepseek-ai/dsh-client-ui-conversation/client'
 import type {} from '@deepseek-ai/dsh-client-ui-renderer/client'
 import type {} from '@deepseek-ai/dsh-client-ui-session/client'
-import type { HostObservable } from '@deepseek-ai/dsh-client-ui-slots'
-import type { RemoteResult } from '@deepseek-ai/dsh-api-remotes/client'
 import type {} from '@deepseek-ai/dsh-api-remotes/client'
 import type {} from '@deepseek-ai/dsh-api-session-controller/client'
-import type { WorkItem } from '../workflow/types.ts'
 import { LAUNCHER_CONFIG_GLOBAL, LauncherDeploymentSchema } from '../config.ts'
 import { Launcher } from './Launcher.tsx'
 import { LauncherSettings } from './Settings.tsx'
-import { createCodingWorkflowSource } from './workflow-source.ts'
-import type { CodingWorkflowSnapshot } from './workflow-source.ts'
 /** Host-persisted launcher configuration. */
 export interface ActionSettings { actionsJson?: string; layoutJson?: string }
 /** Settings form and revision-checked save operation. */
@@ -24,32 +19,11 @@ export interface LauncherSettingsInjected {
   saveActions: (json:string, revision?:number)=>Promise<boolean>
   saveConfiguration: (actionsJson: string, layoutJson: string, revision?: number) => Promise<boolean>
 }
-/** Identity of the exact Host task revision a user acted on. */
-export interface WorkflowTaskRef {
-  readonly taskId: string
-  readonly revision: number
-}
-/** Outcome of one launcher-initiated workflow command. */
-export interface WorkflowCommandResult {
-  /** Whether the Host accepted the command. */
-  readonly ok: boolean
-  /** Failure message for the notice line. */
-  readonly message?: string
-  /** Accepted Host revision, so a later stale write can be detected. */
-  readonly ref?: WorkflowTaskRef
-}
-/** Launcher form, Skill catalog, the Session's coding Work Item, and the Host's stale-plan threshold. */
+/** Launcher form, Skill catalog, and Host's stale-plan threshold. */
 export interface LauncherInjected {
-  hooks: { actionForm: ConfigForm<ActionSettings>; workflow: HostObservable<CodingWorkflowSnapshot> }
+  hooks: { actionForm: ConfigForm<ActionSettings> }
   fetchSkillNames: ()=>Promise<readonly string[]>
   saveLayout: (json: string, revision?: number) => Promise<boolean>
-  /** Revision-checked mutations of the current coding task. */
-  workflowCommands: {
-    approve: (decision: string, ref?: WorkflowTaskRef) => Promise<WorkflowCommandResult>
-    pause: (ref?: WorkflowTaskRef) => Promise<WorkflowCommandResult>
-    resume: (ref?: WorkflowTaskRef) => Promise<WorkflowCommandResult>
-    cancel: (reason: string, ref?: WorkflowTaskRef) => Promise<WorkflowCommandResult>
-  }
   todoStaleMs: number
 }
 declare module '@deepseek-ai/dsh-api-session-controller/client' {
@@ -74,38 +48,7 @@ export function apply(ctx: ClientContext): void {
   ctx.slots.inject('conversation.input.dock', () => ctx.slots.register({
     name: 'conversation.input.dock', locale: 'mattSkillLauncher', id: 'matt-skill-launcher', order: 1,
     inject: (sessionId): LauncherInjected => {
-      // A linked standalone install does not receive the application's generated
-      // `remote.codingWorkflow` contribution; the dock must still mount without it.
-      const workflowRemote = ctx.remote.codingWorkflow
-      const workflow = createCodingWorkflowSource({
-        read: async () => {
-          const binding = ctx.sessions.binding(sessionId)
-          if (binding === undefined || binding.session.getSnapshot().openState !== 'open') {
-            return { ok: false, error: { code: 'session-unavailable', message: 'Session unavailable' } }
-          }
-          if (workflowRemote === undefined) {
-            return { ok: false, error: { code: 'workflow-unavailable', message: 'Coding workflow remote unavailable' } }
-          }
-          return workflowRemote.get(sessionId)
-        },
-        subscribeChange: listener => {
-          try {
-            return ctx.remote.$on('coding-workflow/changed', (change) => {
-              if (change.sessionId === sessionId) listener(change)
-            })
-          } catch {
-            return () => {}
-          }
-        },
-        subscribeReset: listener => ctx.on('connection/reset', listener),
-      })
-      // Every command carries the revision it read, so a stale panel fails instead of overwriting a newer task.
-      const command = async (action: (item: WorkItem) => Promise<RemoteResult<WorkItem>>, expected?: WorkflowTaskRef): Promise<WorkflowCommandResult> => {
-        if (workflowRemote === undefined) return { ok: false, message: 'Coding workflow remote unavailable' }
-        const item = workflow.getSnapshot().item
-        if (item === null) return { ok: false, message: 'No current task' }
-        if (expected && (item.taskId !== expected.taskId || item.revision !== expected.revision))
-          return { ok: false, message: 'Coding task changed; refresh and retry' }
+      return { ok: false, message: 'Coding task changed; refresh and retry' }
         try {
           const result = await action(item)
           return result.ok ? { ok: true, ref: { taskId: result.value.taskId, revision: result.value.revision } }
@@ -115,15 +58,9 @@ export function apply(ctx: ClientContext): void {
         }
       }
       return {
-        hooks: { actionForm: form, workflow },
+        hooks: { actionForm: form },
         todoStaleMs: deployment.todoStaleMs,
         saveLayout: (json, rev) => form.mutate([{ op: 'set', path: ['layoutJson'], value: json }], rev),
-        workflowCommands: {
-          approve: (decision, ref) => command(item => workflowRemote.approve(sessionId, item.taskId, item.revision, decision), ref),
-          pause: ref => command(item => workflowRemote.pause(sessionId, item.taskId, item.revision), ref),
-          resume: ref => command(item => workflowRemote.resume(sessionId, item.taskId, item.revision), ref),
-          cancel: (reason, ref) => command(item => workflowRemote.cancel(sessionId, item.taskId, item.revision, reason), ref),
-        },
         fetchSkillNames: async () => {
           if (ctx.sessions.binding(sessionId) === undefined) throw new Error('Session unavailable')
           return ctx.sessions.using(sessionId,{ source:'mattSkillLauncher' },async (ref)=>{
