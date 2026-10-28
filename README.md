@@ -11,7 +11,7 @@
 
 ### Overview
 
-`dsh-coding-suite` is an all-in-one engineering enhancement suite for [DeepSeek Harness (DSH)](https://github.com/deepseek-ai/deepseek-harness). It combines an authoritative Host-enforced staged workflow, 28 bundled engineering skills and Pocket specifications, an interactive Web/Desktop UI Launcher and panel, and an automated session progress guard.
+`dsh-coding-suite` is an all-in-one engineering enhancement suite for [DeepSeek Harness (DSH)](https://github.com/deepseek-ai/deepseek-harness). It combines an authoritative Host-enforced staged workflow, engineering and product requirements skills and Pocket specifications, an interactive Web/Desktop UI Launcher and panel, and an automated session progress guard.
 
 ### Key Capabilities
 
@@ -28,7 +28,7 @@
    - **S9 (Report)**: Record the delivery report with the commit, review findings, verification results and remaining risks.
    - While a work item is active, tool guards reject recognized direct Git mutations in `bash`/`pwsh` and out-of-plan `write`/`edit` calls. This is not a general-purpose sandbox for arbitrary shell or script writes.
 
-2. **28 Bundled Engineering Skills**
+2. **Bundled Engineering and Product Skills**
    - High-leverage skills from Matt Pocock: `code-review`, `codebase-design`, `diagnosing-bugs`, `domain-modeling`, `grilling`, `prototype`, `tdd`, `to-spec`, `to-tickets`, `writing-for-agents`, etc.
    - Enterprise documentation & reverse engineering: `requirements-spec`, `api-integration-docs`, `database-design-doc`, `component-doc-merge`, `markdown-to-docx`.
    - Pocket maintenance & shared toolchain: `pocket-setup`, `pocket-reorganize`, `evidence_registry`, document QA scripts.
@@ -47,6 +47,7 @@
 “Host-authoritative” means the Host persists the work item and validates stage transitions against evidence and the actual repository; the model's completion claims alone do not advance it.
 
 - **Default buttons are single-stage actions**, not an automatic pipeline. For example, Coding invokes `implement`; Review, Build and Commit have their own scopes. Clicking them does not automatically create a Host work item.
+- **Requirements** follows `product-development-pipeline`: its **Requirements Pipeline** entry guides clarification through analysis, design, every gate, PRD/review, page specifications and UI image prompts. Individual stages can also be invoked separately. Prompts are the default endpoint; image generation and production coding require explicit requests. Existing configurations can add the new presets in settings and enable the new group. See the [requirements contract](docs/pocket/requirements/requirements-analysis-group.md).
 - The **Manual / Automatic** controls sit beside Visible groups and default to Manual when there is no active Host task. Selecting Automatic does not execute anything: click **Prepare automatic task** at the start of the draft to insert `/coding-workflow`, preserve your goal text, then explicitly send. An existing task uses its Host mode; switching it to Automatic pauses it and requires an explicit continuation rather than starting a second task.
 - The agent chooses the route using the objective, context and code evidence: **Bug** means reproduce → root cause → regression test/minimal fix; **Feature or behavior-contract change** means requirements → specification/design → plan → implement. Ambiguity requires clarification. Only a proven unchanged-contract bug may explicitly skip S1/S2 with reasons; both routes require review, real test/build verification, local commit and delivery report.
 - With the `coding_workflow` tool available, the agent starts a work item using `action=start` and advances it through evidence gates. Missing Host tools stop the automatic request rather than silently substituting another authority. Manual takeover first pauses the matching Goal, then changes the Host task to Manual/paused; explicitly resume the Host task to continue within its guards. See the [Skill instructions](assets/skills/coding-workflow/SKILL.md) and [interaction contract](docs/pocket/requirements/automatic-mode.md).
@@ -98,7 +99,7 @@ After rebuilding or editing `lib/`, quit and reopen DSH, or toggle the plugin of
 
 ### 概述
 
-`dsh-coding-suite` 是专为 [DeepSeek Harness (DSH)](https://github.com/deepseek-ai/deepseek-harness) 打造的一体化工程增强套件插件。它将 Host 端权威阶段化工作流、28 项精选工程技能与 Pocket 规范、Web/桌面端交互式发射器与工作流面板，以及待办进度守卫深度融为一体。
+`dsh-coding-suite` 是专为 [DeepSeek Harness (DSH)](https://github.com/deepseek-ai/deepseek-harness) 打造的一体化工程增强套件插件。它将 Host 端权威阶段化工作流、工程与产品需求技能与 Pocket 规范、Web/桌面端交互式发射器与工作流面板，以及待办进度守卫深度融为一体。
 
 ### 核心功能
 
@@ -115,7 +116,7 @@ After rebuilding or editing `lib/`, quit and reopen DSH, or toggle the plugin of
    - **S9 (交付报告)**: 记录提交标识、审查发现、实际验证结果及剩余风险。
    - 活跃工作项下，工具守卫拦截 `bash`/`pwsh` 中可识别的直接 Git 变更操作，以及 `write`/`edit` 超出计划文件范围的调用；不等同于对任意 Shell 或脚本写入的通用沙箱隔离。
 
-2. **28 个内置工程技能与规范**
+2. **内置工程、产品需求技能与规范**
    - Matt Pocock 经典工程技能：`code-review`、`codebase-design`、`diagnosing-bugs`、`domain-modeling`、`grilling`、`prototype`、`tdd`、`to-spec`、`to-tickets`、`writing-for-agents` 等。
    - 文档与逆向工程体系：`requirements-spec`（逆向需求生成）、`api-integration-docs`、`database-design-doc`、`markdown-to-docx` 等。
    - Pocket 知识库运维与共享工具链：`pocket-setup`、`pocket-reorganize`、证据登记表 (`evidence_registry.py`)、文档检索脚本等。
@@ -139,16 +140,18 @@ After rebuilding or editing `lib/`, quit and reopen DSH, or toggle the plugin of
 - 插件[入口](src/index.ts)挂载 [Host 服务](src/workflow/index.ts)，由[模型工具](src/workflow/tool.ts)推进阶段，[工具守卫](src/workflow/guard.ts)约束调用会话的活跃工作项；没有活跃工作项时，不施加这套任务专属守卫规则。
 - 前端只有通过 `remote.codingWorkflow` 读取到工作项时才显示工作流面板。本地 link 安装缺少该 Remote 时，普通动作按钮仍可显示，但不显示工作流面板；不能仅凭面板隐藏就认定 Host 工具不可用。
 
-### 四组编码按钮
+### 五组工作入口
 
-输入框上方的按钮按场景分为「常用」「需求开发」「文档编写」「其他」：
+输入框上方按场景分为「常用」「需求」「开发」「文档」「其他」：
 
-- **常用**固定显示，默认包含 Bug排查、需求讨论、编码、代码审查、修复、编译、提交代码、继续。
-- **需求开发**默认显示；其他两组默认隐藏，可在工具栏直接点击分组按钮切换显示状态。
+- **常用**默认显示，可编辑成员，也可隐藏后恢复。
+- **需求**以产品研发流水线为主干：需求全流程 → 澄清 → 分析 → 风险扫描 → 业务方案 → 模块边界 → 数据/状态 → 异常流程 → PRD/评审/页面规格 → 页面一致性 → 生图提示词。默认展示前 8 项，点击「更多（3）」查看最后阶段。
+- **需求全流程**从最初想法一路推进到最终 UI 生图提示词，各 Gate 失败时回退，不自动实际生图或启动生产编码。明确只要文档或原型时遵循指定终点；其余阶段入口只完成对应一步。详见[需求分析约定](docs/pocket/requirements/requirements-analysis-group.md)。
+- **开发**默认显示；新用户也默认显示需求，文档/其他默认隐藏。旧保存布局的需求组默认隐藏，在「显示分组」打开；已有按钮配置先在设置点击「补齐缺失预设（待保存）」并保存。
 - 「补充文档」默认把本会话已确认结论补进现有产品文档；发送前可把草稿中的“来源”改为指定时间段或指定版本号/标签/提交之后，改按该范围的已提交代码改动记录补充。详见 [补充文档来源约定](docs/pocket/requirements/doc-supplement-sources.md)。
 - 「按钮设置」允许管理每组显隐、常用按钮成员及原有 Skill/提示词；保存和导入导出 JSON 同时包含布局。
 - 同一按钮可在不同分组出现，但始终引用同一个 action ID；隐藏分类不会禁用 Skill。
-- 升级时保留原有已保存提示词及启用状态，旧自定义常用列表优先保留，旧默认快捷列表自动映射为新的八个常用按钮。
+- 升级时保留原有已保存提示词及启用状态，旧自定义常用列表优先保留，旧默认快捷列表映射到当前常用预设；新阶段不自动加入常用。
 
 插件使用 `layoutJson` 保存版本化分类布局，不修改既有 `actionsJson` Schema v3 和 Host 编码阶段规则。安装时仍需携带仓库内的预编译 `lib/`，在 Windows CI 中校验运行时 bundle。
 

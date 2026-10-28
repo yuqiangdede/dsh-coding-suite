@@ -2,9 +2,10 @@ import type { CodingAction } from './actions.ts'
 
 /** Visual-only groups. One action ID may be referenced by several groups. */
 export const LAUNCHER_GROUPS = [
+  { id: 'requirements-analysis', label: 'groupRequirementsAnalysis', actionIds: ['product-development-pipeline', 'requirement-clarification', 'requirement-analysis', 'product-risk-gate', 'solution-design', 'product-module-gate', 'product-state-gate', 'product-exception-gate', 'product-prd-pages', 'product-consistency-gate', 'product-image-prompt'] },
   { id: 'development', label: 'groupDevelopment', actionIds: ['discussion', 'visual', 'spec', 'plan', 'execute', 'add-logs', 'analyze-logs', 'review', 'review-fix', 'compile', 'health-acceptance', 'commit', 'doc-supplement', 'remote-debug'] },
   { id: 'documents', label: 'groupDocuments', actionIds: ['api-docs', 'requirements', 'overview', 'outline', 'database', 'doc-merge', 'docx'] },
-  { id: 'others', label: 'groupOthers', actionIds: ['initialize', 'ask', 'health-acceptance', 'doc-supplement', 'tdd', 'prototype', 'architecture', 'domain', 'research', 'retro', 'handoff', 'image'] },
+  { id: 'others', label: 'groupOthers', actionIds: ['initialize', 'ask', 'health-acceptance', 'doc-supplement', 'tdd', 'prototype', 'architecture', 'domain', 'research', 'retro', 'handoff', 'image', 'prd-writing', 'requirement-review'] },
 ] as const
 
 export type OptionalGroupId = typeof LAUNCHER_GROUPS[number]['id']
@@ -19,7 +20,7 @@ export interface LauncherLayout {
 }
 
 const defaultVisibility: Record<GroupId, boolean> = {
-  common: true, development: true, documents: false, others: false,
+  common: true, 'requirements-analysis': true, development: true, documents: false, others: false,
 }
 const actionIdPattern = /^[a-z0-9][a-z0-9-]{0,63}$/
 
@@ -51,13 +52,16 @@ export function parseLauncherLayout(
   if (doc.schemaVersion !== 1 || !visible || typeof visible !== 'object' || Array.isArray(visible) ||
     !Array.isArray(ids) || ids.length > 100) throw new Error('分组布局版本或字段错误')
   const obj = visible as Record<string, unknown>
-  if ((obj.common !== undefined && typeof obj.common !== 'boolean') || LAUNCHER_GROUPS.some(group => typeof obj[group.id] !== 'boolean') ||
+  if ((obj.common !== undefined && typeof obj.common !== 'boolean') ||
+    (obj['requirements-analysis'] !== undefined && typeof obj['requirements-analysis'] !== 'boolean') ||
+    LAUNCHER_GROUPS.some(group => group.id !== 'requirements-analysis' && typeof obj[group.id] !== 'boolean') ||
     ids.some(id => typeof id !== 'string' || !actionIdPattern.test(id)) ||
     new Set(ids).size !== ids.length) throw new Error('分组布局选项或按钮 ID 错误')
   return {
     schemaVersion: 1,
     visibleGroups: {
       common: obj.common === undefined ? true : obj.common as boolean,
+      'requirements-analysis': obj['requirements-analysis'] === undefined ? false : obj['requirements-analysis'] as boolean,
       development: obj.development as boolean,
       documents: obj.documents as boolean,
       others: obj.others as boolean,

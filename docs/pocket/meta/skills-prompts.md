@@ -216,6 +216,20 @@ node scripts/verify-client-bundle.mjs
 
 ## 8. 变更记录与复用模板
 
+### 2026-10-28：需求分析主干与产品研发技能接入
+
+状态：implemented；用户批准实施并补充要求以产品研发流水线为整个分组主干，从澄清推进到 UI 生图提示词。权威行为见[需求分析分组](../requirements/requirements-analysis-group.md)，变更 ID：`local-20261028-03`。
+
+- 上游：`yuqiangdede/My-Prompts` 固定提交 `bfc391e4b48d40ca3b7dfd337b374432c61559d4`；通过固定提交 GitHub 文件接口读取总控、9 个专项 Skill、10 个步骤及配套材料。Apache-2.0 根许可和归属随包保留，未发现独立 NOTICE。
+- [来源清单](../../../assets/skills/product-development-source.json)记录原始路径和 Git blob ID；[许可](../../../assets/skills/PRODUCT-DEVELOPMENT-LICENSE)、[归属与改动说明](../../../assets/skills/PRODUCT-DEVELOPMENT-NOTICE)保持与 Matt 来源分离。未升级或覆盖 Matt 资产，首次 SHA 基线保持原样。
+- 本地改动：平铺 10 项上游技能、修复路径；新加 7 项单阶段适配，只引用总控 steps；共享规则明确项目知识权威、阶段范围、版本、评审与结果标记；历史参考材料标为按需引用，小任务不强凑流程。按用户要求将 DSH 默认终点改为生图提示词，实际生图仍需明确请求；该默认值与上游有意不同。
+- 当前目录实际可发现 48 个 Skill，默认动作 46 个；这是本次检查结果，不改变第 1 节首次盘点的历史数量。新增 13 个默认动作，需求分析组按主干提供 11 个入口，PRD 写作/独立需求评审作为辅助动作放其他组；旧动作 ID、Skill 和用户内容不换绑。
+- 接收指令、英文展示、阶段 Gate/结果建议、配置兼容和设置补齐同步；旧布局缺新字段补为隐藏，已有动作显式补齐，超过 100 时提示并保留原配置。Host 编码工作流 schema 和工程门禁未改。
+- 发布构建增加上下文推荐模块同步，并为 portable actions/layout/locales/contextual-actions 输出 JS、声明和映射，避免只改按钮表而丢失布局/推荐。真实运行入口仍为 `lib/client.js`。
+- 本次验证：全部 57 项 Node 回归通过，包含发布 bundle 的分组/草稿/设置交互、旧布局与导入导出、显式补齐/英文/100 上限、Gate 顺序及否定/冲突结果、发布 Host provider 的新技能发现/正文/资源基目录、全部新资源的本地 Markdown 链接；portable TypeScript strict 检查、按钮表一致性、插件注册、分组渲染和 Pocket 链接检查通过。`npm pack --dry-run --json` 核对 346 个打包条目，包含总控步骤、新阶段、来源/许可及布局声明；未生成发布包或发布到 registry。
+- 限制：未执行真实 DSH GUI 重载、窄屏/辅助技术实测、模型端到端的小需求/复杂状态权限/NO-GO 业务案例；本次未运行依赖外部 Host 测试环境的 Vitest 套件，不能将 Node 回归表述为全量宿主验证。未提交或推送。
+- 回滚范围：本地原 HEAD `ba42e901b90799c6ad6c82c418dc40e865b455f1` 的运行源码/产物可作对照；按本条列出的新增资产、默认动作和布局/推荐变更回退，不重置用户保存配置，不删除其他工作区改动。
+
 ### 8.1 已核实历史/本次登记
 
 | 日期 | 资产 | 事件及证据级别 | 版本锚点 | 状态 |
@@ -286,14 +300,14 @@ git status --short
 
 | ID | 发现与证据 | 后续维护动作 |
 | --- | --- | --- |
-| U-01 | [包描述](<../../../package.json#L3>)、[README](<../../../README.md>)和 [provider 注释](<../../../src/skill-provider.ts#L1-L3>)仍称 28，实际目录 31 | 在单独文案修订中统一；不要改变真实注册逻辑凑旧数量 |
+| U-01 | 首次盘点发现数量文案为 28、实际 31；2026-10-28 需求主干接入后，[包描述](<../../../package.json#L3>)、[README](<../../../README.md>)与 [provider 源注释](<../../../src/skill-provider.ts#L1-L3>)改为不固定数量的工程/产品技能表述，当前目录 48 | 源文案已修正；旧 Host 编译文件的历史注释仍可能含旧数量，不代表实际注册数 |
 | U-02 | 19 个 Matt 引用只有全局固定 SHA，本次无可比上游内容；其他来源及二级引用元数据不完整 | 补原始内容、固定版本、作者/授权及逐技能本地 diff；缺证据继续标未知 |
 | U-03 | [工作流 Skill](<../../../assets/skills/coding-workflow/SKILL.md#L17>)要求调用 `action=approve decision=…`，但[模型工具动作表](<../../../src/workflow/tool.ts#L17-L20>)不包含 approve；批准实际经 Host Remote/UI | 对齐调用契约与人类审批入口，不能让模型虚构可用动作；先确认设计后修改 |
 | U-04 | [共享定位示例](<../../../assets/skills/_shared/README.md#L5-L11>)按用户安装目录寻址，[共享测试示例](<../../../assets/skills/_shared/README.md#L64>)还含旧源码路径；provider 实际资源根为包内目录 | 从调用返回的资源基目录解析相邻共享目录，清理不适配当前包的示例并验证 |
 | U-05 | 总体/概要设计强制依赖未内置 diagram-design；[ask-matt 路由](<../../../assets/skills/ask-matt/SKILL.md>)提及 grill-me、implement-spec、triage、wayfinder、to-questionnaire、wizard、wait-what、teach 等未内置项 | 区分硬依赖/可选路由，确认当前会话实际可用性；不能声称整个流程离线自足 |
 | U-06 | [domain-modeling](<../../../assets/skills/domain-modeling/SKILL.md>)保留旧术语表/ADR 路径；[setup](<../../../assets/skills/setup-matt-pocock-skills/SKILL.md#L64>)也明确承认兼容限制 | 升级保留 Pocket 权威指针，避免重新生成第二套知识权威 |
 | U-07 | 已保存 v2/v3 配置不自动同步默认提示词，补缺只按 ID | 为用户配置逐字段对比并显式保存，不用整表重置掩盖迁移 |
-| U-08 | [中间按钮产物](<../../../lib/types/client/actions.js>)仍为 29 项、缺健康验收及开发排查前置句；实际 Web bundle 已有新内容 | 区分真正运行入口和中间产物；后续全量构建不可误用旧中间文件导致回退 |
+| U-08 | 首次盘点发现中间按钮产物陈旧；2026-10-28 已随需求主干重新生成 [portable actions](<../../../lib/types/client/actions.js>)、布局、字典和推荐 JS/声明/映射，与源码同步 | 本项已修正；后续使用更新后的 rebuild-launcher-bundle 同步 portable 产物，实际运行入口仍为 lib/client.js |
 | U-09 | [工作流 Skill](<../../../assets/skills/coding-workflow/SKILL.md#L18>)要求缺关键工具时阻塞，后文又允许 helper 回退；[README 阶段说明](<../../../README.md#L18-L27>)仍为 S0～S8，工具已列 S9 | 单独澄清缺依赖时边界及工作流阶段语义，不能本次静默改需求 |
 | U-10 | [Word Skill](<../../../assets/skills/markdown-to-docx/SKILL.md#L62>)警示脚本固定 `-w`，而[当前转换实现](<../../../assets/skills/markdown-to-docx/scripts/convert.py>)已探测可用宽度参数；环境依赖也未由插件包锁定 | 将文档与实际 CLI 探测行为对齐，按使用特性验证，不把 `--check` 当全图形链路成功 |
 
@@ -305,3 +319,5 @@ git status --short
 - 后续增删 Skill、改提示词或共享规则时更新受影响行，追加变更记录；文件内容历史仍交给 Git，不用本台账替代版本控制。
 
 - 2026-10-28：新增 `analyze-logs` 与 `remote-debug` 纯提示词动作，输入及配置兼容约定见 [日志分析与远程调试入口](../requirements/diagnostic-shortcuts.md)；默认提示词以源码为准。
+
+- 2026-10-28（local-20261028-04）：按用户要求，分组显示名由「需求分析 / Requirements Analysis」改为「需求 / Requirements」；保留 requirements-analysis ID、组内阶段名称与既有配置。同步字典、发布产物及使用文档。

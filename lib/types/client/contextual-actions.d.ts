@@ -9,8 +9,22 @@ export interface ChatEntry {
     /** Whether the assistant message was interrupted or ended with an error. */
     failed?: boolean;
 }
+/**
+ * Launcher button signature that attributes a request to the button that
+ * inserted it, without guessing a workflow stage from prompt keywords.
+ */
+export interface ActionSignature {
+    /** Configured button id. */
+    readonly id: string;
+    /** Insertion kind: skills start with their slash command, prompts with their own text. */
+    readonly kind: 'skill' | 'prompt';
+    /** Slash command name of a skill button. */
+    readonly skillId?: string;
+    /** Text a prompt button inserts at the front of the draft. */
+    readonly prompt: string;
+}
 /** Localized reason identifiers for advisory next-step recommendations. */
-export type RecommendationReason = 'reasonReviewFindings' | 'reasonReviewClean' | 'reasonRequirementsReady' | 'reasonSpecReady' | 'reasonPlanReady' | 'reasonImplementationReady' | 'reasonRepairReady' | 'reasonBuildReady' | 'reasonPreviousFailed' | 'reasonResearchReady' | 'reasonPrototypeReady' | 'reasonArchitectureReady' | 'reasonDomainReady' | 'reasonHandoffReady';
+export type RecommendationReason = 'reasonReviewFindings' | 'reasonReviewClean' | 'reasonRequirementsReady' | 'reasonSpecReady' | 'reasonPlanReady' | 'reasonImplementationReady' | 'reasonRepairReady' | 'reasonBuildReady' | 'reasonPreviousFailed' | 'reasonResearchReady' | 'reasonPrototypeReady' | 'reasonArchitectureReady' | 'reasonDomainReady' | 'reasonHandoffReady' | 'reasonProductStageReady' | 'reasonRequirementsRevision';
 /** A suggested button set and the evidence used to choose it. */
 export interface Recommendation {
     /** IDs of the available actions that can follow the completed step. */
@@ -27,22 +41,29 @@ export interface Recommendation {
  */
 export declare function chatEntries(view: unknown): ChatEntry[];
 /**
+ * Attribute a request to the button that inserted it.
+ * @param text - Request text before any inserted context excerpt.
+ * @param actions - Enabled launcher buttons.
+ * @returns The matching button id, or `null` for hand-typed requests.
+ */
+export declare function actionIntent(text: string, actions: readonly ActionSignature[]): string | null;
+/**
  * Recommend the next enabled workflow step from the latest completed exchange.
  * @param entries - Finalized user and assistant messages in sequence order.
  * @param running - Whether the addressed Session is still running.
+ * @param actions - Enabled launcher buttons used to attribute a request without keyword guessing.
  * @returns An advisory recommendation, or `null` when the latest exchange is not actionable.
  */
-export declare function recommend(entries: readonly ChatEntry[], running?: boolean): Recommendation | null;
+export declare function recommend(entries: readonly ChatEntry[], running?: boolean, actions?: readonly ActionSignature[]): Recommendation | null;
 /**
  * Add action-specific receiving instructions to an editable draft.
- * Only review repair carries a bounded summary of the earlier exchange; every other action
- * inserts its prompt without restating the conversation.
+ * Reference the original conversation instead of copying or truncating earlier messages.
  * @param prompt - Configured action prompt.
- * @param recommendation - Current advisory recommendation.
+ * @param _recommendation - Reserved for call compatibility; report content is not copied.
  * @param actionId - Action being inserted.
- * @param entries - Latest completed exchange, independent of recommendation matching.
+ * @param _entries - Reserved for call compatibility; conversation content is not copied.
  * @param english - Whether the receiving instructions use English.
- * @returns A draft carrying the action's receiving task and, for review repair, the earlier excerpt.
+ * @returns A draft carrying the action's receiving task without conversation excerpts.
  */
-export declare function withEvidence(prompt: string, recommendation: Recommendation | null, actionId: string, entries?: readonly ChatEntry[], english?: boolean): string;
+export declare function withEvidence(prompt: string, _recommendation: Recommendation | null, actionId: string, _entries?: readonly ChatEntry[], english?: boolean): string;
 //# sourceMappingURL=contextual-actions.d.ts.map

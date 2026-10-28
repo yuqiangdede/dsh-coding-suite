@@ -27,11 +27,12 @@ export declare const zh: {
     readonly commonLimit: "常用按钮最多 100 个。";
     readonly groupVisibility: "显示分组";
     readonly groupCommon: "常用";
+    readonly groupRequirementsAnalysis: "需求";
     readonly groupDevelopment: "开发";
     readonly groupDocuments: "文档";
     readonly groupOthers: "其他";
     readonly groupAlwaysVisible: "始终显示";
-    readonly groupConfigHelp: "各分组可以独立开关。重复按钮引用同一份 Skill 或提示词。";
+    readonly groupConfigHelp: "各分组可以独立开关。需求分组以完整流水线为主干，从澄清、分析与各阶段 Gate 一直到生图提示词。重复按钮引用同一份 Skill 或提示词。";
     readonly hideGroup: "隐藏本组";
     readonly defaultLocale: "zh";
     readonly fillMissing: "补齐缺失预设（待保存）";
@@ -90,6 +91,8 @@ export declare const zh: {
     readonly reasonReviewFindings: "代码审查发现待修复问题";
     readonly reasonReviewClean: "代码审查未发现问题";
     readonly reasonRequirementsReady: "需求结论可固化";
+    readonly reasonProductStageReady: "当前需求阶段已完成，可进入下一阶段";
+    readonly reasonRequirementsRevision: "请修订对应需求材料，再重新评审";
     readonly reasonSpecReady: "规格可用于拆分工单";
     readonly reasonPlanReady: "已有实施工单";
     readonly reasonResearchReady: "研究结论可用于需求讨论";
@@ -131,3 +134,4 @@ export declare const receivingInstructions: Readonly<Record<string, readonly [st
 export declare const documentReceiving: readonly ["接收目标读者、资料路径、已确认范围和输出要求；先读取原始产物，缺失内容标记待确认，交付时说明文件位置及校验结果。", "Receive the audience, source paths, agreed scope and output requirements; read primary artifacts, flag missing facts and report output paths and validation."];
 /** Document policy shared by the code-writing actions, Chinese then English. */
 export declare const codingDocPolicy: readonly ["编码阶段不更新产品资料文档（需求、总体设计、概要设计、数据库设计、接口文档）；完成后只列出受影响的现有文档，并提示使用「补充文档」按钮；不自行更新。README 和 JSDoc 仍按仓库规则随代码更新。", "Do not update product documents (requirements, system design, high-level design, database design or interface documents) during coding. After finishing, list the affected existing documents and point to the Supplement Docs button; do not update them yourself. README and JSDoc still follow repository rules."];
+//# sourceMappingURL=locales.d.ts.map

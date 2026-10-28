@@ -7,23 +7,23 @@ import {
 
 describe('launcher business groups', () => {
   const actions = parseActions(undefined)
-  it('uses the requested four groups in fixed order, without copying action definitions', () => {
+  it('uses the five groups in fixed order, without copying action definitions', () => {
     const layout = defaultLauncherLayout(actions)
     expect(layout.commonActionIds).toEqual([...DEFAULT_COMMON_IDS])
-    expect(LAUNCHER_GROUPS.map(group => group.id)).toEqual(['development', 'documents', 'others'])
-    expect(LAUNCHER_GROUPS.map(group => group.actionIds.length)).toEqual([14, 7, 12])
+    expect(LAUNCHER_GROUPS.map(group => group.id)).toEqual(['requirements-analysis', 'development', 'documents', 'others'])
+    expect(LAUNCHER_GROUPS.map(group => group.actionIds.length)).toEqual([11, 14, 7, 14])
     expect(actionsForGroup('common', actions, layout).map(a => a.id)).toEqual([...DEFAULT_COMMON_IDS])
     expect(actionsForGroup('development', actions, layout).map(a => a.id)).toEqual([
-      'discussion', 'visual', 'spec', 'plan', 'execute', 'add-logs', 'review', 'review-fix',
-      'compile', 'health-acceptance', 'commit', 'doc-supplement',
+      'discussion', 'visual', 'spec', 'plan', 'execute', 'add-logs', 'analyze-logs', 'review', 'review-fix',
+      'compile', 'health-acceptance', 'commit', 'doc-supplement', 'remote-debug',
     ])
     expect(actionsForGroup('documents', actions, layout)).toHaveLength(7)
-    expect(actionsForGroup('others', actions, layout)).toHaveLength(12)
+    expect(actionsForGroup('others', actions, layout)).toHaveLength(14)
     expect(actionsForGroup('common', actions, layout)[0]).toBe(actions.find(a => a.id === 'bug'))
   })
-  it('defaults only development to visible and preserves independent group switches', () => {
+  it('defaults requirements and development to visible and preserves independent group switches', () => {
     const initial = parseLauncherLayout(undefined, actions)
-    expect(initial.visibleGroups).toEqual({ common: true, development: true, documents: false, others: false })
+    expect(initial.visibleGroups).toEqual({ common: true, 'requirements-analysis': true, development: true, documents: false, others: false })
     const changed = { ...initial, visibleGroups: { ...initial.visibleGroups, documents: true, development: false } }
     expect(parseLauncherLayout(JSON.stringify(changed), actions)).toEqual(changed)
     const legacy = { ...changed, visibleGroups: { ...changed.visibleGroups, bugfix: true } }

@@ -85,6 +85,7 @@ function appendCss(prefix, sourceFile, variable, mapName, classes) {
 
 // Recompile dictionaries too: retaining old auto-mode copy would diverge from source.
 replaceRegion('locales', compile('src/client/locales.ts', ''))
+replaceRegion('contextual-actions', compile('src/client/contextual-actions.ts', ''))
 const globalName = /export const LAUNCHER_CONFIG_GLOBAL = '([^']+)'/.exec(read('src/config.ts'))?.[1]
 if (!globalName) throw new Error('Missing launcher config global')
 replaceRegion('index', compile('src/client/index.ts', '').replace(/\bLAUNCHER_CONFIG_GLOBAL\b/g, JSON.stringify(globalName)))
@@ -161,4 +162,22 @@ workflowBundle = workflowBundle.slice(0, toolStart + toolMarker.length)
   + compile('src/workflow/tool.ts', '') + workflowBundle.slice(toolEnd)
 workflowBundle = workflowBundle.replace(/\n\/\/# sourceMappingURL=.*\s*$/, '\n')
 write('lib/workflow/index.js', workflowBundle)
+// Keep portable generated modules and public layout types aligned with the shipped UI.
+const portable = ts.createProgram([
+  'actions', 'launcher-layout', 'locales', 'contextual-actions',
+].map(name => resolve(root, 'src/client/' + name + '.ts')), {
+  target: ts.ScriptTarget.ES2022,
+  module: ts.ModuleKind.ESNext,
+  moduleResolution: ts.ModuleResolutionKind.Bundler,
+  rootDir: resolve(root, 'src/client'),
+  outDir: resolve(root, 'lib/types/client'),
+  rewriteRelativeImportExtensions: true,
+  declaration: true, declarationMap: true, sourceMap: true,
+  strict: true, skipLibCheck: true, noEmitOnError: true,
+})
+const diagnostics = ts.getPreEmitDiagnostics(portable)
+if (diagnostics.some(item => item.category === ts.DiagnosticCategory.Error)) {
+  throw new Error('Portable client modules failed type checking: ' + diagnostics.map(item => ts.flattenDiagnosticMessageText(item.messageText, '\n')).join('\n'))
+}
+if (portable.emit().emitSkipped) throw new Error('Portable client module emit failed')
 console.log('Launcher, Host workflow tool and layout schema rebuilt successfully.')

@@ -49,7 +49,8 @@ export function LauncherSettings({ useActionForm, saveConfiguration, t }: Props)
   const fillMissing = () => {
     const missing = missingDefaultActions(draft)
     if (missing.length === 0) return
-    setDraft(xs => [...xs, ...missingDefaultActions(xs)])
+    if (draft.length + missing.length > 100) { setError(t('errorVersion')); return }
+    setDraft(xs => [...xs, ...presentDefaultActions(missingDefaultActions(xs), t('defaultLocale') === 'en')])
     setDirty(true)
   }
   const cancel = () => {

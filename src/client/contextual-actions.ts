@@ -43,6 +43,8 @@ export type RecommendationReason =
   | 'reasonArchitectureReady'
   | 'reasonDomainReady'
   | 'reasonHandoffReady'
+  | 'reasonProductStageReady'
+  | 'reasonRequirementsRevision'
 
 /** A suggested button set and the evidence used to choose it. */
 export interface Recommendation {
@@ -193,10 +195,73 @@ export function actionIntent(text: string, actions: readonly ActionSignature[]):
   for (const action of actions) {
     const prefix = action.kind === 'skill' ? (action.skillId ? '/' + action.skillId : '') : action.prompt
     if (!prefix || prefix.length <= width || !value.startsWith(prefix)) continue
+    if (action.kind === 'skill' && value.length > prefix.length && !/\s/.test(value[prefix.length]!)) continue
     match = action
     width = prefix.length
   }
   return match?.id ?? null
+}
+
+/** Product outcomes are explicit advisory markers, never inferred from GO/S0 mentions in prose. */
+const productSteps: Readonly<Record<string, Readonly<Record<string, string>>>> = {
+  'requirement-clarification': { READY_FOR_ANALYSIS: 'requirement-analysis' },
+  'requirement-analysis': { READY_FOR_SOLUTION: 'product-risk-gate', BACK_TO_CLARIFICATION: 'requirement-clarification' },
+  'solution-design': { READY_FOR_PRD: 'product-module-gate' },
+  'prd-writing': { READY_FOR_REVIEW: 'requirement-review', BACK_TO_SOLUTION: 'solution-design' },
+  'product-prd-pages': { READY_FOR_CONSISTENCY: 'product-consistency-gate' },
+  'product-image-prompt': {},
+}
+const productGates: Readonly<Record<string, string>> = {
+  'product-risk-gate': 'solution-design',
+  'product-module-gate': 'product-state-gate',
+  'product-state-gate': 'product-exception-gate',
+  'product-exception-gate': 'product-prd-pages',
+  'product-consistency-gate': 'product-image-prompt',
+}
+function productRecommendation(id: string, response: string): Recommendation | null {
+  const evidence = response.slice(0, 5000)
+  if (id === 'product-development-pipeline') return null
+  let fence: string | undefined
+  const lines = response.split(/\r?\n/).flatMap(line => {
+    const trimmed = line.trim()
+    const delimiter = /^(\x60{3,}|~{3,})/.exec(trimmed)?.[1]
+    if (delimiter) {
+      if (!fence) fence = delimiter
+      else if (delimiter[0] === fence[0] && delimiter.length >= fence.length) fence = undefined
+      return []
+    }
+    return fence ? [] : [trimmed.replace(/^(?:#{1,6}\s+|[-*]\s+)/, '').replace(/\*\*|`/g, '')]
+  })
+  // Keep all declared values so conflicting, unknown or negated outcomes cannot be ignored.
+  const values = (pattern: RegExp) => [...new Set(lines.flatMap(line => {
+    const match = pattern.exec(line)
+    return match ? [match[1]!.trim()] : []
+  }))]
+  const targets = values(/^(?:回退阶段|Return stage)\s*[:：]\s*(.+)$/i)
+  const returnStage = () => targets.length === 1 &&
+    (Object.hasOwn(productSteps, targets[0]!) || Object.hasOwn(productGates, targets[0]!)) && targets[0] !== 'product-image-prompt'
+      ? { ids: [targets[0]!], evidence, reason: 'reasonRequirementsRevision' as const } : null
+  const gates = values(/^(?:阶段\s*Gate|Stage gate)\s*[:：]\s*(.+)$/i)
+  if (gates.length > 0) {
+    if (gates.length !== 1) return null
+    if (gates[0] !== 'PASS') return ['FAIL', 'CONDITIONAL PASS'].includes(gates[0]!) ? returnStage() : null
+    if (targets.length > 0) return null
+  }
+  if (Object.hasOwn(productGates, id)) return gates[0] === 'PASS'
+    ? { ids: [productGates[id]!], evidence, reason: 'reasonProductStageReady' } : null
+  if (id === 'requirement-review') {
+    const outcomes = values(/^(?:需求评审结论|Requirements review outcome)\s*[:：]\s*(.+)$/i)
+    if (outcomes.length !== 1) return null
+    if (outcomes[0] === 'GO') return targets.length === 0
+      ? { ids: ['product-prd-pages'], evidence, reason: 'reasonProductStageReady' } : null
+    if (!['NO-GO', 'CONDITIONAL GO'].includes(outcomes[0]!)) return null
+    return returnStage()
+  }
+  const outcomes = values(/^(?:阶段结论|Stage outcome)\s*[:：]\s*(.+)$/i)
+  const outcomesForStep = productSteps[id]
+  const next = outcomes.length === 1 && outcomesForStep && Object.hasOwn(outcomesForStep, outcomes[0]!)
+    ? outcomesForStep[outcomes[0]!] : undefined
+  return next ? { ids: [next], evidence, reason: 'reasonProductStageReady' } : null
 }
 
 /**
@@ -227,6 +292,9 @@ export function recommend(
   // Negated outcomes are evidence of success, not failures of this turn.
   const outcomeText = response.replace(/(?:未出现|没有出现|未发生|没有发生|未发现|没有|并无|不存在|无)(?:任何)?(?:测试|构建|编译)失败|\bno (?:tests? failed|build failed)\b/gi, '')
   const failed = assistant.failed === true || failures.test(outcomeText)
+  const productId = intent ?? /^\/([a-z][a-z-]*)(?=\s|$)/.exec(requestText)?.[1]
+  if (productId && (Object.hasOwn(productSteps, productId) || Object.hasOwn(productGates, productId) || productId === 'requirement-review' || productId === 'product-development-pipeline'))
+    return failed ? null : productRecommendation(productId, response)
   for (const link of links) {
     if (repairRequest && link.reason !== 'reasonRepairReady') continue
     if (intent === null ? !link.trigger.test(request) : link.actionIds?.includes(intent) !== true) continue

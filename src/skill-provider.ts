@@ -1,6 +1,6 @@
 /**
- * Bundled coding skills provider: discovers and provides the 28 Matt Pocock
- * engineering skills and Pocket specification from package assets.
+ * Bundled coding skills provider: discovers engineering, product requirements
+ * and Pocket skills from package assets.
  *
  * @module @deepseek-ai/dsh-coding-suite/skill-provider
  */

@@ -1,0 +1,210 @@
+{
+  "repository": "https://github.com/yuqiangdede/My-Prompts",
+  "revision": "bfc391e4b48d40ca3b7dfd337b374432c61559d4",
+  "license": "Apache-2.0",
+  "licenseFile": "PRODUCT-DEVELOPMENT-LICENSE",
+  "licenseUpstreamBlob": "261eeb9e9f8b2b4b0d119366dda99c6fd7d35c64",
+  "importedOn": "2026-10-28",
+  "skills": [
+    "product-development-pipeline",
+    "prd-writing",
+    "project-knowledge-capture",
+    "prototype-existing-project",
+    "prototype-greenfield",
+    "requirement-analysis",
+    "requirement-clarification",
+    "requirement-review",
+    "solution-design",
+    "version-retrospective"
+  ],
+  "localChanges": [
+    "Flatten leaf skill directories for the existing provider; repair pipeline sibling and parent links.",
+    "Append DSH shared project authority, stage scope, version and result-marker rules.",
+    "Mark historical references as optional, subordinate material.",
+    "Scale flow counts to task scope; no invented alternative or flow quotas.",
+    "Use the pipeline as the launcher backbone and default its endpoint to UI image prompts; explicit document/prototype targets still take precedence."
+  ],
+  "localStageSkills": ["product-risk-gate", "product-module-gate", "product-state-gate", "product-exception-gate", "product-prd-pages", "product-consistency-gate", "product-image-prompt"],
+  "files": [
+    {
+      "path": "assets/skills/product-development-pipeline/README.md",
+      "upstreamPath": "技能/skills/产品研发/product-development-pipeline/README.md",
+      "upstreamBlob": "0f2062b9adf585819b1ad0f0f66a1b0166fa6496"
+    },
+    {
+      "path": "assets/skills/product-development-pipeline/SKILL.md",
+      "upstreamPath": "技能/skills/产品研发/product-development-pipeline/SKILL.md",
+      "upstreamBlob": "60b6ed25d02791627a219f553c674ae10001b819"
+    },
+    {
+      "path": "assets/skills/product-development-pipeline/references/data-dashboard/数据大屏 页面规格.md",
+      "upstreamPath": "技能/skills/产品研发/product-development-pipeline/references/data-dashboard/数据大屏 页面规格.md",
+      "upstreamBlob": "a678c253ad5374e8e3878a3d71867e7743ed0375"
+    },
+    {
+      "path": "assets/skills/product-development-pipeline/references/feature-implementation/四步需求到实现协议 算法版本.md",
+      "upstreamPath": "技能/skills/产品研发/product-development-pipeline/references/feature-implementation/四步需求到实现协议 算法版本.md",
+      "upstreamBlob": "b9db4fa27bcaa98c39ff94c3ae10716cd95f8f5f"
+    },
+    {
+      "path": "assets/skills/product-development-pipeline/references/feature-implementation/四步需求到实现协议 通用版本.md",
+      "upstreamPath": "技能/skills/产品研发/product-development-pipeline/references/feature-implementation/四步需求到实现协议 通用版本.md",
+      "upstreamBlob": "7810ee20a54d752819ba27bda9afc31a308b1298"
+    },
+    {
+      "path": "assets/skills/product-development-pipeline/references/interaction-rendering/草图转换为正式图.md",
+      "upstreamPath": "技能/skills/产品研发/product-development-pipeline/references/interaction-rendering/草图转换为正式图.md",
+      "upstreamBlob": "468911d1d829445832f5eb0e7421e672173b309b"
+    },
+    {
+      "path": "assets/skills/product-development-pipeline/references/interaction-rendering/页面规格渲染.md",
+      "upstreamPath": "技能/skills/产品研发/product-development-pipeline/references/interaction-rendering/页面规格渲染.md",
+      "upstreamBlob": "3f8f852eebcacda11a5923310a8cc15d2c9d41b9"
+    },
+    {
+      "path": "assets/skills/product-development-pipeline/references/interaction-rendering/页面规格渲染html.md",
+      "upstreamPath": "技能/skills/产品研发/product-development-pipeline/references/interaction-rendering/页面规格渲染html.md",
+      "upstreamBlob": "0cade73f88549792c6de55b086906cbfd168632b"
+    },
+    {
+      "path": "assets/skills/product-development-pipeline/references/monolithic-version/99 单体版本提示词.md",
+      "upstreamPath": "技能/skills/产品研发/product-development-pipeline/references/monolithic-version/99 单体版本提示词.md",
+      "upstreamBlob": "97404ce9efff1df52b57fbb37ca639a30323bdcf"
+    },
+    {
+      "path": "assets/skills/product-development-pipeline/references/performance-optimization/01 流程梳理与性能优化.md",
+      "upstreamPath": "技能/skills/产品研发/product-development-pipeline/references/performance-optimization/01 流程梳理与性能优化.md",
+      "upstreamBlob": "c98349bfd66c18e3b5ab9424b59b112e8b3c9fb6"
+    },
+    {
+      "path": "assets/skills/product-development-pipeline/references/requirement-analysis/完整的需求分析，输出UI页面规格V1.md",
+      "upstreamPath": "技能/skills/产品研发/product-development-pipeline/references/requirement-analysis/完整的需求分析，输出UI页面规格V1.md",
+      "upstreamBlob": "9d6a5a3795bb51897e8e00a86b48b9fd3db245bf"
+    },
+    {
+      "path": "assets/skills/product-development-pipeline/references/requirement-analysis/完整的需求分析，输出UI页面规格V2.md",
+      "upstreamPath": "技能/skills/产品研发/product-development-pipeline/references/requirement-analysis/完整的需求分析，输出UI页面规格V2.md",
+      "upstreamBlob": "b8c3fec027347507d2f75054d016bc576b3bc0e3"
+    },
+    {
+      "path": "assets/skills/product-development-pipeline/references/requirement-analysis/精简的需求分析，输出UI页面规格.md",
+      "upstreamPath": "技能/skills/产品研发/product-development-pipeline/references/requirement-analysis/精简的需求分析，输出UI页面规格.md",
+      "upstreamBlob": "80854fd629c05234ae0801ce67f9b5bdfd3055e4"
+    },
+    {
+      "path": "assets/skills/product-development-pipeline/references/requirement-analysis/输入模糊的功能性描述，输出UI页面规格.md",
+      "upstreamPath": "技能/skills/产品研发/product-development-pipeline/references/requirement-analysis/输入模糊的功能性描述，输出UI页面规格.md",
+      "upstreamBlob": "ed7ad0163919e2c36a4514611b16a51041de98cd"
+    },
+    {
+      "path": "assets/skills/product-development-pipeline/references/requirement-analysis/需求发散分析.md",
+      "upstreamPath": "技能/skills/产品研发/product-development-pipeline/references/requirement-analysis/需求发散分析.md",
+      "upstreamBlob": "6bf66ba908ee07c14e249f9999fc45cca0a63e73"
+    },
+    {
+      "path": "assets/skills/product-development-pipeline/references/流水线说明.md",
+      "upstreamPath": "技能/skills/产品研发/product-development-pipeline/references/流水线说明.md",
+      "upstreamBlob": "eab92d395f02f8162df3cdd364edc49fa19f2606"
+    },
+    {
+      "path": "assets/skills/product-development-pipeline/steps/01 问题澄清与反问.md",
+      "upstreamPath": "技能/skills/产品研发/product-development-pipeline/steps/01 问题澄清与反问.md",
+      "upstreamBlob": "02f0e89b0ed509a45c0b221cbcbed530903a634d"
+    },
+    {
+      "path": "assets/skills/product-development-pipeline/steps/02 问题拆解.md",
+      "upstreamPath": "技能/skills/产品研发/product-development-pipeline/steps/02 问题拆解.md",
+      "upstreamBlob": "74c540699271e991cc83d1689cdc935ea7d3a7c6"
+    },
+    {
+      "path": "assets/skills/product-development-pipeline/steps/03 需求风险扫描.md",
+      "upstreamPath": "技能/skills/产品研发/product-development-pipeline/steps/03 需求风险扫描.md",
+      "upstreamBlob": "6a3d83bd8dd8657cf4620f26e318f1322ec05bff"
+    },
+    {
+      "path": "assets/skills/product-development-pipeline/steps/04 决策与方案对比.md",
+      "upstreamPath": "技能/skills/产品研发/product-development-pipeline/steps/04 决策与方案对比.md",
+      "upstreamBlob": "c938fa956847929d4b6a694875c22aec585ac4b2"
+    },
+    {
+      "path": "assets/skills/product-development-pipeline/steps/05 模块边界审计.md",
+      "upstreamPath": "技能/skills/产品研发/product-development-pipeline/steps/05 模块边界审计.md",
+      "upstreamBlob": "edac5f162ece7171b751db3e13c7df233be2c2d9"
+    },
+    {
+      "path": "assets/skills/product-development-pipeline/steps/06 数据模型与状态校验.md",
+      "upstreamPath": "技能/skills/产品研发/product-development-pipeline/steps/06 数据模型与状态校验.md",
+      "upstreamBlob": "54eafea6ac35ad36081db08d41335c1dae48aa80"
+    },
+    {
+      "path": "assets/skills/product-development-pipeline/steps/07 关键流程异常枚举.md",
+      "upstreamPath": "技能/skills/产品研发/product-development-pipeline/steps/07 关键流程异常枚举.md",
+      "upstreamBlob": "ea4c713ee46e0977c2b9517e8f1f153f7d89ffcb"
+    },
+    {
+      "path": "assets/skills/product-development-pipeline/steps/08 PRD与页面规格.md",
+      "upstreamPath": "技能/skills/产品研发/product-development-pipeline/steps/08 PRD与页面规格.md",
+      "upstreamBlob": "adaf168aa634543532d0443a53aeb3c37396b49d"
+    },
+    {
+      "path": "assets/skills/product-development-pipeline/steps/09 页面-流程-权限一致性校验.md",
+      "upstreamPath": "技能/skills/产品研发/product-development-pipeline/steps/09 页面-流程-权限一致性校验.md",
+      "upstreamBlob": "928ad685d7eb6297f1e4174732bfdc23262efd82"
+    },
+    {
+      "path": "assets/skills/product-development-pipeline/steps/10 输出路由.md",
+      "upstreamPath": "技能/skills/产品研发/product-development-pipeline/steps/10 输出路由.md",
+      "upstreamBlob": "d2031e211a6a9962af14dc75c4dc53dae0b6d8d8"
+    },
+    {
+      "path": "assets/skills/prd-writing/SKILL.md",
+      "upstreamPath": "技能/skills/产品研发/product-development-skills/prd-writing/SKILL.md",
+      "upstreamBlob": "109179b8fc2c634e1d66e6f105a242c228f0ec1d"
+    },
+    {
+      "path": "assets/skills/project-knowledge-capture/SKILL.md",
+      "upstreamPath": "技能/skills/产品研发/product-development-skills/project-knowledge-capture/SKILL.md",
+      "upstreamBlob": "3e4818b1b2906697f85784e47cb3d33dadd0d6a2"
+    },
+    {
+      "path": "assets/skills/project-knowledge-capture/references/storage-contract.md",
+      "upstreamPath": "技能/skills/产品研发/product-development-skills/project-knowledge-capture/references/storage-contract.md",
+      "upstreamBlob": "f690c625d8bb831572b050b27cb2f70333bfcc08"
+    },
+    {
+      "path": "assets/skills/prototype-existing-project/SKILL.md",
+      "upstreamPath": "技能/skills/产品研发/product-development-skills/prototype-existing-project/SKILL.md",
+      "upstreamBlob": "f58457aa8ed98a71d94b4ca7371d8fb1131d9dde"
+    },
+    {
+      "path": "assets/skills/prototype-greenfield/SKILL.md",
+      "upstreamPath": "技能/skills/产品研发/product-development-skills/prototype-greenfield/SKILL.md",
+      "upstreamBlob": "3ece8b815014ab728636ec7137df2e07170e0094"
+    },
+    {
+      "path": "assets/skills/requirement-analysis/SKILL.md",
+      "upstreamPath": "技能/skills/产品研发/product-development-skills/requirement-analysis/SKILL.md",
+      "upstreamBlob": "a28021e61c70a560905fcd32204f9e60059ed307"
+    },
+    {
+      "path": "assets/skills/requirement-clarification/SKILL.md",
+      "upstreamPath": "技能/skills/产品研发/product-development-skills/requirement-clarification/SKILL.md",
+      "upstreamBlob": "fa19c7cdae7366f7ff58b0ebc2bb1ca6e7a7adde"
+    },
+    {
+      "path": "assets/skills/requirement-review/SKILL.md",
+      "upstreamPath": "技能/skills/产品研发/product-development-skills/requirement-review/SKILL.md",
+      "upstreamBlob": "65fa28e25b870ebd4fca36582b5c68278747e8ab"
+    },
+    {
+      "path": "assets/skills/solution-design/SKILL.md",
+      "upstreamPath": "技能/skills/产品研发/product-development-skills/solution-design/SKILL.md",
+      "upstreamBlob": "ceb64d535c00b43fa17be7aa15949bd72b37da8d"
+    },
+    {
+      "path": "assets/skills/version-retrospective/SKILL.md",
+      "upstreamPath": "技能/skills/产品研发/product-development-skills/version-retrospective/SKILL.md",
+      "upstreamBlob": "65773bd4449380e1312f6da2ab0a9522227c6489"
+    }
+  ]
+}

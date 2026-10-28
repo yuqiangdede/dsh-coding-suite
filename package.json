@@ -1,6 +1,6 @@
 {
   "name": "dsh-coding-suite",
-  "description": "Unified coding suite for DeepSeek Harness: Host-authoritative staged workflow, 28 bundled engineering skills & Pocket specs, interactive UI launcher, and todo progress guard.",
+  "description": "Unified coding suite for DeepSeek Harness: Host-authoritative staged workflow, engineering and product requirements skills, Pocket specs, interactive UI launcher, and todo progress guard.",
   "version": "0.2.1",
   "publishConfig": {
     "access": "public"

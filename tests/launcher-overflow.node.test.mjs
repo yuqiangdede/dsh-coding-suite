@@ -3,7 +3,7 @@ import assert from 'node:assert/strict'
 import { readFileSync } from 'node:fs'
 import { runInNewContext } from 'node:vm'
 import { zh, en } from '../src/client/locales.ts'
-import { encodeActions } from '../src/client/actions.ts'
+import { DEFAULT_ACTIONS, encodeActions } from '../src/client/actions.ts'
 
 function harness({ actions, layout, english = false } = {}) {
   let registration, Launcher, cursor = 0
@@ -39,7 +39,7 @@ function harness({ actions, layout, english = false } = {}) {
       insertText: text => { events.push(['insert', text]); return true },
       persistDraft: () => events.push(['persist']),
     },
-    fetchSkillNames: async () => ['to-spec'],
+    fetchSkillNames: async () => DEFAULT_ACTIONS.filter(a => a.kind === 'skill').map(a => a.skillId),
     saveLayout: async (json, revision) => { events.push(['save', json, revision]); if (data.saveOk) data.config.layoutJson = json; return data.saveOk },
     todoStaleMs: 90000, t: key => dictionary[key] ?? key,
   }) }
@@ -67,6 +67,24 @@ test('development group is renamed in both the launcher and settings dictionary'
   const h = harness()
   assert.ok(h.nodes(h.render()).some(n => n.type === 'button' && [n.props.children].flat().filter(value => typeof value === 'string').join('') === '开发'))
   assert.ok(!h.nodes(h.render()).some(n => n.props?.children === '需求开发'))
+})
+
+test('pipeline group renders eight then expands all eleven stages and inserts correct drafts without sending', async () => {
+  const h = harness()
+  const expected = ['product-development-pipeline', 'requirement-clarification', 'requirement-analysis', 'product-risk-gate', 'solution-design', 'product-module-gate', 'product-state-gate', 'product-exception-gate', 'product-prd-pages', 'product-consistency-gate', 'product-image-prompt']
+  assert.equal(h.actionButtons('requirements-analysis').length, 8)
+  assert.equal(h.overflow('requirements-analysis').props.children, '更多（3）')
+  h.overflow('requirements-analysis').props.onClick()
+  assert.deepEqual(h.actionButtons('requirements-analysis').map(n => n.props.children), expected.map(id => DEFAULT_ACTIONS.find(a => a.id === id).label))
+  for (const [index, id] of expected.entries()) {
+    h.actionButtons('requirements-analysis')[index].props.onClick()
+    await new Promise(resolve => setImmediate(resolve))
+    assert.equal(h.events.length, (index + 1) * 2)
+    assert.equal(h.events.at(-1)[0], 'persist')
+    assert.ok(h.events.at(-2)[1].startsWith('/' + DEFAULT_ACTIONS.find(a => a.id === id).skillId + ' '))
+  }
+  const old = harness({ layout: commonLayout(['bug']) })
+  assert.equal(old.actionButtons('requirements-analysis').length, 0)
 })
 
 test('groups show eight actions; the ninth is expanded and collapsed without changing settings or draft', async () => {
