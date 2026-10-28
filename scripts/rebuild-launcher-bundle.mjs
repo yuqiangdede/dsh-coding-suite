@@ -126,8 +126,8 @@ replaceRegion('WorkflowPanel', compile('src/client/WorkflowPanel.tsx', 'Launcher
 replaceRegion('Launcher', compile('src/client/Launcher.tsx', 'Launcher_module_css_default'))
 replaceRegion('Settings', compile('src/client/Settings.tsx', 'Settings_module_css_default'))
 appendCss('xbJU_q', 'src/client/Launcher.module.css', 'css$1', 'Launcher_module_css_default', [
-  'groupToggles', 'groupToggleLabel', 'groupToggle', 'groupToggleActive',
-  'actionGroup', 'groupHeader', 'locked', 'hideGroup', 'commonEditor', 'commonChoices', 'commonChoice',
+  'groupToggles', 'groupControls', 'groupToggleLabel', 'groupToggle', 'groupToggleActive',
+  'actionGroup', 'groupHeader', 'locked', 'hideGroup', 'commonEditor', 'commonChoices', 'commonChoiceGroup', 'commonChoice',
   'history', 'historyTitle', 'historyList', 'historyItem',
 ])
 appendCss('v7HIVa', 'src/client/Settings.module.css', 'css', 'Settings_module_css_default', [

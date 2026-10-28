@@ -70,17 +70,43 @@ test('conversation history follows sent user messages, remains visible while run
     { role: 'user', text: '再讨论一下' }, sent('execute'), sent('review'), sent('commit')]
   const history = () => h.nodes(h.render()).find(n => n.props?.['data-conversation-history'] === true)
   const labels = () => h.nodes(history()).filter(n => n.type === 'li').map(n => n.props.children)
-  assert.deepEqual(labels(), ['固化需求', '自由对话', '编码', '代码审查', '提交代码'])
+  assert.deepEqual(labels(), ['提交代码', '代码审查', '编码', '自由对话', '固化需求'])
+  assert.equal(h.nodes(history()).some(n => n.type === 'span' && n.props.children === zh.historyTitle), false)
+  assert.equal(h.nodes(history()).find(n => n.type === 'ol').props['aria-label'], zh.historyTitle)
   h.data.running = true
-  assert.equal(labels().at(-1), '提交代码')
+  assert.equal(labels()[0], '提交代码')
+  // Both controls and history are direct children of the same wrapping toolbar.
+  const tree = h.render()
+  const row = h.nodes(tree).find(n => Array.isArray(n.props?.children) && n.props.children.some(child => child?.props?.['aria-label'] === '显示分组') && n.props.children.some(child => child?.props?.['data-conversation-history']))
+  assert.ok(row)
   const expand = h.nodes(history()).find(n => n.type === 'button')
   assert.equal(expand.props.children, '查看全部（6）')
   expand.props.onClick()
-  assert.deepEqual(labels(), ['需求讨论', '固化需求', '自由对话', '编码', '代码审查', '提交代码'])
+  assert.deepEqual(labels(), ['提交代码', '代码审查', '编码', '自由对话', '固化需求', '需求讨论'])
   h.data.messages = [{ role: 'user', text: '/implement 手动输入' }, { role: 'user', text: '另一个会话' }]
-  assert.deepEqual(labels(), ['/implement', '自由对话'])
+  assert.deepEqual(labels(), ['自由对话', '/implement'])
   h.data.messages = []
   assert.equal(history(), undefined)
+})
+
+test('history merges only adjacent identical labels before limiting and expanding', () => {
+  const h = harness()
+  const action = DEFAULT_ACTIONS.find(a => a.id === 'discussion')
+  const discussion = () => ({ role: 'user', text: `/${action.skillId} ${action.prompt}` })
+  h.data.messages = [discussion(), discussion(), { role: 'user', text: 'one' }, discussion(), discussion(), discussion(), discussion(), discussion(),
+    { role: 'user', text: 'two' }, { role: 'user', text: 'three' }]
+  const history = () => h.nodes(h.render()).find(n => n.props?.['data-conversation-history'] === true)
+  const labels = () => h.nodes(history()).filter(n => n.type === 'li').map(n => n.props.children)
+  assert.deepEqual(labels(), ['自由对话*2', '需求讨论*5', '自由对话', '需求讨论*2'])
+  assert.equal(h.nodes(history()).find(n => n.type === 'button'), undefined)
+  h.data.messages.push({ role: 'user', text: '/manual one' }, { role: 'user', text: '/manual two' }, { role: 'user', text: '/other three' })
+  assert.deepEqual(labels(), ['/other', '/manual*2', '自由对话*2', '需求讨论*5', '自由对话'])
+  const expand = h.nodes(history()).find(n => n.type === 'button')
+  assert.equal(expand.props.children, '查看全部（6）')
+  expand.props.onClick()
+  assert.deepEqual(labels(), ['/other', '/manual*2', '自由对话*2', '需求讨论*5', '自由对话', '需求讨论*2'])
+  h.nodes(history()).find(n => n.type === 'button').props.onClick()
+  assert.equal(labels().length, 5)
 })
 
 test('unsent button insertions do not appear in conversation history', async () => {
@@ -210,6 +236,33 @@ test('common visibility saves, restores, and respects read-only or rejected chan
   await new Promise(resolve => setImmediate(resolve))
   assert.equal(toggle().props['aria-pressed'], true)
   assert.ok(h.nodes(h.render()).some(n => n.props?.['data-launcher-group'] === 'common'))
+})
+
+test('common editor groups all enabled actions and synchronizes repeated members', async () => {
+  const custom = makeActions(2).map((action, index) => ({ ...action, enabled: index === 0 }))
+  const h = harness({ actions: [...DEFAULT_ACTIONS, ...custom], layout: commonLayout(['bug']) })
+  h.data.writable = true
+  const nodes = () => h.nodes(h.render())
+  nodes().find(n => n.type === 'button' && n.props.children === '编辑常用').props.onClick()
+  const group = id => nodes().find(n => n.props?.['data-common-editor-group'] === id)
+  const labels = id => h.nodes(group(id)).filter(n => n.type === 'label').map(n => n.props.children[1])
+  assert.deepEqual(['requirements-analysis', 'development', 'documents', 'others'].map(id => group(id).props['aria-label']), ['需求', '开发', '文档', '其他'])
+  assert.ok(labels('requirements-analysis').includes('全流程'))
+  assert.ok(labels('development').includes('健康验收'))
+  assert.ok(labels('others').includes('健康验收'))
+  assert.ok(labels('others').includes('Bug排查'))
+  assert.ok(labels('others').includes('Action 0'))
+  assert.ok(!labels('others').includes('Action 1'))
+  const repeated = () => nodes().filter(n => n.type === 'label' && n.props.children[1] === '健康验收')
+    .map(label => h.nodes(label).find(n => n.type === 'input'))
+  assert.equal(repeated().length, 2)
+  repeated()[0].props.onChange({ target: { checked: true } })
+  assert.ok(repeated().every(input => input.props.checked))
+  repeated()[1].props.onChange({ target: { checked: false } })
+  assert.ok(repeated().every(input => !input.props.checked))
+  nodes().find(n => n.type === 'button' && n.props.children === '保存').props.onClick()
+  await new Promise(resolve => setImmediate(resolve))
+  assert.deepEqual(JSON.parse(h.events[0][1]).commonActionIds, ['bug'])
 })
 
 test('edit common on the launcher: select, cancel, save and preserve unavailable IDs', async () => {

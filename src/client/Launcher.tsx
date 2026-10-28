@@ -71,6 +71,12 @@ export function Launcher({
     ...group,
     actions: actionsForGroup(group.id, enabledActions, layout),
   }))
+  // Common-only presets and custom actions must remain editable even if they
+  // do not belong to a business group in the launcher.
+  const groupedIds = new Set(groups.flatMap(group => group.actions.map(action => action.id)))
+  const editorGroups = groups.map(group => group.id === 'others'
+    ? { ...group, actions: [...group.actions, ...enabledActions.filter(action => !groupedIds.has(action.id))] }
+    : group)
   const hasActions = enabledActions.length > 0
   const groupHasRecommendation = (id: GroupId) =>
     (id === 'common' ? commonActions : groups.find(group => group.id === id)?.actions ?? []).some(action => visibleRecommendation?.ids.includes(action.id))
@@ -159,6 +165,14 @@ export function Launcher({
     if (a.id === 'docx' && a.label === 'MD 转 Word') return 'MD转Word'
     return a.label
   }
+  const historyGroups: { label: string; count: number }[] = []
+  for (const entry of history) {
+    const label = entry.id ? displayLabel(actions.find(action => action.id === entry.id)!) : entry.command ? '/' + entry.command : t('historyCustom')
+    const previous = historyGroups[historyGroups.length - 1]
+    if (previous?.label === label) previous.count++
+    else historyGroups.push({ label, count: 1 })
+  }
+  historyGroups.reverse()
   const render = (a: CodingAction) => <button type="button" key={a.id} disabled={!available} className={visibleRecommendation?.ids.includes(a.id) ? css.recommended : css.action}
     title={a.description + '\n' + a.example + (visibleRecommendation?.ids.includes(a.id) ? '\n' + t('recommendationTooltip').replace('{reason}', t(visibleRecommendation.reason)) : '')} onClick={() => { void insert(a) }}>{displayLabel(a)}</button>
   // Expansion is local presentation state, independent of saved membership and action availability.
@@ -180,18 +194,8 @@ export function Launcher({
   return <div className={css.root} data-matt-skill-launcher>
     {item !== null && <WorkflowPanel item={item} decision={decision} pending={pending}
       onDecision={setDecision} onAction={(action) => { void runWorkflow(action) }} t={t} />}
-    {history.length > 0 && <div className={css.history} data-conversation-history>
-      <span className={css.historyTitle} title={t('historyHelp')}>{t('historyTitle')}</span>
-      <ol className={css.historyList} aria-label={t('historyTitle')}>
-        {(historyExpanded ? history : history.slice(-5)).map((entry, index) => <li key={index} className={css.historyItem}>
-          {entry.id ? displayLabel(actions.find(action => action.id === entry.id)!) : entry.command ? '/' + entry.command : t('historyCustom')}
-        </li>)}
-      </ol>
-      {history.length > 5 && <button type="button" className={css.hideGroup} aria-expanded={historyExpanded}
-        onClick={() => setHistoryExpanded(value => !value)}>{historyExpanded ? t('collapse') : t('historyMore').replace('{count}', String(history.length))}</button>}
-    </div>}
-    {hasActions && <>
-      <div className={css.groupToggles} role="group" aria-label={t('groupVisibility')}>
+    {(hasActions || historyGroups.length > 0) && <div className={css.groupToggles}>
+      {hasActions && <div className={css.groupControls} role="group" aria-label={t('groupVisibility')}>
         <span className={css.groupToggleLabel}>{t('groupVisibility')}</span>
         <button type="button" className={layout.visibleGroups.common ? css.groupToggleActive : css.groupToggle}
           aria-pressed={layout.visibleGroups.common} disabled={layoutSaving || Boolean(commonEdit) || snapshot.status !== 'ready' || !snapshot.writable}
@@ -208,16 +212,33 @@ export function Launcher({
         </button>)}
         <button type="button" className={css.groupToggle} onClick={startCommonEdit}
           disabled={Boolean(commonEdit) || Boolean(invalid) || layoutSaving || snapshot.status !== 'ready' || !snapshot.writable || snapshot.revision === undefined}>{t('editCommon')}</button>
-      </div>
+      </div>}
+      {historyGroups.length > 0 && <div className={css.history} data-conversation-history>
+        <ol className={css.historyList} aria-label={t('historyTitle')} title={t('historyHelp')}>
+          {(historyExpanded ? historyGroups : historyGroups.slice(0, 5)).map((entry, index) => <li key={index} className={css.historyItem}>
+            {entry.label + (entry.count > 1 ? '*' + entry.count : '')}
+          </li>)}
+        </ol>
+        {historyGroups.length > 5 && <button type="button" className={css.hideGroup} aria-expanded={historyExpanded}
+          onClick={() => setHistoryExpanded(value => !value)}>{historyExpanded ? t('collapse') : t('historyMore').replace('{count}', String(historyGroups.length))}</button>}
+      </div>}
+    </div>}
+    {hasActions && <>
       {commonEdit && <div className={css.commonEditor} role="group" aria-label={t('editCommon')}>
         <div className={css.groupHeader}><span>{t('commonEditHelp')}</span></div>
         <div className={css.commonChoices}>
-          {enabledActions.map(action => <label className={css.commonChoice} key={action.id} title={action.description}>
-            <input type="checkbox" checked={commonEdit.ids.includes(action.id)} disabled={layoutSaving}
-              onChange={event => setCommonEdit(current => current && ({ ...current, ids: event.target.checked
-                ? [...current.ids, action.id] : current.ids.filter(id => id !== action.id) }))} />
-            {displayLabel(action)}
-          </label>)}
+          {editorGroups.filter(group => group.actions.length > 0).map(group => <div className={css.commonChoiceGroup}
+            key={group.id} role="group" aria-label={t(group.label)} data-common-editor-group={group.id}>
+            <div className={css.groupHeader}>{t(group.label)}</div>
+            <div className={css.row}>
+              {group.actions.map(action => <label className={css.commonChoice} key={action.id} title={action.description}>
+                <input type="checkbox" checked={commonEdit.ids.includes(action.id)} disabled={layoutSaving}
+                  onChange={event => setCommonEdit(current => current && ({ ...current, ids: event.target.checked
+                    ? [...current.ids, action.id] : current.ids.filter(id => id !== action.id) }))} />
+                {displayLabel(action)}
+              </label>)}
+            </div>
+          </div>)}
         </div>
         <div className={css.row}>
           <button type="button" className={css.action} disabled={layoutSaving} onClick={() => { void saveCommonEdit() }}>{t('saveCommon')}</button>
