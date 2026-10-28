@@ -122,7 +122,7 @@ bundle = expectReplace(bundle, settingsMarker,
   '\t\t//#region lib/types/client/launcher-layout.js\n' +
   helpers.trimEnd().split('\n').map(line => '\t\t' + line).join('\n') +
   '\n\t\t//#endregion\n' + settingsMarker, 'launcher module anchor')
-replaceRegion('WorkflowPanel', compile('src/client/WorkflowPanel.tsx', 'Launcher_module_css_default'))
+bundle = cutIfPresent(bundle, '\t\t//#region lib/types/client/WorkflowPanel.js\n', '\t\t//#region lib/types/client/Launcher.js\n', 'retired workflow panel')
 replaceRegion('Launcher', compile('src/client/Launcher.tsx', 'Launcher_module_css_default'))
 replaceRegion('Settings', compile('src/client/Settings.tsx', 'Settings_module_css_default'))
 appendCss('xbJU_q', 'src/client/Launcher.module.css', 'css$1', 'Launcher_module_css_default', [
@@ -183,38 +183,6 @@ if (/WorkflowMode|GoalRef|pauseWorkflow|resumeWorkflow|setMode/.test(declaration
   throw new Error('Launcher declarations still expose the withdrawn execution mode')
 }
 write('lib/types/client/index.d.ts', declarations)
-// Host tool copy is part of the staged entry contract; keep its route hints in sync.
-let workflowBundle = read('lib/workflow/index.js').replace(/\r\n/g, '\n')
-const toolMarker = '//#region lib/types/tool.js\n'
-const toolStart = workflowBundle.indexOf(toolMarker)
-const toolEnd = workflowBundle.indexOf('//#endregion', toolStart + toolMarker.length)
-if (toolStart < 0 || toolEnd < 0) throw new Error('Missing Host workflow tool region')
-workflowBundle = workflowBundle.slice(0, toolStart + toolMarker.length)
-  + compile('src/workflow/tool.ts', '') + workflowBundle.slice(toolEnd)
-// The execution mode was withdrawn: strip the generated domain, schema and
-// service regions that still expose it, then assert no stale verb remains.
-workflowBundle = removeIfPresent(workflowBundle, '\n\t\tmode: input.mode,')
-workflowBundle = cutIfPresent(workflowBundle,
-  '/**\n* Switch mode without resuming work.',
-  '/**\n* Pause further progress.', 'domain setMode')
-workflowBundle = removeIfPresent(workflowBundle, '\tmode: z$1.enum(["manual", "auto"]),\n')
-workflowBundle = removeIfPresent(workflowBundle, '\tlet _setMode_decorators;\n')
-workflowBundle = removeIfPresent(workflowBundle, '\t\t\t_setMode_decorators = [Remote("setMode")];\n')
-workflowBundle = cutIfPresent(workflowBundle,
-  '\t\t\t__esDecorate(this, null, _setMode_decorators, {',
-  '\t\t\t__esDecorate(this, null, _approve_decorators, {', 'service mode decorator call')
-workflowBundle = cutIfPresent(workflowBundle,
-  '\t\t/**\n\t\t* Switch mode without resuming work.',
-  '\t\t/**\n\t\t* Record a scoped human approval.', 'service setMode method')
-workflowBundle = cutIfPresent(workflowBundle,
-  "\t\t/**\n\t\t* Switch the current task's mode from the model path.",
-  '\t\t/**\n\t\t* Pause the current task from the model path.', 'service updateMode method')
-workflowBundle = removeIfPresent(workflowBundle, '\n\t\t\t\tmode: "manual",')
-if (/\bsetMode\b|_setMode_decorators|mode: input\.mode|mode: "manual"|WorkflowMode/.test(workflowBundle)) {
-  throw new Error('Host workflow bundle still exposes a withdrawn execution mode')
-}
-workflowBundle = workflowBundle.replace(/\n\/\/# sourceMappingURL=.*\s*$/, '\n')
-write('lib/workflow/index.js', workflowBundle)
 // Keep portable generated modules and public layout types aligned with the shipped UI.
 const portable = ts.createProgram([
   'actions', 'launcher-layout', 'locales', 'contextual-actions',
@@ -233,4 +201,4 @@ if (diagnostics.some(item => item.category === ts.DiagnosticCategory.Error)) {
   throw new Error('Portable client modules failed type checking: ' + diagnostics.map(item => ts.flattenDiagnosticMessageText(item.messageText, '\n')).join('\n'))
 }
 if (portable.emit().emitSkipped) throw new Error('Portable client module emit failed')
-console.log('Launcher, Host workflow tool and layout schema rebuilt successfully.')
+console.log('Launcher and layout schema rebuilt successfully.')
