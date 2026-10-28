@@ -2,7 +2,7 @@ import { useEffect, useMemo, useRef, useState } from 'react'
 import type { InjectFace, PropsLocale, PropsRuntime } from '@deepseek-ai/dsh-client-ui-slots'
 import { parseActions, actionErrorKey, presentDefaultActions, displayOrder, type CodingAction } from './actions.ts'
 import type { LauncherInjected } from './index.ts'
-import { chatEntries, recommend, withEvidence } from './contextual-actions.ts'
+import { chatEntries, conversationHistory, recommend, withEvidence } from './contextual-actions.ts'
 import { WorkflowPanel } from './WorkflowPanel.tsx'
 import { LAUNCHER_GROUPS, actionsForGroup, defaultLauncherLayout, parseLauncherLayout, type GroupId } from './launcher-layout.ts'
 import css from './Launcher.module.css'
@@ -36,6 +36,7 @@ export function Launcher({
   const unchangedMs = Date.now() - planChangedAt
   const planMayBeStale = watching && unchangedMs >= todoStaleMs
   const unchangedMinutes = Math.ceil(unchangedMs / 60000)
+  const [historyExpanded, setHistoryExpanded] = useState(false)
   const [expandedGroups, setExpandedGroups] = useState<Record<string, boolean>>({})
   const [layoutSaving, setLayoutSaving] = useState(false)
   const [commonEdit, setCommonEdit] = useState<{ ids: string[], revision: number } | null>(null)
@@ -59,6 +60,7 @@ export function Launcher({
   // Buttons travel with their own prompt, so the request can be attributed by id
   // instead of guessing the stage from keywords inside that prompt.
   const entries = sessionRunning ? [] : chatEntries(chat)
+  const history = conversationHistory(chat, actions)
   const recommendation = recommend(entries, sessionRunning, enabledActions)
   const recommendedActions = recommendation
     ? enabledActions.filter(action => recommendation.ids.includes(action.id))
@@ -178,6 +180,16 @@ export function Launcher({
   return <div className={css.root} data-matt-skill-launcher>
     {item !== null && <WorkflowPanel item={item} decision={decision} pending={pending}
       onDecision={setDecision} onAction={(action) => { void runWorkflow(action) }} t={t} />}
+    {history.length > 0 && <div className={css.history} data-conversation-history>
+      <span className={css.historyTitle} title={t('historyHelp')}>{t('historyTitle')}</span>
+      <ol className={css.historyList} aria-label={t('historyTitle')}>
+        {(historyExpanded ? history : history.slice(-5)).map((entry, index) => <li key={index} className={css.historyItem}>
+          {entry.id ? displayLabel(actions.find(action => action.id === entry.id)!) : entry.command ? '/' + entry.command : t('historyCustom')}
+        </li>)}
+      </ol>
+      {history.length > 5 && <button type="button" className={css.hideGroup} aria-expanded={historyExpanded}
+        onClick={() => setHistoryExpanded(value => !value)}>{historyExpanded ? t('collapse') : t('historyMore').replace('{count}', String(history.length))}</button>}
+    </div>}
     {hasActions && <>
       <div className={css.groupToggles} role="group" aria-label={t('groupVisibility')}>
         <span className={css.groupToggleLabel}>{t('groupVisibility')}</span>

@@ -127,6 +127,37 @@ export function chatEntries(view: unknown): ChatEntry[] {
   return entries.reverse()
 }
 
+/** User messages available in the chat view, in display order. */
+export function conversationHistory(view: unknown, actions: readonly ActionSignature[]): { id: string | null; command?: string }[] {
+  const snapshot = record(view)
+  if (!snapshot) return []
+  const legacy = record(snapshot.legacy)
+  const values = [legacy?.nodes, snapshot.items, snapshot.entries, snapshot.messages].find(Array.isArray)
+  if (!Array.isArray(values)) return []
+  const result: { id: string | null; command?: string }[] = []
+  for (const value of values) {
+    const wrapper = record(value)
+    if (!wrapper) continue
+    const data = record(wrapper.data) ?? wrapper
+    const node = record(data.node) ?? record(data.message) ?? data
+    if ((node.kind ?? node.role ?? wrapper.kind) !== 'user') continue
+    const text = typeof node.text === 'string' ? node.text : textBlocks(node.content)
+    if (!text.trim()) continue
+    // A manually typed slash command alone cannot establish which button was used.
+    const matches = actions.filter(action => {
+      if (!action.prompt) return false
+      if (action.kind === 'skill') {
+        return Boolean(action.skillId) && text.trimStart().startsWith('/' + action.skillId + ' ' + action.prompt)
+      }
+      return text.includes(action.prompt)
+    })
+    const id = matches.length === 1 ? matches[0]!.id : null
+    const command = !id ? /^\/([a-z][a-z0-9-]*)(?=\s|$)/i.exec(text.trimStart())?.[1] : undefined
+    result.push({ id, command })
+  }
+  return result
+}
+
 /** Defect evidence naming a severity or a file/line beside the problem. */
 const findingEvidence = String.raw`\bP[0-3]\b|(?:问题|缺陷|错误|finding|defect|issue|error).{0,40}(?:\.tsx?|\.js|\.py|:\d+)`
 

@@ -40,6 +40,11 @@ export interface Recommendation {
  * @returns The latest text exchange in sequence order, excluding tool output.
  */
 export declare function chatEntries(view: unknown): ChatEntry[];
+/** User messages available in the chat view, in display order. */
+export declare function conversationHistory(view: unknown, actions: readonly ActionSignature[]): {
+    id: string | null;
+    command?: string;
+}[];
 /**
  * Attribute a request to the button that inserted it.
  * @param text - Request text before any inserted context excerpt.

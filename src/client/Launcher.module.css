@@ -48,3 +48,8 @@
 .commonChoices{display:flex;flex-wrap:wrap;gap:5px;max-height:30dvh;overflow:auto}
 .commonChoice{display:inline-flex;align-items:center;gap:4px;border:1px solid var(--dsw-alias-border-l2);border-radius:6px;padding:3px 6px;color:var(--dsw-alias-label-primary);font-size:12px;cursor:pointer}
 .commonChoice input{margin:0}
+.history{display:flex;align-items:center;flex-wrap:wrap;gap:5px;padding:4px 2px;color:var(--dsw-alias-label-secondary);font-size:11px}
+.historyTitle{font-weight:600;white-space:nowrap}
+.historyList{display:flex;flex-wrap:wrap;align-items:center;gap:3px;list-style:none;margin:0;padding:0;max-height:25dvh;overflow:auto}
+.historyItem{display:inline-flex;align-items:center;gap:3px;overflow-wrap:anywhere}
+.historyItem:not(:last-child)::after{content:'→';color:var(--dsw-alias-label-tertiary)}

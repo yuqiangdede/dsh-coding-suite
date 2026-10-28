@@ -28,6 +28,8 @@ Only link to files that actually exist. No legacy paths are pending migration.
 
 ## Current state
 
+- [对话中的按钮使用顺序](requirements/conversation-action-history.md) — accepted；输入区按当前对话已发送消息展示识别出的按钮和自由对话，保留顺序并说明识别限制。
+
 - [需求分组与产品研发流水线](requirements/requirements-analysis-group.md) — accepted；分组显示名为「需求」，以产品研发流水线为主干，11 个入口从需求澄清到最终 UI 生图提示词，保留阶段 Gate、回退、旧布局和自定义动作兼容。
 
 - [开发分组改名与更多按钮](requirements/launcher-overflow.md) — accepted；每组默认展示前 8 个，更多/收起独立展开，常用分组可控制显示并在页面内编辑成员。

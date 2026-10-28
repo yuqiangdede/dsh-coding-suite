@@ -1,6 +1,10 @@
 /** Launcher-owned UI dictionaries. */
 /** Simplified Chinese copy. */
 export declare const zh: {
+    readonly historyTitle: "本对话记录";
+    readonly historyHelp: "根据已发送消息中的按钮内容识别；修改提示词、旧配置或手动输入可能影响识别，不代表执行结果。";
+    readonly historyCustom: "自由对话";
+    readonly historyMore: "查看全部（{count}）";
     readonly more: "更多";
     readonly moreCount: "更多（{count}）";
     readonly collapse: "收起";

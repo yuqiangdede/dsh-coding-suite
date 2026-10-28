@@ -4,6 +4,7 @@ import { readFileSync } from 'node:fs'
 import { runInNewContext } from 'node:vm'
 import { zh, en } from '../src/client/locales.ts'
 import { DEFAULT_ACTIONS, encodeActions } from '../src/client/actions.ts'
+import { conversationHistory } from '../src/client/contextual-actions.ts'
 
 function harness({ actions, layout, english = false } = {}) {
   let registration, Launcher, cursor = 0
@@ -27,12 +28,12 @@ function harness({ actions, layout, english = false } = {}) {
     } },
   })
   const config = { ...(actions ? { actionsJson: encodeActions(actions) } : {}), ...(layout ? { layoutJson: JSON.stringify(layout) } : {}) }
-  const data = { config, messages: [], writable: false, revision: 1, saveOk: true }
+  const data = { config, messages: [], writable: false, revision: 1, saveOk: true, running: false }
   const render = () => { cursor = 0; return Launcher({
     useActionForm: fn => fn({ status: 'ready', value: data.config, writable: data.writable, revision: data.revision }),
     useInput: fn => fn({ phase: 'plain', draft: '' }),
     useConversation: fn => fn({ views: new Map([['chat', { messages: data.messages }]]) }),
-    useSession: fn => fn({ running: false }),
+    useSession: fn => fn({ running: data.running }),
     useWorkflow: fn => fn({ item: null }), useProjection: () => [],
     inputActions: {
       captureInsertion: () => ({ start: 0, end: 0 }),
@@ -60,6 +61,45 @@ const makeActions = count => Array.from({ length: count }, (_, i) => ({
   enabled: true, pinned: true, order: i, description: `Description ${i}`, example: '',
 }))
 const commonLayout = ids => ({ schemaVersion: 1, commonActionIds: ids, visibleGroups: { development: false, documents: false, others: false } })
+
+test('conversation history follows sent user messages, remains visible while running, and expands', async () => {
+  const h = harness()
+  const action = id => DEFAULT_ACTIONS.find(a => a.id === id)
+  const sent = id => ({ role: 'user', text: `/${action(id).skillId} ${action(id).prompt}` })
+  h.data.messages = [sent('discussion'), { role: 'assistant', text: 'done' }, sent('spec'),
+    { role: 'user', text: '再讨论一下' }, sent('execute'), sent('review'), sent('commit')]
+  const history = () => h.nodes(h.render()).find(n => n.props?.['data-conversation-history'] === true)
+  const labels = () => h.nodes(history()).filter(n => n.type === 'li').map(n => n.props.children)
+  assert.deepEqual(labels(), ['固化需求', '自由对话', '编码', '代码审查', '提交代码'])
+  h.data.running = true
+  assert.equal(labels().at(-1), '提交代码')
+  const expand = h.nodes(history()).find(n => n.type === 'button')
+  assert.equal(expand.props.children, '查看全部（6）')
+  expand.props.onClick()
+  assert.deepEqual(labels(), ['需求讨论', '固化需求', '自由对话', '编码', '代码审查', '提交代码'])
+  h.data.messages = [{ role: 'user', text: '/implement 手动输入' }, { role: 'user', text: '另一个会话' }]
+  assert.deepEqual(labels(), ['/implement', '自由对话'])
+  h.data.messages = []
+  assert.equal(history(), undefined)
+})
+
+test('unsent button insertions do not appear in conversation history', async () => {
+  const h = harness()
+  h.actionButtons('common').find(n => n.props.children === '需求讨论').props.onClick()
+  await new Promise(resolve => setImmediate(resolve))
+  assert.equal(h.nodes(h.render()).find(n => n.props?.['data-conversation-history'] === true), undefined)
+})
+
+test('history handles repeated actions, wrapped nodes, prompt buttons, and ambiguous signatures', () => {
+  const action = { id: 'custom', kind: 'prompt', prompt: 'Unique inserted text' }
+  const nodes = [
+    { data: { node: { kind: 'user', content: [{ type: 'text', text: 'My request\n\nUnique inserted text' }] } } },
+    { kind: 'tool-result', text: 'Unique inserted text' },
+    { role: 'user', text: 'Unique inserted text' },
+  ]
+  assert.deepEqual(conversationHistory({ legacy: { nodes } }, [action]), [{ id: 'custom', command: undefined }, { id: 'custom', command: undefined }])
+  assert.deepEqual(conversationHistory({ legacy: { nodes } }, [action, { ...action, id: 'other' }]), [{ id: null, command: undefined }, { id: null, command: undefined }])
+})
 
 test('development group is renamed in both the launcher and settings dictionary', () => {
   assert.equal(zh.groupDevelopment, '开发')
