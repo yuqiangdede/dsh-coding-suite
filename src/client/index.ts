@@ -47,17 +47,7 @@ export function apply(ctx: ClientContext): void {
   )
   ctx.slots.inject('conversation.input.dock', () => ctx.slots.register({
     name: 'conversation.input.dock', locale: 'mattSkillLauncher', id: 'matt-skill-launcher', order: 1,
-    inject: (sessionId): LauncherInjected => {
-      return { ok: false, message: 'Coding task changed; refresh and retry' }
-        try {
-          const result = await action(item)
-          return result.ok ? { ok: true, ref: { taskId: result.value.taskId, revision: result.value.revision } }
-            : { ok: false, message: result.error.message }
-        } catch (error) {
-          return { ok: false, message: String(error) }
-        }
-      }
-      return {
+    inject: (sessionId): LauncherInjected => ({
         hooks: { actionForm: form },
         todoStaleMs: deployment.todoStaleMs,
         saveLayout: (json, rev) => form.mutate([{ op: 'set', path: ['layoutJson'], value: json }], rev),
@@ -70,8 +60,7 @@ export function apply(ctx: ClientContext): void {
             return result.value.skills.map(skill=>skill.name)
           })
         },
-      }
-    },
+      }),
   }, Launcher))
   ctx.slots.inject('settings.section', () => ctx.slots.register({
     name: 'settings.section', locale: 'mattSkillLauncher', id: 'matt-skill-launcher', order: 80, label: () => t('title'),
