@@ -28,9 +28,11 @@ Only link to files that actually exist. No legacy paths are pending migration.
 
 ## Current state
 
-- [开发分组改名与更多按钮](requirements/launcher-overflow.md) — accepted；每组默认展示前 8 个，更多/收起独立展开，不改已保存配置。
+- [开发分组改名与更多按钮](requirements/launcher-overflow.md) — accepted；每组默认展示前 8 个，更多/收起独立展开，常用分组可控制显示并在页面内编辑成员。
 
 - [增加日志按钮与临时诊断生命周期](requirements/temporary-logging.md) — accepted；针对具体问题最小加日志，临时标识、清理清单与本会话移除提醒，不承诺跨会话自动提醒。
+
+- [自动编码入口与双链路](requirements/automatic-mode.md) — accepted；显示分组同排切换、默认手动、显式发送启动，Agent 根据证据选择 Bug / 需求链路，共用审查与验证门禁。
 
 - [修复完成后仍推荐修复](pitfalls/repair-recommendation.md) — accepted；修复请求归位及遗留问题栏目误判的修正规则。
 

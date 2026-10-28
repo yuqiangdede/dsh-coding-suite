@@ -25,12 +25,19 @@ export interface LauncherSettingsInjected {
   saveActions: (json:string, revision?:number)=>Promise<boolean>
   saveConfiguration: (actionsJson: string, layoutJson: string, revision?: number) => Promise<boolean>
 }
+/** Identity of the exact Host task revision a user acted on. */
+export interface WorkflowTaskRef {
+  readonly taskId: string
+  readonly revision: number
+}
 /** Outcome of one launcher-initiated workflow command. */
 export interface WorkflowCommandResult {
   /** Whether the Host accepted the command. */
   readonly ok: boolean
   /** Failure message for the notice line. */
   readonly message?: string
+  /** Accepted Host revision, used for a safe rollback after a later Goal failure. */
+  readonly ref?: WorkflowTaskRef
 }
 /** Launcher mode values the workflow record understands. */
 export type WorkflowMode = 'manual' | 'auto'
@@ -40,13 +47,14 @@ export interface LauncherInjected {
   fetchSkillNames: ()=>Promise<readonly string[]>
   saveLayout: (json: string, revision?: number) => Promise<boolean>
   pauseWorkflow: (ref: GoalRef) => Promise<{ readonly ok: true } | { readonly ok: false; readonly error: { readonly message: string } }>
+  resumeWorkflow: (ref: GoalRef) => Promise<{ readonly ok: true } | { readonly ok: false; readonly error: { readonly message: string } }>
   /** Revision-checked mutations of the current coding task. */
   workflowCommands: {
-    approve: (decision: string) => Promise<WorkflowCommandResult>
-    pause: () => Promise<WorkflowCommandResult>
-    resume: () => Promise<WorkflowCommandResult>
-    cancel: (reason: string) => Promise<WorkflowCommandResult>
-    setMode: (mode: WorkflowMode) => Promise<WorkflowCommandResult>
+    approve: (decision: string, ref?: WorkflowTaskRef) => Promise<WorkflowCommandResult>
+    pause: (ref?: WorkflowTaskRef) => Promise<WorkflowCommandResult>
+    resume: (ref?: WorkflowTaskRef) => Promise<WorkflowCommandResult>
+    cancel: (reason: string, ref?: WorkflowTaskRef) => Promise<WorkflowCommandResult>
+    setMode: (mode: WorkflowMode, ref?: WorkflowTaskRef) => Promise<WorkflowCommandResult>
   }
   todoStaleMs: number
 }
@@ -98,39 +106,42 @@ export function apply(ctx: ClientContext): void {
         subscribeReset: listener => ctx.on('connection/reset', listener),
       })
       // Every command carries the revision it read, so a stale panel fails instead of overwriting a newer task.
-      const command = async (action: (item: WorkItem) => Promise<RemoteResult<WorkItem>>): Promise<WorkflowCommandResult> => {
+      const command = async (action: (item: WorkItem) => Promise<RemoteResult<WorkItem>>, expected?: WorkflowTaskRef): Promise<WorkflowCommandResult> => {
         if (workflowRemote === undefined) return { ok: false, message: 'Coding workflow remote unavailable' }
         const item = workflow.getSnapshot().item
         if (item === null) return { ok: false, message: 'No current task' }
+        if (expected && (item.taskId !== expected.taskId || item.revision !== expected.revision))
+          return { ok: false, message: 'Coding task changed; refresh and retry' }
         try {
           const result = await action(item)
-          return result.ok ? { ok: true } : { ok: false, message: result.error.message }
+          return result.ok ? { ok: true, ref: { taskId: result.value.taskId, revision: result.value.revision } }
+            : { ok: false, message: result.error.message }
         } catch (error) {
           return { ok: false, message: String(error) }
         }
+      }
+      const goalCommand = async (action: 'pause' | 'resume', goalRef: GoalRef) => {
+        const binding = ctx.sessions.binding(sessionId)
+        if (binding === undefined || binding.session.getSnapshot().openState !== 'open')
+          return { ok: false as const, error: { message: 'Session unavailable' } }
+        const projection = binding.session.projections.faceOf('goal').getSnapshot() as GoalProjection | null | undefined
+        if (projection == null || projection.goal.id !== goalRef.id || projection.goal.revision !== goalRef.revision)
+          return { ok: false as const, error: { message: 'Workflow goal changed; refresh and retry' } }
+        return ctx.remote.goals[action](sessionId, goalRef)
       }
       return {
         hooks: { actionForm: form, workflow },
         todoStaleMs: deployment.todoStaleMs,
         saveLayout: (json, rev) => form.mutate([{ op: 'set', path: ['layoutJson'], value: json }], rev),
         workflowCommands: {
-          approve: decision => command(item => workflowRemote.approve(sessionId, item.taskId, item.revision, decision)),
-          pause: () => command(item => workflowRemote.pause(sessionId, item.taskId, item.revision)),
-          resume: () => command(item => workflowRemote.resume(sessionId, item.taskId, item.revision)),
-          cancel: reason => command(item => workflowRemote.cancel(sessionId, item.taskId, item.revision, reason)),
-          setMode: mode => command(item => workflowRemote.setMode(sessionId, item.taskId, item.revision, mode)),
+          approve: (decision, ref) => command(item => workflowRemote.approve(sessionId, item.taskId, item.revision, decision), ref),
+          pause: ref => command(item => workflowRemote.pause(sessionId, item.taskId, item.revision), ref),
+          resume: ref => command(item => workflowRemote.resume(sessionId, item.taskId, item.revision), ref),
+          cancel: (reason, ref) => command(item => workflowRemote.cancel(sessionId, item.taskId, item.revision, reason), ref),
+          setMode: (mode, ref) => command(item => workflowRemote.setMode(sessionId, item.taskId, item.revision, mode), ref),
         },
-        pauseWorkflow: async (goalRef) => {
-          const binding = ctx.sessions.binding(sessionId)
-          if (binding === undefined || binding.session.getSnapshot().openState !== 'open')
-            return { ok: false, error: { message: 'Session unavailable' } }
-          // faceOf is the erased framework read; the goal key's type comes from the domain's projection map.
-          const projection = binding.session.projections.faceOf('goal').getSnapshot() as GoalProjection | null | undefined
-          if (projection == null || projection.goal.id !== goalRef.id ||
-              projection.goal.revision !== goalRef.revision)
-            return { ok: false, error: { message: 'Workflow goal changed; refresh and retry' } }
-          return ctx.remote.goals.pause(sessionId, goalRef)
-        },
+        pauseWorkflow: goalRef => goalCommand('pause', goalRef),
+        resumeWorkflow: goalRef => goalCommand('resume', goalRef),
         fetchSkillNames: async () => {
           if (ctx.sessions.binding(sessionId) === undefined) throw new Error('Session unavailable')
           return ctx.sessions.using(sessionId,{ source:'mattSkillLauncher' },async (ref)=>{

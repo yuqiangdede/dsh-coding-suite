@@ -9,6 +9,7 @@
 import { createRequire } from 'node:module'
 import { readFileSync, writeFileSync } from 'node:fs'
 import { resolve } from 'node:path'
+import { buildActionTables } from './build-action-bundle.mjs'
 
 const root = resolve(import.meta.dirname, '..')
 const require = createRequire(import.meta.url)
@@ -82,41 +83,11 @@ function appendCss(prefix, sourceFile, variable, mapName, classes) {
   bundle = bundle.replace(section[0], section[1] + originalMap + ',' + additions + section[3])
 }
 
-function injectLocale() {
-  // Remove the retired Bug fixes group label from both bundled dictionaries.
-  bundle = bundle.replace(/\n\s*"groupBugfix": "[^"]*",/g, '')
-  // A second build starts from the already bundled dictionaries.
-  if (bundle.includes('"groupVisibility": "显示分组"')) return
-  const locales = read('src/client/locales.ts')
-  const enStart = locales.indexOf('export const en:')
-  if (enStart < 0) throw new Error('Missing en locale block')
-  const sources = [locales.slice(0, enStart), locales.slice(enStart)]
-  const keys = [
-    'showButton', 'groupVisibility', 'groupCommon', 'groupDevelopment',
-    'groupDocuments', 'groupOthers', 'groupAlwaysVisible',
-    'groupConfigHelp', 'hideGroup', 'intro',
-  ]
-  for (let lang = 0; lang < sources.length; lang++) {
-    const props = []
-    for (const key of keys) {
-      const match = new RegExp("'"+key+"': '([^'\\n]*)'").exec(sources[lang])
-      if (!match) throw new Error('Missing locale: ' + key)
-      props.push([key, match[1]])
-    }
-    const existingKey = lang === 0 ? '"showButton": "显示在快捷栏",' : '"showButton": "Show in launcher",'
-    const insert = props.filter(([key]) => key !== 'intro')
-      .map(([key, value]) => JSON.stringify(key) + ': ' + JSON.stringify(value) + ',')
-      .join('\n\t\t\t')
-    bundle = expectReplace(bundle, existingKey, insert, 'legacy locale ' + lang)
-    const introIndex = bundle.indexOf('"intro":', lang === 0 ? 0 : bundle.indexOf('const en = {'))
-    if (introIndex < 0) throw new Error('Missing intro copy')
-    const lineEnd = bundle.indexOf('\n', introIndex)
-    const introValue = props.find(([key]) => key === 'intro')[1]
-    bundle = bundle.slice(0, introIndex) + '"intro": ' + JSON.stringify(introValue) + ',' + bundle.slice(lineEnd)
-  }
-}
-
-injectLocale()
+// Recompile dictionaries too: retaining old auto-mode copy would diverge from source.
+replaceRegion('locales', compile('src/client/locales.ts', ''))
+const globalName = /export const LAUNCHER_CONFIG_GLOBAL = '([^']+)'/.exec(read('src/config.ts'))?.[1]
+if (!globalName) throw new Error('Missing launcher config global')
+replaceRegion('index', compile('src/client/index.ts', '').replace(/\bLAUNCHER_CONFIG_GLOBAL\b/g, JSON.stringify(globalName)))
 // The helpers must be evaluated before either component reads them.
 const helpers = compile('src/client/launcher-layout.ts', '')
 const settingsMarker = '\t\t//#region lib/types/client/Launcher.js\n'
@@ -131,11 +102,12 @@ bundle = expectReplace(bundle, settingsMarker,
   '\t\t//#region lib/types/client/launcher-layout.js\n' +
   helpers.trimEnd().split('\n').map(line => '\t\t' + line).join('\n') +
   '\n\t\t//#endregion\n' + settingsMarker, 'launcher module anchor')
+replaceRegion('WorkflowPanel', compile('src/client/WorkflowPanel.tsx', 'Launcher_module_css_default'))
 replaceRegion('Launcher', compile('src/client/Launcher.tsx', 'Launcher_module_css_default'))
 replaceRegion('Settings', compile('src/client/Settings.tsx', 'Settings_module_css_default'))
 appendCss('xbJU_q', 'src/client/Launcher.module.css', 'css$1', 'Launcher_module_css_default', [
   'groupToggles', 'groupToggleLabel', 'groupToggle', 'groupToggleActive',
-  'actionGroup', 'groupHeader', 'locked', 'hideGroup',
+  'actionGroup', 'groupHeader', 'locked', 'hideGroup', 'modeControls', 'commonEditor', 'commonChoices', 'commonChoice',
 ])
 appendCss('v7HIVa', 'src/client/Settings.module.css', 'css', 'Settings_module_css_default', [
   'layoutSection', 'groupSettingRow',
@@ -157,6 +129,8 @@ if (!bundle.includes('saveConfiguration: (actionsJson, layoutJson, rev) =>')) {
 }
 // Old sourcemaps cannot be trusted after a targeted bundle rebuild.
 bundle = bundle.replace(/\n\/\/# sourceMappingURL=client\.js\.map\s*$/, '\n')
+// Keep the portable JSON action/receiving tables byte-for-byte canonical.
+bundle = buildActionTables(bundle)
 write('lib/client.js', bundle)
 
 let host = read('lib/index.js')
@@ -177,4 +151,14 @@ if (!declarations.includes('    saveLayout:')) declarations = expectReplace(decl
   '    fetchSkillNames: () => Promise<readonly string[]>;\n    saveLayout: (json: string, revision?: number) => Promise<boolean>;',
   'launcher interface')
 write('lib/types/client/index.d.ts', declarations)
-console.log('Launcher bundle and Host layout schema rebuilt successfully.')
+// Host tool copy is part of the automatic entry contract; keep its route hints in sync.
+let workflowBundle = read('lib/workflow/index.js').replace(/\r\n/g, '\n')
+const toolMarker = '//#region lib/types/tool.js\n'
+const toolStart = workflowBundle.indexOf(toolMarker)
+const toolEnd = workflowBundle.indexOf('//#endregion', toolStart + toolMarker.length)
+if (toolStart < 0 || toolEnd < 0) throw new Error('Missing Host workflow tool region')
+workflowBundle = workflowBundle.slice(0, toolStart + toolMarker.length)
+  + compile('src/workflow/tool.ts', '') + workflowBundle.slice(toolEnd)
+workflowBundle = workflowBundle.replace(/\n\/\/# sourceMappingURL=.*\s*$/, '\n')
+write('lib/workflow/index.js', workflowBundle)
+console.log('Launcher, Host workflow tool and layout schema rebuilt successfully.')

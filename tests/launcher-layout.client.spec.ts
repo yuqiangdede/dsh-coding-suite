@@ -11,7 +11,7 @@ describe('launcher business groups', () => {
     const layout = defaultLauncherLayout(actions)
     expect(layout.commonActionIds).toEqual([...DEFAULT_COMMON_IDS])
     expect(LAUNCHER_GROUPS.map(group => group.id)).toEqual(['development', 'documents', 'others'])
-    expect(LAUNCHER_GROUPS.map(group => group.actionIds.length)).toEqual([12, 7, 12])
+    expect(LAUNCHER_GROUPS.map(group => group.actionIds.length)).toEqual([14, 7, 12])
     expect(actionsForGroup('common', actions, layout).map(a => a.id)).toEqual([...DEFAULT_COMMON_IDS])
     expect(actionsForGroup('development', actions, layout).map(a => a.id)).toEqual([
       'discussion', 'visual', 'spec', 'plan', 'execute', 'add-logs', 'review', 'review-fix',
@@ -23,7 +23,7 @@ describe('launcher business groups', () => {
   })
   it('defaults only development to visible and preserves independent group switches', () => {
     const initial = parseLauncherLayout(undefined, actions)
-    expect(initial.visibleGroups).toEqual({ development: true, documents: false, others: false })
+    expect(initial.visibleGroups).toEqual({ common: true, development: true, documents: false, others: false })
     const changed = { ...initial, visibleGroups: { ...initial.visibleGroups, documents: true, development: false } }
     expect(parseLauncherLayout(JSON.stringify(changed), actions)).toEqual(changed)
     const legacy = { ...changed, visibleGroups: { ...changed.visibleGroups, bugfix: true } }

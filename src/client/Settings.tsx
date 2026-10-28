@@ -2,7 +2,7 @@ import { useEffect, useRef, useState } from 'react'
 import type { InjectFace, PropsLocale, PropsRuntime } from '@deepseek-ai/dsh-client-ui-slots'
 import { DEFAULT_ACTIONS, parseActions, encodeActions, actionErrorKey, presentDefaultActions, missingDefaultActions, type CodingAction } from './actions.ts'
 import type { LauncherSettingsInjected } from './index.ts'
-import { LAUNCHER_GROUPS, defaultLauncherLayout, exportLauncherConfiguration, importedLauncherLayout, parseLauncherLayout, type LauncherLayout, type OptionalGroupId } from './launcher-layout.ts'
+import { LAUNCHER_GROUPS, defaultLauncherLayout, exportLauncherConfiguration, importedLauncherLayout, parseLauncherLayout, type LauncherLayout, type GroupId } from './launcher-layout.ts'
 import css from './Settings.module.css'
 type Props = PropsRuntime<'settings.section'> & PropsLocale<'mattSkillLauncher'> & InjectFace<LauncherSettingsInjected>
 export function LauncherSettings({ useActionForm, saveConfiguration, t }: Props) {
@@ -29,7 +29,7 @@ export function LauncherSettings({ useActionForm, saveConfiguration, t }: Props)
     } catch (err) { setError(t('corrupt') + explain(err)) }
   }, [form.value?.actionsJson, form.value?.layoutJson, form.revision, dirty])
   const change = (id: string, patch: Partial<CodingAction>) => { setDraft(xs=>xs.map(x=>x.id===id?{ ...x,...patch }:x)); setDirty(true) }
-  const showGroup = (id: OptionalGroupId, visible: boolean) => {
+  const showGroup = (id: GroupId, visible: boolean) => {
     setLayout(current => ({ ...current, visibleGroups: { ...current.visibleGroups, [id]: visible } }))
     setDirty(true)
   }
@@ -88,7 +88,7 @@ export function LauncherSettings({ useActionForm, saveConfiguration, t }: Props)
       <section className={css.layoutSection}>
         <h3>{t('groupVisibility')}</h3>
         <div className={css.groupSettingRow}>
-          <label><input type="checkbox" checked disabled />{t('groupCommon')} · {t('groupAlwaysVisible')}</label>
+          <label><input type="checkbox" checked={layout.visibleGroups.common} onChange={event => showGroup('common', event.target.checked)}/>{t('groupCommon')}</label>
           {LAUNCHER_GROUPS.map(group =>
             <label key={group.id}><input type="checkbox" checked={layout.visibleGroups[group.id]}
               onChange={event => showGroup(group.id, event.target.checked)}/>{t(group.label)}</label>)}

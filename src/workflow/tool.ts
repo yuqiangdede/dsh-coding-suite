@@ -45,8 +45,8 @@ function nextStep(item: WorkItem): string {
   if (item.status === 'waiting_approval') return 'wait for the scoped human decision'
   if (item.status === 'paused') return 'wait for an explicit mode change or resume'
   switch (item.currentStage) {
-    case 'S1': return 'stage S1 (requirements evidence) or skip S1 with reason'
-    case 'S2': return 'stage S2 (specification evidence) or skip S2 with reason'
+    case 'S1': return 'feature/contract change: stage S1 requirements; proven existing-contract bug: explicit skip S1 with evidence-based reason; ask if ambiguous'
+    case 'S2': return 'feature/contract change: stage S2 specification/design; existing-contract bug only: explicit skip S2 with reason why no design change is needed'
     case 'S3': return 'stage S3 (implementation plan evidence)'
     case 'S4': return item.checks === null ? 'checks (planned commands and allowed paths)' : 'stage S4 (implementation evidence)'
     case 'S5': return 'review (evidence plus structured findings)'
@@ -90,6 +90,7 @@ export function codingWorkflowTool(service: CodingWorkflowService): ToolDefiniti
     description: [
       'Drive one staged coding task with durable evidence gates. Call start before changing code; every later step refuses until its prerequisites are recorded.',
       'Stages: S0 workspace, S1 requirements, S2 specification, S3 plan, S4 implementation, S5 review, S6 repair, S7 verification, S8 local commit, S9 report.',
+      'Agent selects bug vs feature from goal, context and evidence; ask if the expected contract is ambiguous. Bugs require reproduction, root-cause and regression evidence; only bugs restoring an unchanged contract may explicitly skip S1/S2 with reasons. Features or contract changes complete S1/S2. Both routes require S3 planning, structured review and passing planned test/build gates before commit.',
       'Evidence paths name files inside the workspace that prove the stage; checks must be planned before S4; verify runs each planned command; commit stages exactly the listed changed files. No push, merge, or remote write exists.',
     ].join(' '),
     parameters: {
@@ -138,12 +139,11 @@ export function codingWorkflowTool(service: CodingWorkflowService): ToolDefiniti
       command: { type: 'array', items: { type: 'string' }, description: 'verify: exact planned command.' },
       files: { type: 'array', items: { type: 'string' }, description: 'commit: exact changed files to commit.' },
       mode: { type: 'string', enum: ['manual', 'auto'], description: 'mode: switch without resuming.' },
-      reason: { type: 'string', description: 'approval/block/cancel: concrete reason and recovery.' },
+      reason: { type: 'string', description: 'skip: evidence-based reason an existing-contract bug needs no S1/S2 change; approval/block/cancel: concrete reason and recovery.' },
     },
     output: {
       schema: {
         type: 'object',
-        required: true,
         additionalProperties: false,
         properties: {
           taskId: { type: 'string', required: true },

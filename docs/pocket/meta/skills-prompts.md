@@ -56,7 +56,7 @@
 - [Launcher 插入逻辑](<../../../src/client/Launcher.tsx#L66-L89>)只插入并保存草稿，不自动发送。Skill 类型先核对会话技能可用性，且必须位于消息开头；纯提示词直接插入文本，无额外业务参数表单。
 - `withEvidence` 当前仅附加接收指令，不复制历史报告正文。推荐下一步是基于可见会话的提示，不是自动执行状态机。
 - [英文展示表](<../../../src/client/actions.ts#L63-L97>)只翻译名称、说明和示例，默认核心 prompt 仍为中文；接收指令单独提供中英文。
-- [语言文案](<../../../src/client/locales.ts#L14>)还保留 `autoInstruction` 等自动模式文本；文本存在不等于当前界面会发送它，升级时要检查调用方。
+- [自动模式文案](<../../../src/client/locales.ts>)由[同排模式入口](<../../../src/client/Launcher.tsx>)调用：选择模式不执行，准备按钮只把 `coding-workflow` 与目标指令插入草稿，用户发送后才启动；Agent 依据证据选择 Bug / 需求链路。详见[已接受约定](<../requirements/automatic-mode.md>)。
 - [工作流持久化 schema](<../../../src/workflow/spec.ts>)是数据结构，不是提示词；不要与按钮配置的 `schemaVersion` 混淆。
 
 ## 3. 明确登记上游的 Skill：Matt Pocock，19 项
@@ -228,6 +228,8 @@ node scripts/verify-client-bundle.mjs
 | 2026-10-26 | 本台账与[首次基线](<baselines/skills-prompts-2026-10-26.json>) | 静态盘点，31 Skill / 30 按钮 / 188 个文件指纹 | `inventory-20261026-01` | 未更新上游版本、未修改运行提示词或用户设置、未提交 |
 | 2026-10-26 | ACTION:doc-supplement + RECEIVING:doc-supplement | 来源扩展为“本会话（默认）或指定时间段/版本号之后的已提交代码改动”；同步默认提示词、接收指令、英文展示和发布 bundle；见[需求](<../requirements/doc-supplement-sources.md>) | 当前工作树（未提交），`local-20261026-02` | 已修改；静态断言、Node 回归测试、`node --check`、bundle 注册与分组渲染校验通过；未提交 |
 | 2026-10-27 | ACTION:execute 名称 | 按用户要求把默认按钮名称由「开发」改为「编码」；只改显示名称，prompt、绑定 Skill、排序和阶段边界未变，英文默认展示仍为 `Develop`；同步[默认按钮表](<../../../src/client/actions.ts#L37>)与发布 [bundle](<../../../lib/client.js>)；已保存配置不自动改名 | 当前工作树（未提交），`local-20261027-01` | 已修改；`build-action-bundle.mjs --check`、`verify-client-bundle.mjs`、`verify-launcher-render.mjs` 通过；未提交 |
+| 2026-10-28 | SKILL:coding-workflow + 自动模式入口/文案 + TOOL:workflow | 用户授权在显示分组同排提供默认手动的切换；显式发送启动，按证据选择 Bug / 需求链路；Bug 只在既有约定不变时可显式跳过 S1/S2，共用审查/验证门禁；无 Host 工具停止而非静默降级；见[交互约定](<../requirements/automatic-mode.md>) | 基于 `7f347ed0b32d2a316f18a6df33e549380cf1a985` 的本地改动，`local-20261028-01`；无上游升级 | 验证结果见交互约定的实现入口；发布 bundle 与相关声明同步，未修改用户已保存按钮配置 |
+
 | 2026-10-28 | ACTION:add-logs | 按用户要求新增“增加日志”纯提示词按钮，默认常用组紧邻 Bug排查、开发组可见；临时诊断日志要求脱敏、标记、清理清单及本会话移除提醒，不承诺后台/跨会话提醒；见[约定](<../requirements/temporary-logging.md>) | 本地新增，无上游升级，`local-20261028-02` | 用户已保存动作/布局不覆盖；源码、发布 bundle 与回归测试同步 |
 
 本次修改使首次基线中的 `src/client/actions.ts`、`src/client/locales.ts`、`lib/client.js` 等指纹变化；首次基线保持原样，不作为最新内容快照。已保存的用户按钮配置不会被自动替换。
@@ -301,3 +303,5 @@ git status --short
 - 所有既有业务/提示词/技能/编译产物保持不变；没有从网络下载新技能、修改来源 SHA、导出用户设置、运行升级、提交或推送。
 - 本次验证覆盖清单数量、文档本地链接、基线文件的 SHA-256 和文档差异格式；不包含 Skill 实际调用、Word 转换、宿主 UI 重载或全量运行测试。
 - 后续增删 Skill、改提示词或共享规则时更新受影响行，追加变更记录；文件内容历史仍交给 Git，不用本台账替代版本控制。
+
+- 2026-10-28：新增 `analyze-logs` 与 `remote-debug` 纯提示词动作，输入及配置兼容约定见 [日志分析与远程调试入口](../requirements/diagnostic-shortcuts.md)；默认提示词以源码为准。

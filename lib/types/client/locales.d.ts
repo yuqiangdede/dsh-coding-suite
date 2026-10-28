@@ -5,7 +5,6 @@ export declare const zh: {
     readonly moreCount: "更多（{count}）";
     readonly collapse: "收起";
     readonly groupOverflowLabel: "{group}：{action}";
-    readonly groupDevelopment: "开发";
     readonly workflowMode: "编码模式";
     readonly goalStatus: "自动任务 Goal 状态";
     readonly goalNotStage: "阶段详细进度待接入";
@@ -13,13 +12,27 @@ export declare const zh: {
     readonly pauseUnavailable: "会话仍在执行，但尚未建立可识别的自动任务 Goal。请先使用原生停止按钮，再切换手动模式。";
     readonly manualMode: "手动";
     readonly autoMode: "全自动";
-    readonly autoStages: "需求 → 固化 → 实现 → 走读 → 修复 → 验证 → 本地提交";
+    readonly autoStages: "自动判断链路：Bug 复现 → 根因 → 回归修复；需求澄清 → 规格设计 → 实现。两者均须审查 → 验证 → 本地提交。";
+    readonly resumeViaAgent: "未找到此任务关联的 Goal；请发送明确的继续请求，由 Agent 核对检查点并恢复原任务。";
     readonly autoPrepare: "准备全自动任务";
-    readonly autoInstruction: "按本次消息中的具体目标连续执行全自动编码工作流。默认仅异常需要人工确认，严格检查阶段证据，修复最多 3 轮，验证后只允许本地 Git commit；禁止 push、创建 PR、部署。若未提供开发目标，先询问用户，不要自行开发。";
+    readonly autoInstruction: "按本次消息中的具体目标执行 coding-workflow 自动工作流。先核对当前任务、工作区和工具；根据目标、上下文、既有行为约定及代码证据判断 Bug 修复或需求开发，说明所选链路，不按关键词硬判。Bug：复现 → 根因 → 回归测试与最小修复；仅在不改变既有行为约定时可带理由显式跳过 S1/S2。需求开发或行为约定变化：需求澄清 → 规格与设计 → 实施计划 → 实现。分类不清先询问。两条链路均必须登记阶段证据、结构化审查、必要修复和真实 test/build 验证，通过后只做本地 Git commit 与交付报告。修复最多 3 轮；禁止 push、创建 PR、部署。不覆盖其他任务或 Goal，重启不自动继续；缺少 Host 工具时停止说明，不静默降级。若未提供开发目标，先询问，不自行开发。";
     readonly autoTooltip: "先把光标移到草稿开头，点击插入 workflow Skill；检查需求文本后手动发送才开始执行。";
     readonly autoHelp: "先填写目标，光标移至开头后点准备；手动发送才授权开始。异常暂停，重启后不会自动继续。";
     readonly todoStale: "任务列表已持续 {minutes} 分钟未变化（按当前页面观察时间计算）；Agent 可能仍在工作，请核对进度。";
-    readonly showButton: "显示在快捷栏";
+    readonly showButton: "加入常用";
+    readonly editCommon: "编辑常用";
+    readonly commonEditHelp: "勾选要在常用中显示的按钮，保存后生效。";
+    readonly saveCommon: "保存";
+    readonly cancelCommon: "取消";
+    readonly commonLimit: "常用按钮最多 100 个。";
+    readonly groupVisibility: "显示分组";
+    readonly groupCommon: "常用";
+    readonly groupDevelopment: "开发";
+    readonly groupDocuments: "文档";
+    readonly groupOthers: "其他";
+    readonly groupAlwaysVisible: "始终显示";
+    readonly groupConfigHelp: "各分组可以独立开关。重复按钮引用同一份 Skill 或提示词。";
+    readonly hideGroup: "隐藏本组";
     readonly defaultLocale: "zh";
     readonly fillMissing: "补齐缺失预设（待保存）";
     readonly invalid: "按钮设置无效，请在设置中修复：";
@@ -36,7 +49,7 @@ export declare const zh: {
     readonly rejected: "DSH Host 拒绝保存；编辑内容已保留";
     readonly unsaved: "未保存：";
     readonly title: "编码按钮 / Skill Launcher";
-    readonly intro: "勾选要直接显示的按钮；未勾选的启用按钮收进「更多」。点击只插入草稿，不会自动发送。可以调整显示状态和顺序。";
+    readonly intro: "各业务分组可独立显示或隐藏。下方按钮设置可调整常用成员、Skill、提示词及排序。点击按钮只插入草稿，不自动发送。";
     readonly skillRow: "Skill 类型按钮";
     readonly promptRow: "提示词类型按钮";
     readonly add: "新增";
@@ -118,21 +131,3 @@ export declare const receivingInstructions: Readonly<Record<string, readonly [st
 export declare const documentReceiving: readonly ["接收目标读者、资料路径、已确认范围和输出要求；先读取原始产物，缺失内容标记待确认，交付时说明文件位置及校验结果。", "Receive the audience, source paths, agreed scope and output requirements; read primary artifacts, flag missing facts and report output paths and validation."];
 /** Document policy shared by the code-writing actions, Chinese then English. */
 export declare const codingDocPolicy: readonly ["编码阶段不更新产品资料文档（需求、总体设计、概要设计、数据库设计、接口文档）；完成后只列出受影响的现有文档，并提示使用「补充文档」按钮；不自行更新。README 和 JSDoc 仍按仓库规则随代码更新。", "Do not update product documents (requirements, system design, high-level design, database design or interface documents) during coding. After finishing, list the affected existing documents and point to the Supplement Docs button; do not update them yourself. README and JSDoc still follow repository rules."];
-/** Localized framing for bounded conversation excerpts. */
-export declare const draftContextCopy: {
-    readonly zh: {
-        readonly truncated: "\n[摘录已截断，请查阅原文。]";
-        readonly heading: "\n\n【上一阶段对话摘录，请核对实际文件】\n";
-        readonly request: "请求：";
-        readonly result: "结果：";
-        readonly verify: "\n摘录仅供参考。请核实产物和当前改动，缺失证据明确报告；推荐不代表任务完成、检查通过或获得提交及推送授权。";
-    };
-    readonly en: {
-        readonly truncated: "\n[Excerpt truncated; consult the original.]";
-        readonly heading: "\n\n【Previous exchange excerpts — verify against source files】\n";
-        readonly request: "Request: ";
-        readonly result: "Result: ";
-        readonly verify: "\nTreat excerpts as reference material. Verify artifacts and current changes; report missing evidence. A recommendation does not establish completion, passing checks or permission to commit or push.";
-    };
-};
-//# sourceMappingURL=locales.d.ts.map

@@ -42,6 +42,14 @@ export interface LauncherInjected {
             readonly message: string;
         };
     }>;
+    resumeWorkflow: (ref: GoalRef) => Promise<{
+        readonly ok: true;
+    } | {
+        readonly ok: false;
+        readonly error: {
+            readonly message: string;
+        };
+    }>;
     /** Revision-checked mutations of the current coding task. */
     workflowCommands: {
         approve: (decision: string) => Promise<WorkflowCommandResult>;
@@ -65,4 +73,3 @@ declare module '@deepseek-ai/dsh-client-ui-slots' {
 }
 export declare const inject: string[];
 export declare function apply(ctx: ClientContext): void;
-//# sourceMappingURL=index.d.ts.map
