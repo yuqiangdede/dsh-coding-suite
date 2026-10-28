@@ -4,9 +4,6 @@
  *
  * 1. DSH keys a client module by the package name, so the bundle must register
  *    that same id. The bundle was once built under the old scoped name.
- * 2. The application-level Remote table never contains a third-party
- *    `remote.codingWorkflow` namespace, so requiring it in the top-level
- *    `inject` list leaves the client fiber waiting forever.
  *
  * Run with `node scripts/verify-client-bundle.mjs`.
  */
@@ -18,6 +15,9 @@ const root = fileURLToPath(new URL('..', import.meta.url))
 const pkg = JSON.parse(readFileSync(new URL('../package.json', import.meta.url), 'utf8'))
 const bundlePath = new URL('../lib/client.js', import.meta.url)
 const bundleSource = readFileSync(bundlePath, 'utf8')
+const hostSource = readFileSync(new URL('../lib/index.js', import.meta.url), 'utf8')
+assert.doesNotMatch(bundleSource, /codingWorkflow|workflowCommands|WorkflowPanel/, 'browser bundle must not contain the retired workflow')
+assert.doesNotMatch(hostSource, /CodingWorkflowService|verificationTimeoutMs/, 'Host bundle must not load the retired workflow')
 
 const registered = []
 globalThis.window = {
@@ -65,11 +65,7 @@ exports.apply(ctx)
 
 assert.deepEqual(registrations.map(options => options.name), ['conversation.input.dock', 'settings.section'])
 const injected = dockOptions.inject('session-1')
-assert.ok(injected.hooks.workflow, 'the dock must expose a workflow source even when the Host Remote is absent')
-assert.equal('pauseWorkflow' in injected, false, 'the dock must not own a native Goal hook')
-assert.equal('resumeWorkflow' in injected, false, 'the dock must not own a native Goal hook')
-assert.equal('setMode' in injected.workflowCommands, false, 'the dock must not expose a mode command')
-const result = await injected.workflowCommands.approve('ship it')
-assert.deepEqual(result, { ok: false, message: 'Coding workflow remote unavailable' })
+assert.ok(injected.hooks.actionForm, 'launcher configuration must remain available')
+assert.equal('workflowCommands' in injected, false, 'retired workflow commands must be absent')
 
-console.log(`OK ${pkg.name}: client bundle registers itself, mounts the input dock, and degrades when remote.codingWorkflow is unavailable.`)
+console.log(`OK ${pkg.name}: client bundle registers itself, mounts the input dock, without retired workflow remotes.`)

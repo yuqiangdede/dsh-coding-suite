@@ -1,1 +1,0 @@
-{"version":3,"file":"typert.remote-client.d.ts","names":["approve","cancel","get","pause","resume","setMode"],"sources":["../src/index.ts"],"sourcesContent":[null],"mappings":";;;;;;;;;;;IAqcEA,O;IAaAC,M;IA/NAC,G;IA0KAC,K;IAYMC,M;IAeNC,O;;;IAaAL,wB;IAaAC,uB;IA/NAC,oB;IA0KAC,sB;IAYMC,uB;IAeNC,wB;;;;;;IAaAL,8B;IAaAC,6B;IA/NAC,0B;IA0KAC,4B;IAYMC,6B;IAeNC,8B","ignoreList":[]}

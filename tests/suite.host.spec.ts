@@ -30,7 +30,7 @@ afterEach(async () => {
 })
 
 describe('CodingSuite Host Loader composition', () => {
-  it('loads the shipped entry, skills, workflow service, and configured launcher settings', async () => {
+  it('loads the shipped entry, skills, and configured launcher settings', async () => {
     root = await mkdtemp(join(tmpdir(), 'dsh-coding-suite-loader-'))
     const repository = join(root, 'repo')
     await mkdir(repository)
@@ -47,7 +47,6 @@ describe('CodingSuite Host Loader composition', () => {
       '  config:',
       '    actionsJson: \'{"schemaVersion":3,"actions":[]}\'',
       '    todoStaleMs: 300000',
-      '    verificationTimeoutMs: 60000',
       '',
     ].join('\n'))
 
@@ -91,31 +90,8 @@ describe('CodingSuite Host Loader composition', () => {
     expect(suiteEntry?.options.config).toMatchObject({
       actionsJson: '{"schemaVersion":3,"actions":[]}',
       todoStaleMs: 300000,
-      verificationTimeoutMs: 60000,
     })
-    expect(ctx.codingWorkflow).toBeDefined()
     expect((await ctx.skills.list()).length).toBeGreaterThan(0)
 
-    const session = ctx.sessions.create(SessionId('coding-suite-loader-agent'))
-    const agent: Agent = {
-      id: session.id,
-      options: {},
-      session,
-      inbox: createInboxStub(),
-      model: { current: () => undefined, select: () => {} },
-      status: 'idle',
-      ctx,
-      followup: () => {},
-      steer: () => {},
-      inject: () => {},
-      send: () => {},
-      cancel() {},
-      runMaintenance: task => task(new AbortController().signal),
-      whenIdle: () => Promise.resolve(),
-    }
-    await ctx.agents.register(agent)
-    const item = await ctx.codingWorkflow.start(agent, 'Loader composition')
-    expect(item.status).toBe('ready')
-    expect(ctx.codingWorkflow.get(agent)).toEqual(item)
   }, 30_000)
 })
