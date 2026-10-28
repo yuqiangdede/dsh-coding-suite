@@ -19,10 +19,6 @@ export declare const workItemRecord: z.ZodObject<{
     sessionId: z.ZodPipe<z.ZodString, z.ZodTransform<SessionId, string>>;
     workspaceRoot: z.ZodString;
     title: z.ZodString;
-    mode: z.ZodEnum<{
-        manual: "manual";
-        auto: "auto";
-    }>;
     status: z.ZodEnum<{
         created: "created";
         ready: "ready";
@@ -209,7 +205,6 @@ export declare const codingWorkflowDomainSpec: {
             sessionId: SessionId;
             workspaceRoot: string;
             title: string;
-            mode: "manual" | "auto";
             status: "created" | "ready" | "running" | "waiting_approval" | "paused" | "blocked" | "completed" | "cancelled";
             currentStage: "S0" | "S1" | "S2" | "S3" | "S4" | "S5" | "S6" | "S7" | "S8" | "S9";
             branch: string;

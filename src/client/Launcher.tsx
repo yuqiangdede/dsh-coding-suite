@@ -9,27 +9,14 @@ import css from './Launcher.module.css'
 type Props = PropsRuntime<'conversation.input.dock'> & PropsLocale<'mattSkillLauncher'> & InjectFace<LauncherInjected>
 export function Launcher({
   useInput, useConversation, useSession, useProjection, inputActions, useActionForm, fetchSkillNames,
-  useWorkflow, workflowCommands, pauseWorkflow, resumeWorkflow, saveLayout, todoStaleMs, t,
+  useWorkflow, workflowCommands, saveLayout, todoStaleMs, t,
 }: Props) {
   const snapshot = useActionForm(x => x)
   const input = useInput(x => x)
   const chat = useConversation(x => x.views.get('chat'))
   const sessionRunning = useSession(x => x.running)
   const workflow = useWorkflow(x => x)
-  const goalProjection = useProjection('goal')
   const item = workflow.item
-  const activeItem = item && !['completed', 'cancelled'].includes(item.status) ? item : null
-  const [preparedMode, setPreparedMode] = useState<'manual' | 'auto'>('manual')
-  const goal = goalProjection?.goal
-  // Never pause or resume an unrelated native Goal. Standalone linked installs
-  // may lack the Work Item Remote; the exact UUID marker still identifies theirs.
-  const goalTask = goal?.objective.match(/^\[coding-workflow:([^\]]+)\](?:\s|$)/)?.[1]
-  const relatedGoal = goal && (activeItem
-    ? goalTask === activeItem.taskId
-    : goalTask !== undefined && /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(goalTask))
-    && goal.phase !== 'complete' ? goal : null
-  const mode = activeItem?.mode ?? (relatedGoal?.phase === 'active' ? 'auto' : preparedMode)
-  const autoOwnsSession = activeItem?.mode === 'auto' || (mode === 'auto' && relatedGoal !== null)
   const commandLock = useRef(false)
   const todos = useProjection('todos')
   const planSignature = JSON.stringify(todos ?? [])
@@ -115,34 +102,6 @@ export function Launcher({
     finally { if (alive.current) setLayoutSaving(false) }
   }
   const available = input.phase === 'plain' && !pending && snapshot.status === 'ready'
-  const singleStageAvailable = available && !autoOwnsSession
-  const changeMode = async (nextMode: 'manual' | 'auto') => {
-    if (commandLock.current || nextMode === mode) return
-    commandLock.current = true
-    setPending(true)
-    setNotice('')
-    try {
-      // Mode selection never starts/resumes execution. Before manual takeover,
-      // stop continuation first; failure keeps the displayed mode unchanged.
-      if (sessionRunning && (nextMode === 'auto' || !relatedGoal)) {
-        setNotice(t('pauseUnavailable')); return
-      }
-      if (relatedGoal?.phase === 'active') {
-        const result = await pauseWorkflow({ id: relatedGoal.id, revision: relatedGoal.revision })
-        if (!result.ok) { if (alive.current) setNotice(t('pauseFailed') + result.error.message); return }
-      }
-      if (activeItem) {
-        const result = await workflowCommands.setMode(nextMode)
-        if (!result.ok) { if (alive.current) setNotice(t('workflowActionFailed') + (result.message ?? '')); return }
-      }
-      if (alive.current) setPreparedMode(nextMode)
-    } catch (error) {
-      if (alive.current) setNotice(t('workflowActionFailed') + String(error))
-    } finally {
-      commandLock.current = false
-      if (alive.current) setPending(false)
-    }
-  }
   const insert = async (action: CodingAction) => {
     if (!available || commandLock.current) return
     setNotice('')
@@ -176,13 +135,6 @@ export function Launcher({
     setNotice('')
     try {
       const text = decision.trim()
-      if ((action === 'pause' || action === 'cancel') && relatedGoal?.phase === 'active') {
-        const paused = await pauseWorkflow({ id: relatedGoal.id, revision: relatedGoal.revision })
-        if (!paused.ok) { if (alive.current) setNotice(t('pauseFailed') + paused.error.message); return }
-      }
-      if (action === 'resume' && activeItem?.mode === 'auto' && !relatedGoal) {
-        setNotice(t('resumeViaAgent')); return
-      }
       let result
       if (action === 'approve') result = await workflowCommands.approve(text)
       else if (action === 'cancel') result = await workflowCommands.cancel(text)
@@ -190,16 +142,6 @@ export function Launcher({
       else result = await workflowCommands.resume()
       if (!alive.current) return
       if (!result.ok) { setNotice(t('workflowActionFailed') + (result.message ?? '')); return }
-      if (action === 'resume' && activeItem?.mode === 'auto' && relatedGoal) {
-        const resumed = await resumeWorkflow({ id: relatedGoal.id, revision: relatedGoal.revision })
-        if (!resumed.ok) {
-          // Host may already be ready; restore its stop before surfacing failure.
-          const stopped = await workflowCommands.pause()
-          if (alive.current) setNotice(t('workflowActionFailed') + resumed.error.message
-            + (stopped.ok ? '' : `; ${stopped.message ?? ''}`))
-          return
-        }
-      }
       if (action === 'approve' || action === 'cancel') setDecision('')
     } catch (error) {
       if (alive.current) setNotice(t('workflowActionFailed') + String(error))
@@ -208,11 +150,6 @@ export function Launcher({
       if (alive.current) setPending(false)
     }
   }
-  const prepareAutomatic = () => {
-    if (!available || sessionRunning || activeItem || relatedGoal) return
-    void insert({ id: 'automatic', label: t('autoPrepare'), kind: 'skill', skillId: 'coding-workflow',
-      prompt: t('autoInstruction'), enabled: true, order: 0, description: '', example: '' })
-  }
   // Presentation-only aliases for stored, unchanged legacy preset labels.
   const displayLabel = (a: CodingAction): string => {
     if (a.id === 'review-fix' && a.label === '修复审核问题') return '修复'
@@ -220,7 +157,7 @@ export function Launcher({
     if (a.id === 'docx' && a.label === 'MD 转 Word') return 'MD转Word'
     return a.label
   }
-  const render = (a: CodingAction) => <button type="button" key={a.id} disabled={!singleStageAvailable} className={visibleRecommendation?.ids.includes(a.id) ? css.recommended : css.action}
+  const render = (a: CodingAction) => <button type="button" key={a.id} disabled={!available} className={visibleRecommendation?.ids.includes(a.id) ? css.recommended : css.action}
     title={a.description + '\n' + a.example + (visibleRecommendation?.ids.includes(a.id) ? '\n' + t('recommendationTooltip').replace('{reason}', t(visibleRecommendation.reason)) : '')} onClick={() => { void insert(a) }}>{displayLabel(a)}</button>
   // Expansion is local presentation state, independent of saved membership and action availability.
   const renderGroupActions = (id: string, label: string, members: CodingAction[]) => {
@@ -239,7 +176,7 @@ export function Launcher({
     </div>
   }
   return <div className={css.root} data-matt-skill-launcher>
-    {item !== null && <WorkflowPanel item={item} continuationPaused={item.mode === 'auto' && relatedGoal !== null && relatedGoal.phase !== 'active'} decision={decision} pending={pending}
+    {item !== null && <WorkflowPanel item={item} decision={decision} pending={pending}
       onDecision={setDecision} onAction={(action) => { void runWorkflow(action) }} t={t} />}
     {hasActions && <>
       <div className={css.groupToggles} role="group" aria-label={t('groupVisibility')}>
@@ -259,20 +196,7 @@ export function Launcher({
         </button>)}
         <button type="button" className={css.groupToggle} onClick={startCommonEdit}
           disabled={Boolean(commonEdit) || Boolean(invalid) || layoutSaving || snapshot.status !== 'ready' || !snapshot.writable || snapshot.revision === undefined}>{t('editCommon')}</button>
-        <span className={css.modeControls} role="group" aria-label={t('workflowMode')}>
-          <span className={css.groupToggleLabel}>{t('workflowMode')}</span>
-          <button type="button" className={mode === 'manual' ? css.groupToggleActive : css.groupToggle}
-            aria-pressed={mode === 'manual'} disabled={pending}
-            onClick={() => { void changeMode('manual') }}>{t('manualMode')}</button>
-          <button type="button" className={mode === 'auto' ? css.groupToggleActive : css.groupToggle}
-            aria-pressed={mode === 'auto'} disabled={pending || (sessionRunning && mode !== 'auto')}
-            onClick={() => { void changeMode('auto') }}>{t('autoMode')}</button>
-        </span>
-        {mode === 'auto' && <button type="button" className={css.action} title={t('autoTooltip')}
-          disabled={!available || sessionRunning || Boolean(activeItem) || Boolean(relatedGoal)}
-          onClick={prepareAutomatic}>{t('autoPrepare')}</button>}
       </div>
-      {mode === 'auto' && <div className={css.hint}>{t('autoStages')}<br />{t('autoHelp')}</div>}
       {commonEdit && <div className={css.commonEditor} role="group" aria-label={t('editCommon')}>
         <div className={css.groupHeader}><span>{t('commonEditHelp')}</span></div>
         <div className={css.commonChoices}>

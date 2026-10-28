@@ -23,7 +23,6 @@ import type {
   WorkItem,
   WorkItemApproval,
   WorkItemBlocker,
-  WorkflowMode,
 } from './types.ts'
 
 /** Automatic repair rounds a task may spend on a failing review. */
@@ -190,8 +189,6 @@ export interface CreateWorkItemInput {
   readonly workspaceRoot: string
   /** Human task title. */
   readonly title: string
-  /** Initial mode; switching never resumes work by itself. */
-  readonly mode: WorkflowMode
   /** Branch the task claims. */
   readonly branch: string
   /** HEAD the task starts from. */
@@ -222,7 +219,6 @@ export function createWorkItem(input: CreateWorkItemInput): WorkItem {
     sessionId: input.sessionId,
     workspaceRoot: input.workspaceRoot,
     title,
-    mode: input.mode,
     status: 'ready',
     currentStage: 'S1',
     branch: input.branch,
@@ -576,19 +572,6 @@ export function requireCommitReady(item: WorkItem, snapshot: RepositorySnapshot,
   ensure(JSON.stringify(listed) === JSON.stringify(snapshot.files),
     'Unowned files or incomplete file list', 'WORKFLOW_INVALID_COMMIT')
   ensure(listed.every(file => !SENSITIVE_FILE.test(file)), 'Sensitive candidate file', 'WORKFLOW_INVALID_COMMIT')
-}
-
-/**
- * Switch mode without resuming work.
- * @param item - current record.
- * @param mode - requested mode.
- * @param now - ISO-8601 mutation time.
- * @returns the paused record with the new mode.
- */
-export function setMode(item: WorkItem, mode: WorkflowMode, now: string): WorkItem {
-  requireNonterminal(item)
-  ensure(mode === 'manual' || mode === 'auto', 'Expected manual or auto', 'WORKFLOW_INVALID_MODE')
-  return next(item, { mode, status: item.status === 'waiting_approval' ? 'waiting_approval' : 'paused' }, now)
 }
 
 /**

@@ -31,7 +31,7 @@ const checks = [
 function task() {
   let item = createWorkItem({
     taskId: 'route-test', sessionId: 'session-test', workspaceRoot: 'workspace',
-    title: 'Route test', mode: 'auto', branch: 'coding/route-test', baseCommit: 'baseline', now,
+    title: 'Route test', branch: 'coding/route-test', baseCommit: 'baseline', now,
   })
   let snapshot = { branch: item.branch, head: 'baseline', clean: true, files: [], fingerprint: 'clean' }
   const service = {
@@ -53,6 +53,7 @@ function task() {
   const tool = codingWorkflowTool(service)
   const call = args => tool.execute(args, { agent: {}, callId: 'route-call' })
   return {
+    tool,
     call,
     stage: stage => call({ action: 'stage', stage, evidencePath: evidence.path }),
     plan: planned => call({ action: 'checks', evidencePath: evidence.path, checks: planned, allowedPaths: ['src/change.ts'] }),
@@ -70,6 +71,16 @@ const commit = t => t.call({ action: 'commit', files: ['src/change.ts'] })
 const review = t => t.call({ action: 'review', evidencePath: evidence.path, findings: [] })
 const verify = (t, check) => t.call({ action: 'verify', ...check })
 const rejectsCode = (action, code) => assert.rejects(action, error => error.code === code)
+
+test('the task carries no execution mode and the mode verb is gone', async () => {
+  const t = task()
+  const status = await t.call({ action: 'status' })
+  assert.equal('mode' in status, false)
+  assert.equal(t.tool.parameters.mode, undefined)
+  assert.equal(t.tool.parameters.action.enum.includes('mode'), false)
+  assert.equal(t.tool.output.schema.properties.mode, undefined)
+  await assert.rejects(t.call({ action: 'mode', mode: 'auto' }), /unknown action/)
+})
 
 test('bug skips require explicit reasons and cannot skip shared mandatory stages', async () => {
   const t = task()

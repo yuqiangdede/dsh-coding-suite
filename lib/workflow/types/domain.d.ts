@@ -5,7 +5,7 @@
  *
  * @module @deepseek-ai/dsh-coding-workflow/domain
  */
-import type { CheckPlan, EvidenceRef, RepositorySnapshot, ReviewFinding, StageId, TaskId, VerificationRun, WorkItem, WorkflowMode } from './types.ts';
+import type { CheckPlan, EvidenceRef, RepositorySnapshot, ReviewFinding, StageId, TaskId, VerificationRun, WorkItem } from './types.ts';
 /** Automatic repair rounds a task may spend on a failing review. */
 export declare const MAX_REPAIR_ROUNDS = 3;
 /** Planned checks a configuration must declare. */
@@ -69,8 +69,6 @@ export interface CreateWorkItemInput {
     readonly workspaceRoot: string;
     /** Human task title. */
     readonly title: string;
-    /** Initial mode; switching never resumes work by itself. */
-    readonly mode: WorkflowMode;
     /** Branch the task claims. */
     readonly branch: string;
     /** HEAD the task starts from. */
@@ -169,14 +167,6 @@ export declare function recordCommit(item: WorkItem, commit: {
  * @param files - exact files the caller wants to commit.
  */
 export declare function requireCommitReady(item: WorkItem, snapshot: RepositorySnapshot, files: readonly string[]): void;
-/**
- * Switch mode without resuming work.
- * @param item - current record.
- * @param mode - requested mode.
- * @param now - ISO-8601 mutation time.
- * @returns the paused record with the new mode.
- */
-export declare function setMode(item: WorkItem, mode: WorkflowMode, now: string): WorkItem;
 /**
  * Pause further progress.
  * @param item - current record.

@@ -13,8 +13,6 @@ export declare const MIN_DECISION_LENGTH = 8;
 export interface WorkflowPanelProps {
     /** Current durable record. */
     readonly item: WorkItem;
-    /** Host is ready but native continuation is paused; offer explicit resume. */
-    readonly continuationPaused?: boolean;
     /** Draft decision text. */
     readonly decision: string;
     /** Whether a command is in flight. */
@@ -31,4 +29,4 @@ export interface WorkflowPanelProps {
  * @param props - record, draft, pending flag, callbacks, and locale lookup.
  * @returns the panel element.
  */
-export declare function WorkflowPanel({ item, continuationPaused, decision, pending, onDecision, onAction, t }: WorkflowPanelProps): import("react").JSX.Element;
+export declare function WorkflowPanel({ item, decision, pending, onDecision, onAction, t }: WorkflowPanelProps): import("react").JSX.Element;

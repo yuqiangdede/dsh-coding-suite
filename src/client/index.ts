@@ -10,7 +10,6 @@ import type { HostObservable } from '@deepseek-ai/dsh-client-ui-slots'
 import type { RemoteResult } from '@deepseek-ai/dsh-api-remotes/client'
 import type {} from '@deepseek-ai/dsh-api-remotes/client'
 import type {} from '@deepseek-ai/dsh-api-session-controller/client'
-import type { GoalProjection, GoalRef } from '@deepseek-ai/dsh-goal/client'
 import type { WorkItem } from '../workflow/types.ts'
 import { LAUNCHER_CONFIG_GLOBAL, LauncherDeploymentSchema } from '../config.ts'
 import { Launcher } from './Launcher.tsx'
@@ -36,25 +35,20 @@ export interface WorkflowCommandResult {
   readonly ok: boolean
   /** Failure message for the notice line. */
   readonly message?: string
-  /** Accepted Host revision, used for a safe rollback after a later Goal failure. */
+  /** Accepted Host revision, so a later stale write can be detected. */
   readonly ref?: WorkflowTaskRef
 }
-/** Launcher mode values the workflow record understands. */
-export type WorkflowMode = 'manual' | 'auto'
 /** Launcher form, Skill catalog, the Session's coding Work Item, and the Host's stale-plan threshold. */
 export interface LauncherInjected {
   hooks: { actionForm: ConfigForm<ActionSettings>; workflow: HostObservable<CodingWorkflowSnapshot> }
   fetchSkillNames: ()=>Promise<readonly string[]>
   saveLayout: (json: string, revision?: number) => Promise<boolean>
-  pauseWorkflow: (ref: GoalRef) => Promise<{ readonly ok: true } | { readonly ok: false; readonly error: { readonly message: string } }>
-  resumeWorkflow: (ref: GoalRef) => Promise<{ readonly ok: true } | { readonly ok: false; readonly error: { readonly message: string } }>
   /** Revision-checked mutations of the current coding task. */
   workflowCommands: {
     approve: (decision: string, ref?: WorkflowTaskRef) => Promise<WorkflowCommandResult>
     pause: (ref?: WorkflowTaskRef) => Promise<WorkflowCommandResult>
     resume: (ref?: WorkflowTaskRef) => Promise<WorkflowCommandResult>
     cancel: (reason: string, ref?: WorkflowTaskRef) => Promise<WorkflowCommandResult>
-    setMode: (mode: WorkflowMode, ref?: WorkflowTaskRef) => Promise<WorkflowCommandResult>
   }
   todoStaleMs: number
 }
@@ -67,7 +61,7 @@ declare module '@deepseek-ai/dsh-client-ui-slots' {
     mattSkillLauncher: LauncherLocaleKey
   }
 }
-export const inject = ['locale', 'slots','sessions','remote','remote.skills','remote.goals','configForms']
+export const inject = ['locale', 'slots','sessions','remote','remote.skills','configForms']
 export function apply(ctx: ClientContext): void {
   ctx.effect(() => ctx.locale.register('mattSkillLauncher', { zh, en }), 'launcher dictionaries')
   const t = ctx.locale.bind('mattSkillLauncher')
@@ -120,15 +114,6 @@ export function apply(ctx: ClientContext): void {
           return { ok: false, message: String(error) }
         }
       }
-      const goalCommand = async (action: 'pause' | 'resume', goalRef: GoalRef) => {
-        const binding = ctx.sessions.binding(sessionId)
-        if (binding === undefined || binding.session.getSnapshot().openState !== 'open')
-          return { ok: false as const, error: { message: 'Session unavailable' } }
-        const projection = binding.session.projections.faceOf('goal').getSnapshot() as GoalProjection | null | undefined
-        if (projection == null || projection.goal.id !== goalRef.id || projection.goal.revision !== goalRef.revision)
-          return { ok: false as const, error: { message: 'Workflow goal changed; refresh and retry' } }
-        return ctx.remote.goals[action](sessionId, goalRef)
-      }
       return {
         hooks: { actionForm: form, workflow },
         todoStaleMs: deployment.todoStaleMs,
@@ -138,10 +123,7 @@ export function apply(ctx: ClientContext): void {
           pause: ref => command(item => workflowRemote.pause(sessionId, item.taskId, item.revision), ref),
           resume: ref => command(item => workflowRemote.resume(sessionId, item.taskId, item.revision), ref),
           cancel: (reason, ref) => command(item => workflowRemote.cancel(sessionId, item.taskId, item.revision, reason), ref),
-          setMode: (mode, ref) => command(item => workflowRemote.setMode(sessionId, item.taskId, item.revision, mode), ref),
         },
-        pauseWorkflow: goalRef => goalCommand('pause', goalRef),
-        resumeWorkflow: goalRef => goalCommand('resume', goalRef),
         fetchSkillNames: async () => {
           if (ctx.sessions.binding(sessionId) === undefined) throw new Error('Session unavailable')
           return ctx.sessions.using(sessionId,{ source:'mattSkillLauncher' },async (ref)=>{

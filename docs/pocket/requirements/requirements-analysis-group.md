@@ -12,16 +12,16 @@
 
 | 顺序 | 入口 | action / Skill ID | 主干 |
 | --- | --- | --- | --- |
-| 1 | 需求全流程 | product-development-pipeline | 从澄清到生图提示词的总控 |
-| 2 | 需求澄清 | requirement-clarification | Step 01：问题边界 |
-| 3 | 需求分析 | requirement-analysis | Step 02：价值、根因、范围、规则及验证 |
-| 4 | 需求风险扫描 | product-risk-gate | Step 03：Gate ① |
+| 1 | 全流程 | product-development-pipeline | 从澄清到生图提示词的总控 |
+| 2 | 澄清 | requirement-clarification | Step 01：问题边界 |
+| 3 | 分析 | requirement-analysis | Step 02：价值、根因、范围、规则及验证 |
+| 4 | 风险扫描 | product-risk-gate | Step 03：Gate ① |
 | 5 | 业务方案 | solution-design | Step 04：模块、对象、流程、状态和权限 |
-| 6 | 模块边界审计 | product-module-gate | Step 05：Gate ②-A |
-| 7 | 数据与状态校验 | product-state-gate | Step 06：Gate ②-B1 |
-| 8 | 异常流程检查 | product-exception-gate | Step 07：Gate ②-B2 |
-| 9 | PRD 与页面规格 | product-prd-pages | Step 08：PRD → 独立评审 → 页面规格 |
-| 10 | 页面一致性校验 | product-consistency-gate | Step 09：页面/流程/状态/权限 Gate ③ |
+| 6 | 边界审计 | product-module-gate | Step 05：Gate ②-A |
+| 7 | 数据状态 | product-state-gate | Step 06：Gate ②-B1 |
+| 8 | 异常检查 | product-exception-gate | Step 07：Gate ②-B2 |
+| 9 | PRD/页面 | product-prd-pages | Step 08：PRD → 独立评审 → 页面规格 |
+| 10 | 一致性校验 | product-consistency-gate | Step 09：页面/流程/状态/权限 Gate ③ |
 | 11 | 生图提示词 | product-image-prompt | Step 10：路由 B |
 
 沿用每组默认 8 个：「更多（3）」展开末尾阶段，各组独立展开/收起，不重排推荐项。`prd-writing`、`requirement-review` 作为辅助入口放其他组；主干 Step 08 复用它们，不维护第二套写作/评审方法。原有固化需求与可视化讨论保留开发组绑定。
@@ -45,7 +45,7 @@
 
 前端仅接受明确结束标记，不从“无 S0”“不是 NO-GO”猜测放行；代码示例、引用、未知或相互冲突的结果不作为成功。有条件结果不自动向前推进；显式回退只允许需求阶段。总控自行维护内部阶段，不因中间 PASS 推荐全流程结束。推荐是辅助，不是强制状态机。
 
-现有「固化需求可直接使用」继续有效：无需 PRD 或评审历史即可点击，不增加置灰前置门槛。产品主干与 Host `coding-workflow` 分开；用户可将有效 PRD、方案、评审与验收交给规格/工单/编码，或显式启动自动编码。Host S1/S2 仍须核验和登记证据，产品 Gate 不代替代码审查、真实 test/build 或审批，不修改 Host schema。
+现有「固化需求可直接使用」继续有效：无需 PRD 或评审历史即可点击，不增加置灰前置门槛。产品主干与 Host `coding-workflow` 分开；用户可将有效 PRD、方案、评审与验收交给规格/工单/编码。Host S1/S2 仍须核验和登记证据，产品 Gate 不代替代码审查、真实 test/build 或审批，不修改 Host schema。
 
 现有能力保留职责：discussion 仍做工程访谈与领域沉淀；requirements-spec 仍做源码反推、多来源融合与正式需求文档；prototype 仍做单一问题的一次性原型；retro 仍复盘编码会话/Agent 环境；doc-supplement 仍只增量补充既有文档。不静默换绑既有 Skill。
 
@@ -67,7 +67,7 @@ DSH 默认终点按用户要求改为生图提示词，与上游默认可仅交�
 
 动作仍为 schema v3。已保存标签、提示词、Skill、启用状态、顺序及自定义内容不自动覆盖。设置页「补齐缺失预设（待保存）」按缺失 ID 添加新动作，检查后保存；重复补齐不重复，英文界面翻译新增展示字段。补齐超过 100 个时提示且保留原编辑，不截断用户动作。
 
-缺技能沿用通用反馈；总控/阶段启动再核对依赖，缺失时指出并停止，不伪造调用。只读、版本冲突、执行锁与自动编码接管沿用既有规则。
+缺技能沿用通用反馈；总控/阶段启动再核对依赖，缺失时指出并停止，不伪造调用。只读、版本冲突与执行锁沿用既有规则。
 
 ## 实现与验证入口
 
@@ -75,8 +75,11 @@ DSH 默认终点按用户要求改为生图提示词，与上游默认可仅交�
 - [总控](../../../assets/skills/product-development-pipeline/SKILL.md)、steps/ 与 7 项本地阶段入口。
 - [发布重建](../../../scripts/rebuild-launcher-bundle.mjs)：同步推荐/布局/组件、portable JS/类型与 [bundle](../../../lib/client.js)，仅同步按钮表不足以覆盖本功能。
 - [主干回归](../../../tests/requirements-analysis.node.test.mjs)：布局迁移、显式补齐、英文展示、100 上限、版本化保存、推荐/回退、资源链接与 Host 发布 provider 发现/加载。
-- [分组交互](../../../tests/launcher-overflow.node.test.mjs)：发布 bundle 的 11 项顺序、8/11 折叠、逐项插入、旧布局隐藏；固化需求和自动模式回归继续适用。
+- [分组交互](../../../tests/launcher-overflow.node.test.mjs)：发布 bundle 的 11 项顺序、8/11 折叠、逐项插入、旧布局隐藏；固化需求回归继续适用。
 
 实际检查结果记录在[技能台账](../meta/skills-prompts.md)。真实宿主 GUI、窄屏/辅助技术，以及小需求/复杂权限状态/NO-GO 模型任务仍需试用；静态与 stub-render 检查不代替这些验证。
 
-相关约定：[分组与更多](launcher-overflow.md)、[固化需求自由使用](spec-action-free.md)、[自动编码双链路](automatic-mode.md)。
+相关约定：[分组与更多](launcher-overflow.md)、[固化需求自由使用](spec-action-free.md)。
+
+
+2026-10-28：按用户要求缩短需求组按钮名称。旧中文预设名仅在 action ID 与 Skill 绑定仍匹配时按上表显示短名；自定义标签和其他字段保持原样，读取不自动写入 Host 配置。英文展示保持不变。

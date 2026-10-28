@@ -17,7 +17,6 @@ function task(status: WorkItem['status'], over: Partial<WorkItem> = {}, stagesOv
     sessionId: brandString<SessionId>('session-1'),
     workspaceRoot: '/repo',
     title: 'Add proof',
-    mode: 'auto',
     status,
     currentStage: 'S4',
     branch: 'coding/abc12345',
@@ -50,7 +49,7 @@ function renderPanel(item: WorkItem, overrides: Partial<Parameters<typeof Workfl
 }
 
 describe('coding workflow panel', () => {
-  it('shows the task identity, mode, branch, and every stage with its localized state', () => {
+  it('shows the task identity, branch, and every stage with its localized state', () => {
     renderPanel(task('ready', {}, {
       S0: { status: 'completed', attempts: 1 },
       S1: { status: 'completed', attempts: 1 },
@@ -58,8 +57,8 @@ describe('coding workflow panel', () => {
       S3: { status: 'failed', attempts: 2 },
     }))
     expect(screen.getByText(/11111111/)).toBeDefined()
-    expect(screen.getByText(/auto/)).toBeDefined()
     expect(screen.getByText(/coding\/abc12345/)).toBeDefined()
+    expect(screen.queryByText(/workflowModeLabel/)).toBeNull()
     const stages = screen.getByRole('group', { name: 'workflowStages' })
     expect(stages.querySelectorAll('[title]')).toHaveLength(10)
     expect(stages.querySelector('[title="workflowStageCompleted"]')).not.toBeNull()

@@ -62,6 +62,17 @@ test('old layout gains a hidden group; malformed existing and new fields still f
 })
 
 test('saved custom presets survive parsing; opt-in additions are unique and translated', () => {
+  const oldNames = [["product-development-pipeline","需求全流程","全流程"],["requirement-clarification","需求澄清","澄清"],["requirement-analysis","需求分析","分析"],["product-risk-gate","需求风险扫描","风险扫描"],["product-module-gate","模块边界审计","边界审计"],["product-state-gate","数据与状态校验","数据状态"],["product-exception-gate","异常流程检查","异常检查"],["product-prd-pages","PRD 与页面规格","PRD/页面"],["product-consistency-gate","页面一致性校验","一致性校验"]]
+  for (const [id, previous, compact] of oldNames) {
+    const preset = DEFAULT_ACTIONS.find(action => action.id === id)
+    assert.equal(preset.label, compact)
+    const old = { ...preset, label: previous, prompt: '保留我的正文', enabled: false, order: 999 }
+    assert.deepEqual(parseActions(encodeActions([old])), [{ ...old, label: compact }])
+    const custom = { ...old, label: '自定义入口' }
+    assert.deepEqual(parseActions(encodeActions([custom])), [custom])
+    const rebound = { ...old, skillId: 'research' }
+    assert.deepEqual(parseActions(encodeActions([rebound])), [rebound])
+  }
   const custom = DEFAULT_ACTIONS.filter(a => !newIds.includes(a.id)).map(a => a.id === 'spec' ? { ...a, label: '我的规格', prompt: '我的原提示词', enabled: false, order: 999 } : { ...a })
   assert.deepEqual(parseActions(encodeActions(custom)), custom)
   const missing = missingDefaultActions(custom)

@@ -24,6 +24,24 @@ function expectReplace(text, from, to, description) {
   return text.replace(from, to)
 }
 
+function cutBefore(text, startMarker, nextMarker, description) {
+  const start = text.indexOf(startMarker)
+  if (start < 0) throw new Error('Bundle signature missing: ' + description)
+  const end = text.indexOf(nextMarker, start + startMarker.length)
+  if (end < 0) throw new Error('Bundle end signature missing: ' + description)
+  return text.slice(0, start) + text.slice(end)
+}
+
+/** Remove a generated fragment when present; a rebuilt bundle no longer has it. */
+function removeIfPresent(text, from) {
+  return text.includes(from) ? text.replace(from, '') : text
+}
+
+/** Cut a generated fragment when present, so repeated rebuilds stay idempotent. */
+function cutIfPresent(text, startMarker, nextMarker, description) {
+  return text.includes(startMarker) ? cutBefore(text, startMarker, nextMarker, description) : text
+}
+
 function compile(path, alias) {
   let source = ts.transpileModule(read(path), {
     fileName: path,
@@ -83,8 +101,9 @@ function appendCss(prefix, sourceFile, variable, mapName, classes) {
   bundle = bundle.replace(section[0], section[1] + originalMap + ',' + additions + section[3])
 }
 
-// Recompile dictionaries too: retaining old auto-mode copy would diverge from source.
+// Recompile dictionaries too: retaining old copy would diverge from source.
 replaceRegion('locales', compile('src/client/locales.ts', ''))
+replaceRegion('actions', compile('src/client/actions.ts', ''))
 replaceRegion('contextual-actions', compile('src/client/contextual-actions.ts', ''))
 const globalName = /export const LAUNCHER_CONFIG_GLOBAL = '([^']+)'/.exec(read('src/config.ts'))?.[1]
 if (!globalName) throw new Error('Missing launcher config global')
@@ -108,11 +127,13 @@ replaceRegion('Launcher', compile('src/client/Launcher.tsx', 'Launcher_module_cs
 replaceRegion('Settings', compile('src/client/Settings.tsx', 'Settings_module_css_default'))
 appendCss('xbJU_q', 'src/client/Launcher.module.css', 'css$1', 'Launcher_module_css_default', [
   'groupToggles', 'groupToggleLabel', 'groupToggle', 'groupToggleActive',
-  'actionGroup', 'groupHeader', 'locked', 'hideGroup', 'modeControls', 'commonEditor', 'commonChoices', 'commonChoice',
+  'actionGroup', 'groupHeader', 'locked', 'hideGroup', 'commonEditor', 'commonChoices', 'commonChoice',
 ])
 appendCss('v7HIVa', 'src/client/Settings.module.css', 'css', 'Settings_module_css_default', [
   'layoutSection', 'groupSettingRow',
 ])
+// The mode controls no longer exist, so drop their stale CSS-module mapping.
+bundle = bundle.replace(/\r?\n\t\t\t"modeControls": "xbJU_q_modeControls",/, '')
 const injectAnchor = 'todoStaleMs: deployment.todoStaleMs,'
 if (!bundle.includes('saveLayout: (json, rev) =>')) {
   bundle = expectReplace(bundle, injectAnchor,
@@ -151,8 +172,17 @@ if (!declarations.includes('    saveConfiguration:')) declarations = expectRepla
 if (!declarations.includes('    saveLayout:')) declarations = expectReplace(declarations, '    fetchSkillNames: () => Promise<readonly string[]>;',
   '    fetchSkillNames: () => Promise<readonly string[]>;\n    saveLayout: (json: string, revision?: number) => Promise<boolean>;',
   'launcher interface')
+// The withdrawn execution mode leaves no injected goal hook or mode command.
+declarations = declarations
+  .replace(/^import type \{ GoalRef \} from '@deepseek-ai\/dsh-goal\/client';\n/m, '')
+  .replace(/\/\*\* Launcher mode values the workflow record understands\. \*\/\nexport type WorkflowMode = 'manual' \| 'auto';\n/, '')
+  .replace(/\n    pauseWorkflow:[\s\S]*?(?=\n    \/\*\* Revision-checked)/, '')
+  .replace(/\n        setMode: \(mode: WorkflowMode\) => Promise<WorkflowCommandResult>;/, '')
+if (/WorkflowMode|GoalRef|pauseWorkflow|resumeWorkflow|setMode/.test(declarations)) {
+  throw new Error('Launcher declarations still expose the withdrawn execution mode')
+}
 write('lib/types/client/index.d.ts', declarations)
-// Host tool copy is part of the automatic entry contract; keep its route hints in sync.
+// Host tool copy is part of the staged entry contract; keep its route hints in sync.
 let workflowBundle = read('lib/workflow/index.js').replace(/\r\n/g, '\n')
 const toolMarker = '//#region lib/types/tool.js\n'
 const toolStart = workflowBundle.indexOf(toolMarker)
@@ -160,6 +190,28 @@ const toolEnd = workflowBundle.indexOf('//#endregion', toolStart + toolMarker.le
 if (toolStart < 0 || toolEnd < 0) throw new Error('Missing Host workflow tool region')
 workflowBundle = workflowBundle.slice(0, toolStart + toolMarker.length)
   + compile('src/workflow/tool.ts', '') + workflowBundle.slice(toolEnd)
+// The execution mode was withdrawn: strip the generated domain, schema and
+// service regions that still expose it, then assert no stale verb remains.
+workflowBundle = removeIfPresent(workflowBundle, '\n\t\tmode: input.mode,')
+workflowBundle = cutIfPresent(workflowBundle,
+  '/**\n* Switch mode without resuming work.',
+  '/**\n* Pause further progress.', 'domain setMode')
+workflowBundle = removeIfPresent(workflowBundle, '\tmode: z$1.enum(["manual", "auto"]),\n')
+workflowBundle = removeIfPresent(workflowBundle, '\tlet _setMode_decorators;\n')
+workflowBundle = removeIfPresent(workflowBundle, '\t\t\t_setMode_decorators = [Remote("setMode")];\n')
+workflowBundle = cutIfPresent(workflowBundle,
+  '\t\t\t__esDecorate(this, null, _setMode_decorators, {',
+  '\t\t\t__esDecorate(this, null, _approve_decorators, {', 'service mode decorator call')
+workflowBundle = cutIfPresent(workflowBundle,
+  '\t\t/**\n\t\t* Switch mode without resuming work.',
+  '\t\t/**\n\t\t* Record a scoped human approval.', 'service setMode method')
+workflowBundle = cutIfPresent(workflowBundle,
+  "\t\t/**\n\t\t* Switch the current task's mode from the model path.",
+  '\t\t/**\n\t\t* Pause the current task from the model path.', 'service updateMode method')
+workflowBundle = removeIfPresent(workflowBundle, '\n\t\t\t\tmode: "manual",')
+if (/\bsetMode\b|_setMode_decorators|mode: input\.mode|mode: "manual"|WorkflowMode/.test(workflowBundle)) {
+  throw new Error('Host workflow bundle still exposes a withdrawn execution mode')
+}
 workflowBundle = workflowBundle.replace(/\n\/\/# sourceMappingURL=.*\s*$/, '\n')
 write('lib/workflow/index.js', workflowBundle)
 // Keep portable generated modules and public layout types aligned with the shipped UI.

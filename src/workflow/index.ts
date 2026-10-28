@@ -41,7 +41,6 @@ import {
   requireScoped,
   requireWritable,
   resume,
-  setMode,
 } from './domain.ts'
 import { codingWorkflowDomainSpec } from './spec.ts'
 import type { WorkItemRecord } from './spec.ts'
@@ -68,7 +67,6 @@ import type {
   TaskId,
   VerificationRun,
   WorkItem,
-  WorkflowMode,
 } from './types.ts'
 
 /** Quote one argv item for the composed POSIX shell or PowerShell executor. */
@@ -225,7 +223,6 @@ export class CodingWorkflowService extends TypertRemoteService {
       sessionId: agent.session.id,
       workspaceRoot: root,
       title,
-      mode: 'manual',
       branch: snapshot.branch,
       baseCommit: snapshot.head,
       now: new Date().toISOString(),
@@ -430,19 +427,6 @@ export class CodingWorkflowService extends TypertRemoteService {
   }
 
   /**
-   * Switch mode without resuming work.
-   * @param agent - live owning Agent.
-   * @param taskId - task identity.
-   * @param revision - expected revision.
-   * @param mode - requested mode.
-   * @returns the paused record with the new mode.
-   */
-  @Remote('setMode')
-  setMode(agent: Agent, taskId: TaskId, revision: number, mode: WorkflowMode): Promise<WorkItem> {
-    return this.updateByRef(agent, taskId, revision, item => setMode(item, mode, this.now()))
-  }
-
-  /**
    * Record a scoped human approval.
    * @param agent - live owning Agent.
    * @param taskId - task identity.
@@ -486,16 +470,6 @@ export class CodingWorkflowService extends TypertRemoteService {
    */
   async block(agent: Agent, reason: string): Promise<WorkItem> {
     return this.updateCurrent(agent, item => block(item, reason, this.now()))
-  }
-
-  /**
-   * Switch the current task's mode from the model path.
-   * @param agent - live owning Agent.
-   * @param mode - requested mode.
-   * @returns the paused record with the new mode.
-   */
-  async updateMode(agent: Agent, mode: WorkflowMode): Promise<WorkItem> {
-    return this.updateCurrent(agent, item => setMode(item, mode, this.now()))
   }
 
   /**

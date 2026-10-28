@@ -5,19 +5,6 @@ export declare const zh: {
     readonly moreCount: "更多（{count}）";
     readonly collapse: "收起";
     readonly groupOverflowLabel: "{group}：{action}";
-    readonly workflowMode: "编码模式";
-    readonly goalStatus: "自动任务 Goal 状态";
-    readonly goalNotStage: "阶段详细进度待接入";
-    readonly pauseFailed: "暂停自动任务失败，未切换模式：";
-    readonly pauseUnavailable: "会话仍在执行，但尚未建立可识别的自动任务 Goal。请先使用原生停止按钮，再切换手动模式。";
-    readonly manualMode: "手动";
-    readonly autoMode: "全自动";
-    readonly autoStages: "自动判断链路：Bug 复现 → 根因 → 回归修复；需求澄清 → 规格设计 → 实现。两者均须审查 → 验证 → 本地提交。";
-    readonly resumeViaAgent: "未找到此任务关联的 Goal；请发送明确的继续请求，由 Agent 核对检查点并恢复原任务。";
-    readonly autoPrepare: "准备全自动任务";
-    readonly autoInstruction: "按本次消息中的具体目标执行 coding-workflow 自动工作流。先核对当前任务、工作区和工具；根据目标、上下文、既有行为约定及代码证据判断 Bug 修复或需求开发，说明所选链路，不按关键词硬判。Bug：复现 → 根因 → 回归测试与最小修复；仅在不改变既有行为约定时可带理由显式跳过 S1/S2。需求开发或行为约定变化：需求澄清 → 规格与设计 → 实施计划 → 实现。分类不清先询问。两条链路均必须登记阶段证据、结构化审查、必要修复和真实 test/build 验证，通过后只做本地 Git commit 与交付报告。修复最多 3 轮；禁止 push、创建 PR、部署。不覆盖其他任务或 Goal，重启不自动继续；缺少 Host 工具时停止说明，不静默降级。若未提供开发目标，先询问，不自行开发。";
-    readonly autoTooltip: "先把光标移到草稿开头，点击插入 workflow Skill；检查需求文本后手动发送才开始执行。";
-    readonly autoHelp: "先填写目标，光标移至开头后点准备；手动发送才授权开始。异常暂停，重启后不会自动继续。";
     readonly todoStale: "任务列表已持续 {minutes} 分钟未变化（按当前页面观察时间计算）；Agent 可能仍在工作，请核对进度。";
     readonly showButton: "加入常用";
     readonly editCommon: "编辑常用";
@@ -106,7 +93,6 @@ export declare const zh: {
     readonly reasonPreviousFailed: "上一操作存在失败或中断";
     readonly workflowTask: "编码任务";
     readonly workflowStages: "阶段进度";
-    readonly workflowModeLabel: "模式";
     readonly workflowBranchLabel: "分支";
     readonly workflowApprove: "批准继续";
     readonly workflowDecision: "审批说明（必填）";

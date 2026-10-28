@@ -47,14 +47,14 @@ const configure = (e, id) => {
   const result = e.run('checks', id, checks)
   assert.equal(result.status, 0, result.stderr)
 }
-test('a clean task defaults to manual and creates a local feature branch', () => {
+test('a clean task starts ready on a local feature branch', () => {
   const e = setup()
   try {
     const created = e.run('start', 'simple change')
     assert.equal(created.status, 0, created.stderr)
-    assert.equal(created.value.mode, 'manual')
+    assert.equal(created.value.status, 'ready')
     assert.match(created.value.branch, /^coding\//)
-    assert.equal(e.run('mode', created.value.taskId, 'auto').value.status, 'paused')
+    assert.equal(e.run('pause', created.value.taskId).value.status, 'paused')
     assert.equal(e.run('resume', created.value.taskId).value.status, 'ready')
   } finally { e.cleanup() }
 })
@@ -125,12 +125,12 @@ test('active task owns its branch until cancellation or completion', () => {
   } finally { e.cleanup() }
 })
 
-test('manual takeover and approval are explicit, stopped work cannot write checkpoints', () => {
+test('stopped work and approval are explicit, paused tasks cannot write checkpoints', () => {
   const e = setup()
   try {
     const id = e.run('start', 'approval handling').value.taskId
     const proof = join(e.base, 'requirements.txt'); writeFileSync(proof, 'reviewed requirements')
-    assert.equal(e.run('mode', id, 'auto').value.status, 'paused')
+    assert.equal(e.run('pause', id).value.status, 'paused')
     assert.notEqual(e.run('stage', id, 'S1', proof).status, 0)
     assert.equal(e.run('resume', id).value.status, 'ready')
     assert.equal(e.run('approval', id, 'Need explicit permission to change access control').value.status, 'waiting_approval')
@@ -138,7 +138,7 @@ test('manual takeover and approval are explicit, stopped work cannot write check
     assert.notEqual(e.run('stage', id, 'S1', proof).status, 0)
     assert.equal(e.run('approve', id, 'approved scoped user role change').value.status, 'ready')
     assert.equal(e.run('stage', id, 'S1', proof).status, 0)
-    assert.equal(e.run('mode', id, 'manual').value.status, 'paused')
+    assert.equal(e.run('pause', id).value.status, 'paused')
     assert.notEqual(e.run('stage', id, 'S2', proof).status, 0)
   } finally { e.cleanup() }
 })

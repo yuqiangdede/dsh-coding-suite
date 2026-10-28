@@ -26,7 +26,6 @@ function task(revision: number, over: Partial<WorkItem> = {}): WorkItem {
     sessionId: brandString<SessionId>('session-1'),
     workspaceRoot: '/repo',
     title: 'Task',
-    mode: 'manual',
     status: 'ready',
     currentStage: 'S1',
     branch: 'coding/abc',

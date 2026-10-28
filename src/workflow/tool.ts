@@ -16,7 +16,7 @@ import type { CodingWorkflowService } from './index.ts'
 /** Verbs the model may invoke. */
 const ACTIONS = [
   'start', 'status', 'stage', 'skip', 'checks', 'review', 'repair', 'verify', 'commit',
-  'mode', 'pause', 'resume', 'approval', 'block', 'cancel',
+  'pause', 'resume', 'approval', 'block', 'cancel',
 ] as const
 
 /** Stage arguments the model may submit directly. */
@@ -31,7 +31,6 @@ interface ToolValue {
   revision: number
   status: string
   currentStage: string
-  mode: string
   branch: string
   commitRef: string
   blocker: string
@@ -43,7 +42,7 @@ interface ToolValue {
 function nextStep(item: WorkItem): string {
   if (item.status === 'blocked') return `resolve the blocker first: ${item.blocker?.reason ?? 'see blocker'}`
   if (item.status === 'waiting_approval') return 'wait for the scoped human decision'
-  if (item.status === 'paused') return 'wait for an explicit mode change or resume'
+  if (item.status === 'paused') return 'wait for an explicit resume'
   switch (item.currentStage) {
     case 'S1': return 'feature/contract change: stage S1 requirements; proven existing-contract bug: explicit skip S1 with evidence-based reason; ask if ambiguous'
     case 'S2': return 'feature/contract change: stage S2 specification/design; existing-contract bug only: explicit skip S2 with reason why no design change is needed'
@@ -64,7 +63,6 @@ function toValue(item: WorkItem): ToolValue {
     revision: item.revision,
     status: item.status,
     currentStage: item.currentStage,
-    mode: item.mode,
     branch: item.branch,
     commitRef: item.commitRef ?? '',
     blocker: item.blocker === null ? '' : `${item.blocker.stage}: ${item.blocker.reason}`,
@@ -138,7 +136,6 @@ export function codingWorkflowTool(service: CodingWorkflowService): ToolDefiniti
       kind: { type: 'string', enum: [...CHECK_KINDS], description: 'verify: planned check kind to run.' },
       command: { type: 'array', items: { type: 'string' }, description: 'verify: exact planned command.' },
       files: { type: 'array', items: { type: 'string' }, description: 'commit: exact changed files to commit.' },
-      mode: { type: 'string', enum: ['manual', 'auto'], description: 'mode: switch without resuming.' },
       reason: { type: 'string', description: 'skip: evidence-based reason an existing-contract bug needs no S1/S2 change; approval/block/cancel: concrete reason and recovery.' },
     },
     output: {
@@ -150,7 +147,6 @@ export function codingWorkflowTool(service: CodingWorkflowService): ToolDefiniti
           revision: { type: 'integer', required: true },
           status: { type: 'string', required: true },
           currentStage: { type: 'string', required: true },
-          mode: { type: 'string', required: true },
           branch: { type: 'string', required: true },
           commitRef: { type: 'string', required: true },
           blocker: { type: 'string', required: true },
@@ -171,7 +167,7 @@ export function codingWorkflowTool(service: CodingWorkflowService): ToolDefiniti
       },
       render: (_args, value) => [{
         type: 'text',
-        text: `Work Item ${value.taskId.slice(0, 8)} · ${value.status} · ${String(value.currentStage)} · ${value.mode}`
+        text: `Work Item ${value.taskId.slice(0, 8)} · ${value.status} · ${String(value.currentStage)}`
           + (value.blocker === '' ? '' : `\nBlocked — ${value.blocker}`)
           + `\nNext: ${value.next}`,
       }],
@@ -217,7 +213,6 @@ export function codingWorkflowTool(service: CodingWorkflowService): ToolDefiniti
           callId: exec.callId,
         }, exec.signal))
         case 'commit': return toValue(await service.commit(agent, { files: required(args.files, 'files') }))
-        case 'mode': return toValue(await service.updateMode(agent, required(args.mode, 'mode')))
         case 'pause': return toValue(await service.pauseCurrent(agent))
         case 'resume': return toValue(await service.resumeCurrent(agent))
         case 'approval': return toValue(await service.requestApproval(agent, required(args.reason, 'reason')))

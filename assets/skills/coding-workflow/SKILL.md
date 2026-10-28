@@ -1,25 +1,25 @@
 ---
 name: coding-workflow
-description: Use for a user-authorized end-to-end coding task in mattpocock-DSH auto mode, with guarded checkpoints, review/repair, real verification, and local-only Git commit.
+description: Use for a user-authorized end-to-end change — requirements analysis, implementation, or documentation — with guarded checkpoints, review/repair, real verification, and a local-only Git commit.
 ---
 
-# Coding workflow — auto mode (exceptions-only approvals)
+# Coding workflow — staged delivery with human checkpoints
 
 This Skill is **a bounded orchestration entry**, not a substitute for the single-stage Skills. Keep all normal DSH permissions, sandbox and tool approvals. A user sending this Skill invocation authorizes routine local engineering steps, **not** destructive or remote changes.
 
 ## Mandatory policy
 
-- Default/manual mode remains the existing single-stage launcher; this Skill is only for an explicit auto-mode request.
+- Single-stage launcher buttons remain the default for one-step work; this Skill orchestrates one task across every stage.
 - Use existing `grill-with-docs`, `to-spec`, `to-tickets` as needed, `implement`, `code-review`, `diagnosing-bugs` as methods. Follow their stage boundaries when executing each stage.
 - Never push, fetch credentials, open/merge PRs, deploy, release, or modify a remote repository. Never run SVN commit. Only local Git commit is eligible.
 - Pause and request **scoped user approval** for material ambiguity, destructive DB/data changes, security policy/permission changes, unrelated files, unknown pre-existing modifications, or any attempt to bypass tests/protection.
 - Do not create or modify the project's product documents (requirements, system design, high-level design, database design, interface documents) during S1–S8. Keep the S2 specification and S9 delivery report outside the product-document tree, for example under `DSH_HOME/coding-work-items` or an OS temporary directory. README and JSDoc updates still accompany code changes.
-- At S9, after the local commit, list the affected existing product documents and ask once whether to supplement them (all / selected / none). Call `coding_workflow` with `action=approval` for this choice and pause the native Goal until the user answers. The model-facing tool has no `approve` action: the user records the decision through the Host workflow panel/Remote. After `action=status` reflects that decision, call `action=resume`. Update only on confirmation. Keep those document changes in the working tree and never create a second local commit. Record the choice and changed documents in the delivery report.
+- At S9, after the local commit, list the affected existing product documents and ask once whether to supplement them (all / selected / none). Call `coding_workflow` with `action=approval` for this choice and wait for the user's answer. The model-facing tool has no `approve` action: the user records the decision through the Host workflow panel/Remote. After `action=status` reflects that decision, call `action=resume`. Update only on confirmation. Keep those document changes in the working tree and never create a second local commit. Record the choice and changed documents in the delivery report.
 - If an essential Skill, execution tool, build dependency or evidence is unavailable, **block with the actual reason**; do not quietly substitute a generic prompt and call it successful.
 - Existing DSH tool permission checks and user approvals are authoritative. This Skill cannot override a denied tool call.
 - Never mark a step as passed by interpreting the model's own prose. Artifacts must exist, review must be structured, and tests/builds must actually run.
 - Retry at most 3 substantive repair iterations and stop after 2 iterations without reduction of unresolved findings. On budget/time exhaustion stop with a checkpoint; do not loop indefinitely.
-- The user may stop or switch to manual at any time. After restart do **not** auto-resume; ask the user to explicitly continue.
+- The user may stop the task at any time. After restart do **not** resume automatically; ask the user to explicitly continue.
 
 ## The Host work item
 
@@ -30,7 +30,6 @@ Pass evidence as **file paths inside the workspace or in a temporary directory**
 ```text
 coding_workflow action=start title="Short task objective"
 coding_workflow action=status
-coding_workflow action=mode mode=auto
 coding_workflow action=resume
 coding_workflow action=stage stage=S1 evidencePath=<requirements-file>
 coding_workflow action=stage stage=S2 evidencePath=<spec-file>
@@ -49,11 +48,7 @@ coding_workflow action=stage stage=S9 evidencePath=<delivery-report>
 
 Findings are structured arguments now: `{"id":"F-1","severity":"P1","status":"open","file":"…","evidence":"…"}`. Use an empty array only after actually inspecting source/diff and requirements. The review file itself stays as the stage's evidence artifact.
 
-If `coding_workflow` is not registered, stop the Host auto workflow and report the missing tool; never silently substitute another authority. Only after the user explicitly approves a separate standalone-helper workflow may you use the bundled `scripts/workflow-state.mjs` with the same verbs; it requires Node >=22, Git, and local files under `DSH_HOME/coding-work-items`. Explain that this is a separate local authority, not a Host work item or Host-enforced execution. Never mix or migrate the two authorities within one task.
-
-## Integration with native DSH Goal
-
-Prefer the existing DSH Goal service / goal tool for authorized multi-round continuation when available. Create an objective that **begins exactly** with `[coding-workflow:<task-uuid>]` (UUID from the `start` result), followed by the scoped objective. The launcher uses this marker to distinguish unrelated goals and pauses both the Host task and this goal when switching to manual. On start, inspect any active goal and never overwrite another task's goal. If no conflicting goal exists, create a goal for this exact Work Item with a bounded Round budget (recommend 30, not the DSH default of 256); only mark native goal complete after the local task reaches S9. Pause or block the native goal whenever the Host task enters paused, waiting_approval, or blocked, so Goal Round automation cannot bypass human approval. Resume requires a new explicit user action after a restart. If Goal tools are missing, do not claim unattended multi-round execution: perform only safe work in the current authorized turn, persist a checkpoint, and report what remains.
+If `coding_workflow` is not registered, stop the staged workflow and report the missing tool; never silently substitute another authority. Only after the user explicitly approves a separate standalone-helper workflow may you use the bundled `scripts/workflow-state.mjs` with the same verbs; it requires Node >=22, Git, and local files under `DSH_HOME/coding-work-items`. Explain that this is a separate local authority, not a Host work item or Host-enforced execution. Never mix or migrate the two authorities within one task.
 
 ## Route selection: bug or feature
 
@@ -64,18 +59,18 @@ The **agent** chooses the route from the user's goal, conversation, existing con
 
 Both routes converge at S3 and retain the **same** scope, structured review, repair, actual test/build, local commit and delivery gates. A bug skip shortens requirements/design recording only; it never substitutes for S3 planning, regression tests, review or verification.
 
-## Automatic execution
+## Execution order
 
-1. Check user goal, current workspace and tooling; select the route above and resolve ambiguity. Begin with `action=start`; a dirty tree blocks automatic ownership. On clean `main/master` the Host creates a dedicated `coding/<id>` branch.
-2. Record task mode auto, explicitly resume it. Complete or explicitly skip S1/S2 according to the selected route. S3: record the route, supporting evidence, implementation strategy, exact expected modified-file allowlist and actual verification commands; include the bug's reproduction, root cause and regression plan, or the feature's acceptance coverage. Save artifacts, mark each stage, then register the required test/build commands with `action=checks` **before** implementing.
+1. Check the user goal, current workspace and tooling; select the route above and resolve ambiguity. Begin with `action=start`; a dirty tree blocks task ownership. On clean `main/master` the Host creates a dedicated `coding/<id>` branch.
+2. Explicitly resume the task. Complete or explicitly skip S1/S2 according to the selected route. S3: record the route, supporting evidence, implementation strategy, exact expected modified-file allowlist and actual verification commands; include the bug's reproduction, root cause and regression plan, or the feature's acceptance coverage. Save artifacts, mark each stage, then register the required test/build commands with `action=checks` **before** implementing.
 3. S4: implement minimal scoped change and run focused tests. Save code diff summary and task evidence; call `action=stage stage=S4` only when tracked code has actually changed.
 4. S5: inspect real diff and requirement coverage with the `code-review` method. Pass structured findings to `action=review`; the Host calculates the current diff fingerprint and routes to repair or verification. Do not invent clean reports.
 5. S6 (conditional): fix findings one by one with specific tests, write repair report, call `action=repair`, then perform **fresh** `action=review`. Stop when repair/no-progress limits hit.
 6. S7: run **every** test/build/lint command registered with `action=checks`, using `action=verify kind=<kind> command=<exact registered executable and arguments>`. All required commands must pass against the same reviewed diff; never treat one passing command as proof for another. If any required check failed or did not run, block and do not commit.
 7. S8: compare full current changes to the task, explicitly enumerate every owned path and call `action=commit files=[…]`. Never broad-add the whole repository; if any path is uncertain, block. Hooks must run. Never push.
-8. S9: when the change affects existing product documents, ask the document-supplement question after the local commit and before writing the report: list the affected documents and offer all / selected / none, recording `action=approval` and pausing the native Goal; update only on confirmation and keep the changes uncommitted. List missing document types separately and point to the existing document-generation buttons instead of creating them. Then write an accurate delivery report with the actual commit SHA, changed files, review findings, executed tests, document choice and changes, limitations, and remaining risks. Mark S9 completed only once the report file exists.
+8. S9: when the change affects existing product documents, ask the document-supplement question after the local commit and before writing the report: list the affected documents and offer all / selected / none, recording `action=approval` and waiting for the answer; update only on confirmation and keep the changes uncommitted. List missing document types separately and point to the existing document-generation buttons instead of creating them. Then write an accurate delivery report with the actual commit SHA, changed files, review findings, executed tests, document choice and changes, limitations, and remaining risks. Mark S9 completed only once the report file exists.
 
-If a user requests manual takeover, run `action=pause` and `action=mode mode=manual`; continue with the old single-stage buttons. Never infer stage completion just because an old conversation contains "done".
+If a user requests takeover, run `action=pause`; continue with the single-stage buttons. Never infer stage completion just because an old conversation contains "done".
 
 ## Error handling and continuation
 

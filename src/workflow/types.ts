@@ -40,9 +40,6 @@ export type StageStatus =
   | 'skipped'
   | 'stale'
 
-/** Human-chosen execution mode. */
-export type WorkflowMode = 'manual' | 'auto'
-
 /** Kinds of pre-registered verification command. */
 export type CheckKind = 'test' | 'build' | 'lint' | 'typecheck' | 'integration'
 
@@ -166,8 +163,6 @@ export interface WorkItem {
   readonly workspaceRoot: string
   /** Human task title. */
   readonly title: string
-  /** Human-chosen mode. */
-  readonly mode: WorkflowMode
   /** Whole-task lifecycle. */
   readonly status: WorkItemStatus
   /** Stage the workflow is working on. */

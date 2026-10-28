@@ -40,7 +40,7 @@ const ctx = {
   locale: { register: () => {}, bind: () => key => key },
   configForms: { get: () => form },
   sessions: { binding: () => ({ session: { getSnapshot: () => ({ openState: 'open' }), projections: { faceOf: () => ({ getSnapshot: () => null }) } } }) },
-  remote: { $on: () => () => {}, skills: {}, goals: {} },
+  remote: { $on: () => () => {}, skills: {} },
   slots: { inject: (_slot, register) => { register() }, register: (options, component) => { mounts.push({ options, component }); return { dispose() {} } } },
 }
 mod.apply(ctx)
@@ -76,10 +76,8 @@ visit(tree)
 const buttons = nodes.filter(x => x.type === 'button')
 const toggles = buttons.filter(x => typeof x.props['aria-pressed'] === 'boolean'
   && ['groupCommon', 'groupRequirementsAnalysis', 'groupDevelopment', 'groupDocuments', 'groupOthers'].includes([x.props.children].flat().filter(value => typeof value === 'string').join('')))
-const manual = buttons.find(x => x.props.children === 'manualMode')
-const automatic = buttons.find(x => x.props.children === 'autoMode')
-assert.equal(manual?.props['aria-pressed'], true, 'launcher must default to manual')
-assert.equal(automatic?.props['aria-pressed'], false)
+assert.equal(buttons.some(x => x.props.children === 'manualMode'
+  || x.props.children === 'autoMode' || x.props.children === 'autoPrepare'), false, 'the withdrawn mode controls must not render')
 assert.deepEqual(toggles.map(x => [x.props.children].flat().filter(value => typeof value === 'string').join('')), ['groupCommon', 'groupRequirementsAnalysis', 'groupDevelopment', 'groupDocuments', 'groupOthers'])
 assert.deepEqual(toggles.map(x => x.props['aria-pressed']), [true, true, true, false, false])
 assert.equal(buttons.filter(x => x.props.children === '编码').length, 2)

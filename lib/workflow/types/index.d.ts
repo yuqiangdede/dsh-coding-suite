@@ -11,7 +11,7 @@ import type { Agent } from '@deepseek-ai/dsh-agent';
 import type { ToolCallId } from '@deepseek-ai/dsh-llm';
 import { TypertRemoteService } from '@deepseek-ai/dsh-typert-protocol';
 import z from '@deepseek-ai/schemastery';
-import type { CheckKind, CheckPlan, ReviewFinding, StageId, TaskId, WorkItem, WorkflowMode } from './types.ts';
+import type { CheckKind, CheckPlan, ReviewFinding, StageId, TaskId, WorkItem } from './types.ts';
 /** Deployment settings of the workflow service. */
 export interface Config {
     /** Deadline of one registered verification command. */
@@ -173,15 +173,6 @@ export declare class CodingWorkflowService extends TypertRemoteService {
      */
     resume(agent: Agent, taskId: TaskId, revision: number): Promise<WorkItem>;
     /**
-     * Switch mode without resuming work.
-     * @param agent - live owning Agent.
-     * @param taskId - task identity.
-     * @param revision - expected revision.
-     * @param mode - requested mode.
-     * @returns the paused record with the new mode.
-     */
-    setMode(agent: Agent, taskId: TaskId, revision: number, mode: WorkflowMode): Promise<WorkItem>;
-    /**
      * Record a scoped human approval.
      * @param agent - live owning Agent.
      * @param taskId - task identity.
@@ -213,13 +204,6 @@ export declare class CodingWorkflowService extends TypertRemoteService {
      * @returns the blocked record.
      */
     block(agent: Agent, reason: string): Promise<WorkItem>;
-    /**
-     * Switch the current task's mode from the model path.
-     * @param agent - live owning Agent.
-     * @param mode - requested mode.
-     * @returns the paused record with the new mode.
-     */
-    updateMode(agent: Agent, mode: WorkflowMode): Promise<WorkItem>;
     /**
      * Pause the current task from the model path.
      * @param agent - live owning Agent.

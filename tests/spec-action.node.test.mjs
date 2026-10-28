@@ -27,7 +27,7 @@ function loadLauncher() {
     effect: fn => fn(), on: () => () => {},
     locale: { register() {}, bind: () => key => zh[key] ?? key },
     configForms: { get: () => ({ status: 'ready', value: {}, subscribe: () => () => {} }) },
-    sessions: {}, remote: { $on: () => () => {}, goals: {}, skills: {} },
+    sessions: {}, remote: { $on: () => () => {}, skills: {} },
     slots: {
       inject: (_, fn) => fn(),
       register: (options, component) => {

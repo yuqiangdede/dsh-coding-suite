@@ -138,7 +138,7 @@ const start = () => {
   const now = new Date().toISOString()
   const stages = Object.fromEntries(steps.map(s => [s, { status: s === 'S0' ? 'completed' : 'pending', attempts: s === 'S0' ? 1 : 0 }]))
   const task = {
-    schemaVersion: 1, revision: 1, taskId: id, title, mode: 'manual',
+    schemaVersion: 1, revision: 1, taskId: id, title,
     repositoryRoot: root, branch: currentBranch, baseCommit: head(root),
     status: 'ready', currentStage: 'S1', stages, repairRounds: 0,
     review: null, verification: null, verificationRuns: [], checks: null, allowedPaths: null, commitRef: null, blocker: null,
@@ -157,14 +157,6 @@ const main = () => {
   const id = identifier(args.shift())
   if (verb === 'show') return output(load(root, id))
   const result = mutate(root, id, task => {
-    if (verb === 'mode') {
-      const mode = args.shift()
-      ensure(mode === 'manual' || mode === 'auto', 'Expected manual or auto')
-      requireNonterminal(task)
-      task.mode = mode
-      task.status = 'paused' // Switching never implicitly resumes an agent.
-      return task
-    }
     if (verb === 'pause') {
       requireNonterminal(task); task.status = 'paused'; return task
     }

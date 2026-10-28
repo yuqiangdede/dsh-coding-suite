@@ -37,7 +37,8 @@ export declare class ActionConfigError extends Error {
 /** Return a typed locale key without leaking internal validation messages to the UI. */
 export declare function actionErrorKey(error: unknown): ActionConfigErrorKey | undefined;
 /** Validate a persisted action document and copy defaults when absent.
- * Versions 1, 2, and 3 load as saved; version 1 also upgrades unchanged preset fields.
+ * Versions 1, 2, and 3 preserve saved content except the previous Chinese requirement preset labels;
+ * version 1 also upgrades unchanged preset fields.
  * The retired `group` field is ignored and omitted from the parsed actions.
  * @param text Saved JSON or an absent configuration.
  * @returns Validated actions.

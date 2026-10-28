@@ -89,7 +89,6 @@ export const workItemRecord = z.object({
   sessionId,
   workspaceRoot: z.string(),
   title: z.string(),
-  mode: z.enum(['manual', 'auto']),
   status: z.enum(['created', 'ready', 'running', 'waiting_approval', 'paused', 'blocked', 'completed', 'cancelled']),
   currentStage: z.enum(WORKFLOW_STAGES),
   branch: z.string(),
