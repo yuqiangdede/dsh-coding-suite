@@ -2,13 +2,13 @@
 
 供同一 skills 资源包中的文档技能使用。此目录没有 SKILL.md，不作为独立 Skill 注入。各 Skill 仍是专业方法、证据判断和交付范围的权威入口；这里的工具只处理确定性操作。仅需 Python 3.10+ 标准库，不自动安装依赖。
 
-先在 PowerShell 中定位 DSH 实际安装的 Skill 资源目录（适用于默认安装位置或指定 DSH_HOME）：
+从被调用 Skill 返回的资源基目录定位其同级 `_shared` 目录；插件默认使用包内 `assets/skills`，自定义 `assetRoot` 时以实际返回路径为准。不要假定用户目录中的另一份技能副本就是本次调用的资源。PowerShell 示例：
 
 ```powershell
-$SkillsRoot = if ($env:DSH_HOME) { Join-Path $env:DSH_HOME 'skills' } else { Join-Path $HOME '.dsh/skills' }
+$SkillsRoot = Split-Path -Parent '<本次调用 Skill 的资源基目录>'
 ```
 
-以下脚本路径全部从已安装的 `$SkillsRoot` 目录解析，不依赖项目源码中的旧 `apps/desktop/resources/skills` 目录。
+以下脚本路径全部从本次调用的 `$SkillsRoot` 目录解析。
 
 ## 任务开始与中断恢复
 
@@ -61,7 +61,7 @@ python "$SkillsRoot/_shared/scripts/document_workspace.py" assemble "输出.md" 
 ~~~text
 python "$SkillsRoot/_shared/scripts/document_qa.py" "输出.md" --report "scratch/md-qa.json"
 python "$SkillsRoot/_shared/scripts/docx_text_check.py" "输出.docx" --phrase "某一必须存在的章节标题" --report "scratch/docx-text.json"
-python -m unittest discover -s apps/desktop/resources/skills/_shared/scripts -p "test_*.py"
+python -m unittest discover -s "$SkillsRoot/_shared/scripts" -p "test_*.py"
 ~~~
 
 - Markdown 工具检查 UTF-8、围栏、JSON 代码块、相对文件链接及可疑缩进；不证明 API 字段、SQL 结构、需求或设计语义正确。

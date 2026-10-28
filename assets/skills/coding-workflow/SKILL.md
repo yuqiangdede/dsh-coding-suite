@@ -14,7 +14,7 @@ This Skill is **a bounded orchestration entry**, not a substitute for the single
 - Never push, fetch credentials, open/merge PRs, deploy, release, or modify a remote repository. Never run SVN commit. Only local Git commit is eligible.
 - Pause and request **scoped user approval** for material ambiguity, destructive DB/data changes, security policy/permission changes, unrelated files, unknown pre-existing modifications, or any attempt to bypass tests/protection.
 - Do not create or modify the project's product documents (requirements, system design, high-level design, database design, interface documents) during S1–S8. Keep the S2 specification and S9 delivery report outside the product-document tree, for example under `DSH_HOME/coding-work-items` or an OS temporary directory. README and JSDoc updates still accompany code changes.
-- At S9, after the local commit, list the affected existing product documents and ask once whether to supplement them (all / selected / none). Call `coding_workflow` with `action=approval` for this choice and pause the native Goal until the user answers; then call `action=approve` and `action=resume`. Update only on confirmation. Keep those document changes in the working tree and never create a second local commit. Record the choice and changed documents in the delivery report.
+- At S9, after the local commit, list the affected existing product documents and ask once whether to supplement them (all / selected / none). Call `coding_workflow` with `action=approval` for this choice and pause the native Goal until the user answers. The model-facing tool has no `approve` action: the user records the decision through the Host workflow panel/Remote. After `action=status` reflects that decision, call `action=resume`. Update only on confirmation. Keep those document changes in the working tree and never create a second local commit. Record the choice and changed documents in the delivery report.
 - If an essential Skill, execution tool, build dependency or evidence is unavailable, **block with the actual reason**; do not quietly substitute a generic prompt and call it successful.
 - Existing DSH tool permission checks and user approvals are authoritative. This Skill cannot override a denied tool call.
 - Never mark a step as passed by interpreting the model's own prose. Artifacts must exist, review must be structured, and tests/builds must actually run.
@@ -79,7 +79,7 @@ If a user requests manual takeover, run `action=pause` and `action=mode mode=man
 
 ## Error handling and continuation
 
-- `action=approval reason=<concrete risk and decision>` records a waiting-approval state; **stop before the risky operation**. After a concrete user decision, use `action=approve decision=<scope>` and `action=resume`.
+- `action=approval reason=<concrete risk and decision>` records a waiting-approval state; **stop before the risky operation**. The user decides through the Host panel/Remote `approve` operation. Check `action=status` to confirm the decision was recorded, then use `action=resume`; never invent a model-facing `approve` verb.
 - `action=block reason=<reason and recovery>` for no build, missing Skill, branch mismatch, diff drift, no progress or exhausted limits.
 - `action=status` after interruption. Confirm the working tree/branch against its stage rows and blocker, then `action=resume` only after explicit human instruction.
 - Report missing tests and Windows/Electron end-to-end testing as **not executed** until there is real evidence.

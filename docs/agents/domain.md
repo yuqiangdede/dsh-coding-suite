@@ -8,4 +8,4 @@ None. This repository has no root `GLOSSARY.md`, `GLOSSARY-MAP.md`, `docs/adr/`,
 
 ## Imported skill behavior
 
-`domain-modeling` still names root `GLOSSARY.md` and `docs/adr/` as its defaults. When it runs in this repository, write new terms and ADRs to the Pocket paths above rather than creating a second root glossary or ADR set. `to-spec` publishes specs to the GitHub issue tracker described in `docs/agents/issue-tracker.md`.
+The bundled `domain-modeling` Skill now reads the target project's knowledge index before choosing paths. In this repository, write new terms and ADRs to the Pocket paths above rather than creating a second root glossary or ADR set. `to-spec` publishes specs to the GitHub issue tracker described in `docs/agents/issue-tracker.md`.

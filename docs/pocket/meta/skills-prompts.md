@@ -311,6 +311,22 @@ git status --short
 | U-09 | [工作流 Skill](<../../../assets/skills/coding-workflow/SKILL.md#L18>)要求缺关键工具时阻塞，后文又允许 helper 回退；[README 阶段说明](<../../../README.md#L18-L27>)仍为 S0～S8，工具已列 S9 | 单独澄清缺依赖时边界及工作流阶段语义，不能本次静默改需求 |
 | U-10 | [Word Skill](<../../../assets/skills/markdown-to-docx/SKILL.md#L62>)警示脚本固定 `-w`，而[当前转换实现](<../../../assets/skills/markdown-to-docx/scripts/convert.py>)已探测可用宽度参数；环境依赖也未由插件包锁定 | 将文档与实际 CLI 探测行为对齐，按使用特性验证，不把 `--check` 当全图形链路成功 |
 
+### 9.1 2026-10-28 本地提示词优化复核（local-20261028-06）
+
+本次针对可证实的执行冲突作本地适配，未导入或宣称升级上游版本。变更文件：`ask-matt`、`implement`、`code-review`、`coding-workflow`、`domain-modeling`、`diagnosing-bugs`、`tdd`、`pr`、`improve-codebase-architecture`、`setup-matt-pocock-skills`、`markdown-to-docx` 的 `SKILL.md`，以及 `_shared/README.md`、`docs/agents/domain.md`。版本锚点是修改前的 Git HEAD 与本次工作树差异；首次指纹基线仍为历史基线，不改写。
+
+| 台账项 | 本次处理 | 仍需核对 |
+| --- | --- | --- |
+| U-03 | `coding-workflow` 改为由 Host 面板/Remote 记录人类决定，模型仅用 `status` 核对后 `resume`；不再指示虚构的 `action=approve` | 宿主 UI 实际交互 |
+| U-04 | `_shared` 示例改为从本次调用的资源基目录定位，测试路径使用同一根目录 | 自定义 `assetRoot` 的真实安装环境 |
+| U-05 | `ask-matt` 只推荐当前包可用且经核对的路线；缺席 Skill 先查会话可用性。`diagram-design` 仍是设计技能要求的外部依赖，未擅自改 Gate | 外部依赖安装/授权及实际制图能力 |
+| U-06 | `domain-modeling` 等常用工程 Skill 改为先按目标项目知识索引选路径；本仓库明确使用 Pocket 术语表和 ADR | 其余上游资源中的旧路径假设仍需按实际调用逐项处理 |
+| U-10 | Word Skill 的 Mermaid 说明与 `convert.py` 宽度参数探测行为对齐 | 需在有 Mermaid 的转换任务中做实际 CLI 探针 |
+
+另修复两处未单列的边界：`implement` 不再自动触发审查/提交，符合单阶段“编码”按钮；`code-review` 明确纳入 staged、unstaged 和相关未跟踪文件，且找不到规格时如实报告证据缺口。两者均保留直接调用时用户明确范围的优先级。`ask-matt` 从旧上游长路由改为本包本地路由，属于有意的本地差异；上游许可与来源记录不变。没有修改用户已保存按钮配置。本文第 3～5 节及旧 U 行为原始盘点记录，以上表为本次处理状态；第 10 节仍描述首次台账交付，不代表本次改动范围。
+
+验证：`git diff --check` 对上述资产和本文通过；Node 静态检查确认修改的 `SKILL.md` 有名称、描述、闭合 frontmatter，且相对链接目标存在。未做宿主中的实际调用验证。仓库的 Vitest 测试因未安装 `vitest` 无法启动；skill-creator 的 `quick_validate.py` 因当前 Python 缺少 `yaml` 模块无法启动。未为此安装环境依赖。
+
 ## 10. 本次交付与验证边界
 
 - 新增本台账、首次文件指纹基线，并在[Pocket 索引](<../README.md>)增加入口。
