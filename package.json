@@ -1,6 +1,6 @@
 {
   "name": "dsh-coding-suite",
-  "description": "Unified coding suite for DeepSeek Harness: Host-authoritative staged workflow, engineering and product requirements skills, Pocket specs, interactive UI launcher, and todo progress guard.",
+  "description": "Unified coding suite for DeepSeek Harness: engineering and product requirements skills, Pocket specs, interactive UI launcher, and todo progress guard.",
   "version": "0.2.2",
   "publishConfig": {
     "access": "public"
@@ -29,10 +29,6 @@
     "./todo-progress-guard": {
       "types": "./lib/types/todo-progress-guard.d.ts",
       "default": "./lib/todo-progress-guard.js"
-    },
-    "./workflow": {
-      "types": "./lib/workflow/types/index.d.ts",
-      "default": "./lib/workflow/index.js"
     },
     "./cordis.patch.yml": "./cordis.patch.yml",
     "./package.json": "./package.json"
@@ -63,11 +59,7 @@
   "license": "MIT",
   "peerDependencies": {
     "@deepseek-ai/cordis": ">=4.0.0",
-    "@deepseek-ai/dsh-brand": ">=0.2.0 <0.3.0",
-    "@deepseek-ai/dsh-sandbox": ">=0.2.0 <0.3.0",
-    "@deepseek-ai/dsh-storage-domain": ">=0.2.0 <0.3.0",
-    "@deepseek-ai/dsh-tools": ">=0.2.0 <0.3.0",
-    "@deepseek-ai/dsh-typert-protocol": ">=0.2.0 <0.3.0"
+    "@deepseek-ai/dsh-brand": ">=0.2.0 <0.3.0"
   },
   "dependencies": {
     "@deepseek-ai/schemastery": ">=3.18.0",
@@ -75,4 +67,3 @@
     "zod": "4.4.3"
   }
 }
-
