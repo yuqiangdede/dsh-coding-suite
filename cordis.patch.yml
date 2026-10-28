@@ -3,5 +3,4 @@
     - id: coding-suite
       name: dsh-coding-suite
       config:
-        verificationTimeoutMs: 1800000
         todoStaleMs: 90000
