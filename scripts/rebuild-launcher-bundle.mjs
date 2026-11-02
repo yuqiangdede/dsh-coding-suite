@@ -59,7 +59,7 @@ function compile(path, alias) {
   }
   return source.outputText
     .replace(/^import[\s\S]*?;\r?\n/gm, '')
-    .replace(/\bexport (?=(?:const|function|class) )/g, '')
+    .replace(/\bexport (?=(?:async function|const|function|class) )/g, '')
     .replace(/\b_jsx\b/g, 'react_jsx_runtime.jsx')
     .replace(/\b_jsxs\b/g, 'react_jsx_runtime.jsxs')
     .replace(/\b_Fragment\b/g, 'react_jsx_runtime.Fragment')
