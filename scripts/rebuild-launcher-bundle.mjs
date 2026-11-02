@@ -80,7 +80,7 @@ function appendCss(prefix, sourceFile, variable, mapName, classes) {
   const start = text.indexOf(prefix === 'xbJU_q' ? '.groupToggles' : '.layoutSection')
   if (start < 0) throw new Error('Group CSS missing: ' + sourceFile)
   text = text.slice(start).trim()
-    .replace('composes:groupToggle;', 'border:1px solid var(--dsw-alias-border-l2);border-radius:6px;padding:3px 8px;background:transparent;color:var(--dsw-alias-label-secondary);font-size:11px;cursor:pointer;')
+    .replace(/composes:groupToggle;/g, 'border:1px solid var(--dsw-alias-border-l2);border-radius:6px;padding:3px 8px;background:transparent;color:var(--dsw-alias-label-secondary);font-size:11px;cursor:pointer;')
     .replace(/\.([a-zA-Z][a-zA-Z0-9]*)/g, (_match, name) => '.' + prefix + '_' + name)
     .replace(/\r?\n/g, '')
   const regex = new RegExp('(const ' + variable.replace('$', '\\$') + ' = )("(?:\\\\.|[^"\\\\])*")(;)')
