@@ -162,7 +162,7 @@ bundle = bundle.replace(/\n\/\/# sourceMappingURL=client\.js\.map\s*$/, '\n')
 bundle = buildActionTables(bundle)
 write('lib/client.js', bundle)
 
-let host = read('lib/index.js')
+let host = read('lib/index.js').replace(/\r\n/g, '\n')
 if (!host.includes('layoutJson: z.string().volatile()')) {
   host = expectReplace(host, 'actionsJson: z.string().volatile(),',
     'actionsJson: z.string().volatile(),\n\tlayoutJson: z.string().volatile(),', 'host config')
