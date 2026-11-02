@@ -2,6 +2,10 @@
 
 本仓库已有的 Pocket 文档继续作为相应主题的权威来源。**Pocket 主要承担知识导航与缺失主题补位，不要求将现有需求、设计、接口和运维文件复制或迁移进来。** 其他目标项目优先复用它们已确认的文档目录与知识索引；Git 保存版本历史，小型项目不需要 RAG。参见 [文档单一权威位置协议](../../assets/skills/_shared/DOCUMENT_AUTHORITY.md)。
 
+## Unified artifact routing
+
+- [统一文档与中间产物路径](../agents/document-layout.md) — 初始化时登记全部功能的正式资料、工作稿、临时缓存和外部工单路径。工作区入口：[docs/_work/README.md](../_work/README.md)；任务子目录按需建立。
+
 ## Always read
 
 - [Knowledge policy](meta/knowledge-policy.md) — document authority, updates and maintenance

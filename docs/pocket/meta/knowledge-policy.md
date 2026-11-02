@@ -1,5 +1,9 @@
 # Knowledge ownership and maintenance
 
+## 项目文件产物统一约束
+
+读取、生成、依赖文档或文件型中间产物前，优先读取 [布局契约](../../agents/document-layout.md) 和知识索引。正式文件继续按主题维护，临时与阶段中间成果集中 `docs/_work/<task-id>/`；初始化建立工作区 README，不创建无内容的空分类目录。变更正式资料依旧必须预览和确认。
+
 ## Scope and authority
 
 - 本仓库 `dsh-coding-suite` 已有 `docs/pocket/README.md` 索引，现行 `docs/pocket/requirements/`、`docs/pocket/pitfalls/` 和 `docs/pocket/meta/` 中已确认文件继续在原位置维护。**这不意味着其他目标项目也必须使用同一套目录。**
