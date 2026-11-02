@@ -167,6 +167,21 @@ if (!host.includes('layoutJson: z.string().volatile()')) {
   host = expectReplace(host, 'actionsJson: z.string().volatile(),',
     'actionsJson: z.string().volatile(),\n\tlayoutJson: z.string().volatile(),', 'host config')
 }
+// Mirror the Host Skill provider's append-only artifact-routing contract. This
+// standalone bundle is not rebuilt from src/skill-provider.ts by the launcher bundler.
+const routeStatement = '\tconst artifactRouting = readFileSync(fileURLToPath(new URL("../assets/skills/_shared/ARTIFACT_LAYOUT.md", import.meta.url)), "utf8").trim();'
+if (!host.includes(routeStatement)) {
+  host = expectReplace(host,
+    '\tconst provider = {\n\t\tname: "coding-suite",',
+    routeStatement + '\n\tconst provider = {\n\t\tname: "coding-suite",',
+    'Host artifact routing declaration')
+}
+if (!host.includes('content: content + "\\n\\n" + artifactRouting')) {
+  host = expectReplace(host,
+    '\t\t\treturn {\n\t\t\t\t...summary,\n\t\t\t\tcontent\n\t\t\t};',
+    '\t\t\treturn {\n\t\t\t\t...summary,\n\t\t\t\tcontent: content + "\\n\\n" + artifactRouting\n\t\t\t};',
+    'Host provider content delivery')
+}
 write('lib/index.js', host)
 
 let declarations = read('lib/types/client/index.d.ts')
