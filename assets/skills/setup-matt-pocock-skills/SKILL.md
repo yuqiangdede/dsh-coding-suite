@@ -39,13 +39,13 @@ Look at the current repo to understand its starting state. Read whatever exists;
 
 Summarise verified present/missing facts, classify each required change as AUTO or NEEDS_DECISION under SETUP_AUTO_DECISIONS.md, and automatically carry out safe recommended choices. Gather only genuinely ambiguous or high-impact decisions in one concise question; do not ask the user to approve an obvious default every time.
 
-Lead each section with the recommended answer so the user can accept it in a word. Give a one-line explainer only when the choice genuinely branches; skip the section entirely when exploration already settled it (Section B when `triage` isn't installed, Section C when there's no monorepo).
+Execute routine choices as a single AUTO batch. Skip irrelevant branches (`triage` absent; monorepo-only guidance absent). Do not stop for a yes/no on a recommendation. Only unresolved NEEDS_DECISION items require a user response; prefer one consolidated question with a default when there are multiple real exceptions.
 
 **Section A: Issue tracker.**
 
 > Explainer: The "issue tracker" is where issues live for this repo. Skills like `to-tickets`, `triage`, and `to-spec` read from and write to it. They need to know whether to call `gh issue create`, write a markdown file under `.scratch/`, or follow some other workflow you describe. Pick the place you actually track work for this repo.
 
-Auto-select the only clearly indicated Issue Tracker (GitHub/GitLab from an unambiguous remote, otherwise local Markdown in a new remote-less project). Ask only if existing project conventions conflict; writing remote labels or issues still requires separate permission. Default posture: these skills were designed for GitHub. If a `git remote` points at GitHub, propose that. If a `git remote` points at GitLab (`gitlab.com` or a self-hosted host), propose GitLab. Otherwise (or if the user prefers), offer:
+Auto-select the only clearly indicated Issue Tracker (GitHub/GitLab from an unambiguous remote, otherwise local Markdown in a new remote-less project). Ask only if existing project conventions conflict; writing remote labels or issues still requires separate permission. Default posture: these skills were designed for GitHub. If a `git remote` points at GitHub, use GitHub for the local tracker config. If it points at GitLab (`gitlab.com` or a self-hosted host), use GitLab. Otherwise use the local Markdown default unless a pre-existing tracker configuration proves otherwise. Alternative integrations for explicit user requirements are:
 
 - **GitHub**: issues live in the repo's GitHub Issues (uses the `gh` CLI)
 - **GitLab**: issues live in the repo's GitLab Issues (uses the [`glab`](https://gitlab.com/gitlab-org/cli) CLI)
@@ -60,11 +60,11 @@ If installed and no conflicting label vocabulary already exists, use canonical d
 
 > Do you want to keep the default triage labels? (recommended: **yes**)
 
-The defaults are the five canonical roles, each label string equal to its name: `needs-triage`, `needs-info`, `ready-for-agent`, `ready-for-human`, `wontfix`. On **yes**, write them as-is. Only if the user says no, usually because their tracker already uses other names (e.g. `bug:triage` for `needs-triage`), collect the overrides so `triage` applies existing labels instead of creating duplicates.
+The defaults are the five canonical roles, each label string equal to its name: `needs-triage`, `needs-info`, `ready-for-agent`, `ready-for-human`, `wontfix`. Write the defaults when no existing contradictory mapping is present. If the existing tracker uses different real labels (e.g. `bug:triage` for `needs-triage`), prefer preserving its current mapping; never duplicate remote labels automatically.
 
-**Section C: Domain docs and Pocket.** First apply [single-authority document routing](../_shared/DOCUMENT_AUTHORITY.md). Map each theme (requirements, design, ADR, glossary, interface, operations) to its **existing authoritative file**. If an index already exists, update it rather than create a duplicate. If no index exists, propose a minimal Pocket index and policy on approval; even then existing documents stay where they are. For a genuinely large monorepo, use module links within the same active index, not a separate knowledge root.
+**Section C: Domain docs and Pocket.** First apply [single-authority document routing](../_shared/DOCUMENT_AUTHORITY.md). Map each theme (requirements, design, ADR, glossary, interface, operations) to its **existing authoritative file**. If an index already exists, update it rather than create a duplicate. If no index exists and no existing authoritative index can be found, automatically create a minimal Pocket index/policy as safe setup metadata; even then existing documents stay where they are. For a genuinely large monorepo, use module links within the same active index, not a separate knowledge root.
 
-For a new project without document conventions, `docs/pocket/` may supply missing topic documents lazily. If existing documents such as `GLOSSARY.md`, `GLOSSARY-MAP.md`, `docs/adr/`, `docs/Requirements/` or `docs/Design/` are authoritative, **do not silently relocate, duplicate or reclassify them as legacy**. Report paths and status in the selected index and write `docs/agents/domain.md` with the actual paths. A migration requires a separate approved decision. Some imported Skills may still contain legacy path/output assumptions; inspect the bundled version before claiming full integration. `to-spec` output follows the issue tracker.
+For a new project without document conventions, `docs/pocket/` may supply missing topic documents lazily. Do not ask just to approve the documented fallback location. If existing documents such as `GLOSSARY.md`, `GLOSSARY-MAP.md`, `docs/adr/`, `docs/Requirements/` or `docs/Design/` are authoritative, **do not silently relocate, duplicate or reclassify them as legacy**. Report paths and status in the selected index and write `docs/agents/domain.md` with the actual paths. A migration requires a separate approved decision. Some imported Skills may still contain legacy path/output assumptions; inspect the bundled version before claiming full integration. `to-spec` output follows the issue tracker.
 
 **Section D: Unified document and intermediate outputs.** Always complete after sections A–C. Inventory requirements/PRD, designs/ADRs, API/database, acceptance/handover/operations, external issue tracker, Gate/review records, intermediate extraction and conversion caches. Draft `docs/agents/document-layout.md` mapping each category to existing authoritative files or a fallback; choose a single task-specific intermediate work root. Recommend `docs/_work/` unless an established project work directory is preferable. Automatically resolve historical Skill default-path disagreements in favor of the project's already verified document layout, without creating a competing folder or migrating documents. Create missing setup-only layout and work-root README automatically when the safe criteria are satisfied; migration, collision, or editing approved documents still needs explicit approval.
 
@@ -72,7 +72,7 @@ For a new project without document conventions, `docs/pocket/` may supply missin
 
 Call the model-invocable **`writing-for-agents` Skill** before drafting. Apply its pointer-writing, progressive disclosure, single-owner, and pruning guidance to the Agent instruction block, the Pocket index, and the domain-document pointers. When that Skill cannot be loaded, state the limitation instead of claiming it ran.
 
-Show the user a draft of:
+For AUTO items, prepare the following content and execute the non-conflicting changes without an extra confirmation turn; show what actually changed afterward. For NEEDS_DECISION items, preview the relevant proposed changes and wait on those items only:
 
 - The `## Agent skills` block to add or update in each loaded root instruction file (`CLAUDE.md` and/or `AGENTS.md`; see step 4 for selection rules)
 - The full proposed contents of `docs/agents/document-layout.md` and its chosen work-root `README.md` (including actual location, any pre-existing files and conflicts), plus `docs/agents/issue-tracker.md`, `docs/agents/domain.md`, and `docs/agents/triage-labels.md` (the last only when `triage` is installed)
@@ -84,8 +84,8 @@ For AUTO cases, minimally edit setup metadata and report completed paths/diffs w
 
 **Pick the file to edit:**
 
-- If `CLAUDE.md` exists, edit it.
-- Else if `AGENTS.md` exists, edit it.
+- If `CLAUDE.md` exists, edit it, respecting existing content.
+- Else if `AGENTS.md` exists, edit it, respecting existing content.
 - If neither exists, create AGENTS.md as the default safe root instruction file unless a project rule explicitly requires a different filename.
 
 Never create `AGENTS.md` when `CLAUDE.md` already exists (or vice versa); always edit the one that's already there.
