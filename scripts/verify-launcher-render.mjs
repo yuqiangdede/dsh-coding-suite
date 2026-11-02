@@ -40,7 +40,7 @@ const ctx = {
   on: () => () => {},
   locale: { register: () => {}, bind: () => key => key },
   configForms: { get: () => form },
-  sessions: { binding: () => ({ session: { getSnapshot: () => ({ openState: 'open' }), projections: { faceOf: () => ({ getSnapshot: () => null }) } } }) },
+  sessions: { list: { getSnapshot: () => ({ byId: { 'test-session': { cwd: 'C:/project' } } }) }, binding: () => ({ session: { getSnapshot: () => ({ openState: 'open' }), projections: { faceOf: () => ({ getSnapshot: () => null }) } } }) },
   remote: { $on: () => () => {}, skills: {} },
   slots: { inject: (_slot, register) => { register() }, register: (options, component) => { mounts.push({ options, component }); return { dispose() {} } } },
 }
@@ -75,6 +75,9 @@ function visit(value) {
 }
 visit(tree)
 const buttons = nodes.filter(x => x.type === 'button')
+const initialize = buttons.find(x => x.props['data-setup-action'] === 'initialize')
+assert(initialize, 'initialization must stay in the group toggle row')
+assert.equal(initialize.props.children.flat().filter(x => typeof x === 'string').join(''), 'setupLabel •')
 const toggles = buttons.filter(x => typeof x.props['aria-pressed'] === 'boolean'
   && ['groupCommon', 'groupRequirementsAnalysis', 'groupDevelopment', 'groupDocuments', 'groupHandoverDocs', 'groupOthers'].includes([x.props.children].flat().filter(value => typeof value === 'string').join('')))
 assert.equal(buttons.some(x => x.props.children === 'manualMode'
@@ -93,9 +96,21 @@ for (const button of overflow) button.props.onClick()
 nodes.length = 0
 visit(render())
 assert.equal(nodes.filter(x => x.type === 'button' && x.props.children === '继续').length, 1)
-const supplement = nodes.find(x => x.type === 'button' && x.props.children === '补充文档')
+let supplement = nodes.find(x => x.type === 'button' && x.props.children === '补充文档')
 assert(supplement, 'Supplement Docs button missing')
 supplement.props.onClick()
+assert.equal(inserted, '', 'uninitialized workspaces must not insert other actions')
+const setupIndex = state.findIndex(x => x !== null && typeof x === 'object' && 'root' in x && 'status' in x)
+assert(setupIndex >= 0, 'setup gate state must exist')
+state[setupIndex] = { root: 'C:/project', status: 'ready', missing: [] }
+injected.checkProjectSetup = async () => ({ ready: true, missing: [] })
+nodes.length = 0
+visit(render())
+supplement = nodes.find(x => x.type === 'button' && x.props.children === '补充文档')
+assert(supplement)
+supplement.props.onClick()
+await Promise.resolve()
+await Promise.resolve()
 assert(inserted.includes('来源：本会话'), 'supplement draft must default to this session')
 assert(inserted.includes('时间段'), 'supplement draft must offer a time range')
 assert(inserted.includes('版本'), 'supplement draft must offer a version baseline')
