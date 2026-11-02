@@ -36,6 +36,7 @@
 .groupControls{display:flex;align-items:center;flex-wrap:wrap;gap:5px}
 .groupToggleLabel{font-size:11px;color:var(--dsw-alias-label-secondary);margin-right:2px}
 .groupToggle{border:1px solid var(--dsw-alias-border-l2);border-radius:6px;padding:3px 8px;background:transparent;color:var(--dsw-alias-label-secondary);font-size:11px;cursor:pointer}
+.setupRequired{composes:groupToggle;border-color:var(--dsw-alias-state-warning-primary,var(--dsw-alias-label-primary));color:var(--dsw-alias-label-primary);box-shadow:0 0 0 1px var(--dsw-alias-state-warning-primary,var(--dsw-alias-border-l2));font-weight:700}
 .groupToggleActive{composes:groupToggle;background:var(--dsw-alias-interactive-bg-hover);color:var(--dsw-alias-label-primary);font-weight:600}
 .groupToggle:focus-visible,.groupToggleActive:focus-visible,.hideGroup:focus-visible{outline:2px solid var(--dsw-alias-border-l2);outline-offset:2px}
 .groupToggle:disabled,.groupToggleActive:disabled,.hideGroup:disabled{opacity:.5;cursor:default}
