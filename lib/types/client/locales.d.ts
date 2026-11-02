@@ -20,7 +20,8 @@ export declare const zh: {
     readonly groupCommon: "常用";
     readonly groupRequirementsAnalysis: "需求";
     readonly groupDevelopment: "开发";
-    readonly groupDocuments: "文档";
+    readonly groupDocuments: "验收文档";
+    readonly groupHandoverDocs: "交接文档";
     readonly groupOthers: "其他";
     readonly groupAlwaysVisible: "始终显示";
     readonly groupConfigHelp: "各分组可以独立开关。需求分组以完整流水线为主干，从澄清、分析与各阶段 Gate 一直到生图提示词。重复按钮引用同一份 Skill 或提示词。";

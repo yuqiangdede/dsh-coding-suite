@@ -4,13 +4,13 @@ import { DEFAULT_ACTIONS, encodeActions, parseActions } from '../src/client/acti
 import { DEFAULT_COMMON_IDS, LAUNCHER_GROUPS, actionsForGroup, defaultLauncherLayout,
   fittedActionCount, parseLauncherLayout, exportLauncherConfiguration, importedLauncherLayout } from '../src/client/launcher-layout.ts'
 
-test('five group IDs, defaults, and ordered button references', () => {
+test('six group IDs, defaults, and ordered button references', () => {
   const layout = defaultLauncherLayout(DEFAULT_ACTIONS)
   assert.deepEqual(layout.commonActionIds, [...DEFAULT_COMMON_IDS])
   assert.deepEqual(Object.entries(layout.visibleGroups), [
-    ['common', true], ['requirements-analysis', true], ['development', true], ['documents', false], ['others', false],
+    ['common', true], ['requirements-analysis', true], ['development', true], ['documents', false], ['handover-docs', false], ['others', false],
   ])
-  assert.deepEqual(LAUNCHER_GROUPS.map(g => g.actionIds.length), [11, 15, 7, 16])
+  assert.deepEqual(LAUNCHER_GROUPS.map(g => g.actionIds.length), [11, 15, 7, 5, 16])
   assert.deepEqual(actionsForGroup('common', DEFAULT_ACTIONS, layout).map(a => a.id), [...DEFAULT_COMMON_IDS])
   assert.equal(actionsForGroup('documents', DEFAULT_ACTIONS, layout).length, 7)
   const others = actionsForGroup('others', DEFAULT_ACTIONS, layout).map(a => a.id)
@@ -66,7 +66,7 @@ test('invalid saved layouts fail closed', () => {
 test('common visibility defaults on for old layouts and round trips explicit choices', () => {
   const old = { schemaVersion: 1, commonActionIds: ['bug'], visibleGroups: { development: false, documents: true, others: false } }
   const migrated = parseLauncherLayout(JSON.stringify(old), DEFAULT_ACTIONS)
-  assert.deepEqual(migrated.visibleGroups, { common: true, 'requirements-analysis': false, ...old.visibleGroups })
+  assert.deepEqual(migrated.visibleGroups, { common: true, 'requirements-analysis': false, ...old.visibleGroups, 'handover-docs': false })
   const hidden = { ...migrated, visibleGroups: { ...migrated.visibleGroups, common: false } }
   assert.deepEqual(parseLauncherLayout(JSON.stringify(hidden), DEFAULT_ACTIONS), hidden)
   assert.deepEqual(importedLauncherLayout(exportLauncherConfiguration(encodeActions(DEFAULT_ACTIONS), hidden), DEFAULT_ACTIONS, migrated), hidden)

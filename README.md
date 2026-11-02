@@ -111,6 +111,14 @@ Pocket 是项目知识的**索引与兜底位置**，不是独立的业务文档
 
 参见 [文档单一权威位置协议](assets/skills/_shared/DOCUMENT_AUTHORITY.md)、[初始化规范](assets/skills/_shared/POCKET_SETUP.md) 和 [本仓库 Pocket 索引](docs/pocket/README.md)。本仓库已有的 Pocket 需求及问题文档保留原位置。
 
+### 项目交接文档（交接分组）
+
+新增独立的「交接文档」（Project Handover）分组，默认隐藏，可在「显示分组」中启用；原「文档」只更名为「验收文档」（Acceptance Docs），保留原 ID 和七个按钮。交接分组包含「交接总览」「功能规则」「关键流程」「日志排查」「交接维护」五个独立 Skill。支持全项目/指定模块整理；优先复用目标项目的权威资料目录，否则推荐 Pocket。共享证据、冲突和写入规则位于 `assets/skills/_shared/project-handover/`。
+
+点击按钮只插入可编辑草稿；实际整理会先核对仓库基线与事实依据，**创建和更新任何交接文档前必须显示具体差异并再次获得用户确认**。不会自动修改业务代码、远程环境或提交代码。已有 `actionsJson` 的用户需要在按钮设置点击「补齐缺失预设（待保存）」再保存，旧设置不会被覆盖。原 `handoff`「上下文交接」仍用于短期会话交接。
+
+参见 [正式需求](docs/pocket/requirements/project-handover.md)、[技术方案](docs/pocket/requirements/project-handover-implementation.md) 与 [30 项验收标准](docs/pocket/requirements/project-handover-acceptance.md)。
+
 ### 健康验收
 
 新增「健康验收」Skill 按钮，绑定内置 `project-runtime-acceptance`，默认进行全量静态只读验收，覆盖数据库、任务、缓存、API 等12领域，输出资产覆盖率、源码证据及整改建议，不改业务代码、不操作生产环境。

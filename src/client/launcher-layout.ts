@@ -5,6 +5,7 @@ export const LAUNCHER_GROUPS = [
   { id: 'requirements-analysis', label: 'groupRequirementsAnalysis', actionIds: ['product-development-pipeline', 'requirement-clarification', 'requirement-analysis', 'product-risk-gate', 'solution-design', 'product-module-gate', 'product-state-gate', 'product-exception-gate', 'product-prd-pages', 'product-consistency-gate', 'product-image-prompt'] },
   { id: 'development', label: 'groupDevelopment', actionIds: ['discussion', 'visual', 'spec', 'plan', 'execute', 'bug', 'add-logs', 'analyze-logs', 'review', 'review-fix', 'compile', 'health-acceptance', 'commit', 'doc-supplement', 'remote-debug'] },
   { id: 'documents', label: 'groupDocuments', actionIds: ['api-docs', 'requirements', 'overview', 'outline', 'database', 'doc-merge', 'docx'] },
+  { id: 'handover-docs', label: 'groupHandoverDocs', actionIds: ['handover-overview', 'handover-features', 'handover-flows', 'handover-troubleshooting', 'handover-maintain'] },
   { id: 'others', label: 'groupOthers', actionIds: ['initialize', 'graphify-navigation', 'graphify-refresh', 'ask', 'health-acceptance', 'doc-supplement', 'tdd', 'prototype', 'architecture', 'domain', 'research', 'retro', 'handoff', 'image', 'prd-writing', 'requirement-review'] },
 ] as const
 
@@ -20,7 +21,7 @@ export interface LauncherLayout {
 }
 
 const defaultVisibility: Record<GroupId, boolean> = {
-  common: true, 'requirements-analysis': true, development: true, documents: false, others: false,
+  common: true, 'requirements-analysis': true, development: true, documents: false, 'handover-docs': false, others: false,
 }
 const actionIdPattern = /^[a-z0-9][a-z0-9-]{0,63}$/
 
@@ -54,7 +55,8 @@ export function parseLauncherLayout(
   const obj = visible as Record<string, unknown>
   if ((obj.common !== undefined && typeof obj.common !== 'boolean') ||
     (obj['requirements-analysis'] !== undefined && typeof obj['requirements-analysis'] !== 'boolean') ||
-    LAUNCHER_GROUPS.some(group => group.id !== 'requirements-analysis' && typeof obj[group.id] !== 'boolean') ||
+    (obj['handover-docs'] !== undefined && typeof obj['handover-docs'] !== 'boolean') ||
+    LAUNCHER_GROUPS.some(group => group.id !== 'requirements-analysis' && group.id !== 'handover-docs' && typeof obj[group.id] !== 'boolean') ||
     ids.some(id => typeof id !== 'string' || !actionIdPattern.test(id)) ||
     new Set(ids).size !== ids.length) throw new Error('分组布局选项或按钮 ID 错误')
   return {
@@ -64,6 +66,7 @@ export function parseLauncherLayout(
       'requirements-analysis': obj['requirements-analysis'] === undefined ? false : obj['requirements-analysis'] as boolean,
       development: obj.development as boolean,
       documents: obj.documents as boolean,
+      'handover-docs': obj['handover-docs'] === undefined ? false : obj['handover-docs'] as boolean,
       others: obj.others as boolean,
     },
     commonActionIds: ids as string[],

@@ -6,6 +6,27 @@
 
 范围：本仓库内置 Skill、附带规则/模板/脚本、按钮默认提示词、附加接收指令、系统注入及提醒。**不包含宿主 DSH 的完整默认提示词、其他插件/用户目录的 Skill、用户已保存的按钮配置正文。**
 
+## 2026-11-02 项目交接分组本地新增资产（实施分支）
+
+来源类别：**本地编写（依据用户确认的项目交接需求）**；提供者：dsh-coding-suite；日期：2026-11-02；外部上游版本/许可：不适用（未复制第三方正文）。基线：本次功能 PR 的 Git 提交历史。正式业务依据：[交接需求](../requirements/project-handover.md)；既有 [Pocket 约定](knowledge-policy.md)、[源码证据工具](../../../assets/skills/_shared/EVIDENCE.md) 为方法参考，不代表改写其来源和协议。
+
+| 本地资产（均为本地编写） | 目的与改造范围 |
+| --- | --- |
+| `src/client/actions.ts` 中 `handover-overview` / `handover-features` / `handover-flows` / `handover-troubleshooting` / `handover-maintain` 默认提示词 | 新增五个独立可识别的交接动作，保留可编辑草稿与分组兼容 |
+| `src/client/locales.ts` 中五条交接接收指令和中英展示 | 增加事实核验、未授权不写、脱敏等接收约束 |
+| `assets/skills/project-handover-overview/SKILL.md` | 全项目/模块盘点与接手入口 |
+| `assets/skills/project-handover-features/SKILL.md` | 已实现功能与规则 |
+| `assets/skills/project-handover-flows/SKILL.md` | 调用、状态和异常链路 |
+| `assets/skills/project-handover-troubleshooting/SKILL.md` | 日志位置与只读排查 |
+| `assets/skills/project-handover-maintain/SKILL.md` | 按范围增量复核与安全更新 |
+| `assets/skills/_shared/project-handover/protocol.md` | 共用操作流程和知识权威规则 |
+| `assets/skills/_shared/project-handover/evidence.md` | 证据分级、冲突与敏感信息 |
+| `assets/skills/_shared/project-handover/templates.md` | 项目交接目录与人工阅读模板 |
+| `assets/skills/_shared/project-handover/updates.md` | 预览/确认/并发检查与增量规则 |
+| `assets/skills/_shared/project-handover/scripts/handover_write_guard.py` | 标准库安全路径、SHA-256 和逐文件预览/写入检查 |
+
+变更方式：以上全部为新本地资产，非上游导入；依托现有 provider、Pocket 和共享证据工具，但不改变其历史来源记录。每次后续改动按 Git 版本及本表记录。
+
 ## 1. 如何使用这份文档
 
 2026-10-28 新增本地维护的 [graphify-navigation](../../../assets/skills/graphify-navigation/SKILL.md) 适配技能及按钮，并在初始化诊断中增加可选 Graphify 状态检查；集成边界见[需求](../requirements/graphify-navigation.md)。外部 CLI 由用户选择安装，上游代码未捆绑；下方 2026-10-26 数量和基线保持历史记录。

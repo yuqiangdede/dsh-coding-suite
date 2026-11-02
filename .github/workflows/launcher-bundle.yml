@@ -1,5 +1,14 @@
 name: Windows launcher bundle check
 on:
+  pull_request:
+    paths:
+      - 'src/client/**'
+      - 'assets/skills/project-handover-*/**'
+      - 'assets/skills/_shared/project-handover/**'
+      - 'lib/client.js'
+      - 'tests/**'
+      - 'scripts/**'
+      - '.github/workflows/launcher-bundle.yml'
   push:
     branches:
       - feat/launcher-action-groups
@@ -10,7 +19,7 @@ permissions:
 
 jobs:
   bundle:
-    if: "!startsWith(github.event.head_commit.message, 'chore(bundle):')"
+    if: "github.event_name == 'pull_request' || !startsWith(github.event.head_commit.message, 'chore(bundle):')"
     runs-on: windows-latest
     steps:
       - uses: actions/checkout@v4
@@ -22,6 +31,13 @@ jobs:
       - name: Install isolated TypeScript compiler
         shell: pwsh
         run: npm install --prefix .build-tools --no-save --no-package-lock typescript@5.9.3
+      - name: Verify checked-in bundle before regeneration
+        shell: pwsh
+        run: |
+          node --check lib/client.js
+          node --experimental-transform-types scripts/build-action-bundle.mjs --check
+          node scripts/verify-client-bundle.mjs
+          node scripts/verify-launcher-render.mjs
       - name: Rebuild shipped bundles
         shell: pwsh
         run: |
@@ -34,8 +50,10 @@ jobs:
           node --check lib/index.js
           node scripts/verify-client-bundle.mjs
           node scripts/verify-launcher-render.mjs
-          node --experimental-transform-types --test tests/launcher-layout.node.test.mjs
+          node --experimental-transform-types --test tests/launcher-layout.node.test.mjs tests/project-handover.node.test.mjs tests/diagnostic-shortcuts.node.test.mjs tests/requirements-analysis.node.test.mjs
+          python -m unittest discover -s assets/skills/_shared/project-handover/scripts -p test_handover_write_guard.py
       - name: Commit generated runtime files
+        if: github.event_name == 'push'
         shell: pwsh
         run: |
           git config user.name "github-actions[bot]"
