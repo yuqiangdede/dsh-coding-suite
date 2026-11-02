@@ -1,6 +1,6 @@
 import { useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react'
 import type { InjectFace, PropsLocale, PropsRuntime } from '@deepseek-ai/dsh-client-ui-slots'
-import { parseActions, actionErrorKey, presentDefaultActions, displayOrder, type CodingAction } from './actions.ts'
+import { DEFAULT_ACTIONS, parseActions, actionErrorKey, presentDefaultActions, displayOrder, type CodingAction } from './actions.ts'
 import type { LauncherInjected } from './index.ts'
 import { chatEntries, conversationHistory, recommend, withEvidence } from './contextual-actions.ts'
 import { LAUNCHER_GROUPS, actionsForGroup, defaultLauncherLayout, fittedActionCount, parseLauncherLayout, type GroupId } from './launcher-layout.ts'
@@ -8,7 +8,7 @@ import css from './Launcher.module.css'
 type Props = PropsRuntime<'conversation.input.dock'> & PropsLocale<'mattSkillLauncher'> & InjectFace<LauncherInjected>
 export function Launcher({
   useInput, useConversation, useSession, useProjection, inputActions, useActionForm, fetchSkillNames,
-  saveLayout, todoStaleMs, t,
+  saveLayout, todoStaleMs, projectRoot, checkProjectSetup, t,
 }: Props) {
   const snapshot = useActionForm(x => x)
   const input = useInput(x => x)
@@ -41,6 +41,11 @@ export function Launcher({
   const [commonEdit, setCommonEdit] = useState<{ ids: string[], revision: number } | null>(null)
   const [pending, setPending] = useState(false)
   const [notice, setNotice] = useState('')
+  const [setup, setSetup] = useState<{
+    root: string; status: 'checking' | 'ready' | 'missing' | 'error'; missing: readonly string[]
+  }>({ root: '', status: 'checking', missing: [] })
+  const checkerRef = useRef(checkProjectSetup)
+  checkerRef.current = checkProjectSetup
   const alive = useRef(true)
   const groupRows = useRef<Record<string, HTMLDivElement | null>>({})
   const groupProbes = useRef<Record<string, HTMLDivElement | null>>({})
@@ -61,6 +66,21 @@ export function Launcher({
   // instead of guessing the stage from keywords inside that prompt.
   const entries = sessionRunning ? [] : chatEntries(chat)
   const history = conversationHistory(chat, actions)
+  const root = projectRoot ?? ''
+  const latestReply = !sessionRunning && entries.at(-1)?.role === 'assistant' ? entries.at(-1)?.text : ''
+  // On new workspace or completed response, verify disk files again; no global completed flag.
+  useEffect(() => {
+    let cancelled = false
+    setSetup({ root, status: 'checking', missing: [] })
+    void checkerRef.current().then(report => {
+      if (!cancelled) setSetup({ root, status: report.ready ? 'ready' : 'missing', missing: report.missing })
+    }).catch(error => {
+      if (!cancelled) setSetup({ root, status: 'error', missing: [String(error)] })
+    })
+    return () => { cancelled = true }
+  }, [root, latestReply])
+  const setupReady = setup.root === root && setup.status === 'ready'
+  const initializeAction = DEFAULT_ACTIONS.find(action => action.id === 'initialize')!
   const recommendation = recommend(entries, sessionRunning, enabledActions)
   const recommendedActions = recommendation
     ? enabledActions.filter(action => recommendation.ids.includes(action.id))
@@ -161,6 +181,27 @@ export function Launcher({
   const insert = async (action: CodingAction) => {
     if (!available || commandLock.current) return
     setNotice('')
+    if (action.id !== 'initialize') {
+      if (!setupReady) { setNotice(t('setupFirst')); return }
+      // Re-evaluate before each insert: manually deleted files re-lock the UI.
+      commandLock.current = true
+      setPending(true)
+      try {
+        const report = await checkProjectSetup()
+        if (!alive.current) return
+        setSetup({ root, status: report.ready ? 'ready' : 'missing', missing: report.missing })
+        if (!report.ready) { setNotice(t('setupFirst') + report.missing.join('；')); return }
+      } catch (error) {
+        if (alive.current) {
+          setSetup({ root, status: 'error', missing: [String(error)] })
+          setNotice(t('setupCheckFailed') + String(error))
+        }
+        return
+      } finally {
+        commandLock.current = false
+        if (alive.current) setPending(false)
+      }
+    }
     const span = inputActions.captureInsertion()
     if (span.start !== span.end) { setNotice(t('selection')); return }
     if (action.kind === 'skill' && (span.start !== 0 || input.draft.startsWith('/'))) {
@@ -243,6 +284,12 @@ export function Launcher({
           {t(group.label)}
           {!layout.visibleGroups[group.id] && groupHasRecommendation(group.id) ? ' •' : ''}
         </button>)}
+        <button type="button" data-setup-action="initialize"
+          className={setupReady ? css.groupToggle : css.setupRequired}
+          aria-label={t('setupLabel')} title={setupReady ? t('setupReady') : t('setupFirst')}
+          onClick={() => { void insert(initializeAction) }} disabled={!available}>
+          {t('setupLabel')}{!setupReady ? ' •' : ''}
+        </button>
         <button type="button" className={css.groupToggle} onClick={startCommonEdit}
           disabled={Boolean(commonEdit) || Boolean(invalid) || layoutSaving || snapshot.status !== 'ready' || !snapshot.writable || snapshot.revision === undefined}>{t('editCommon')}</button>
       </div>}
@@ -294,7 +341,11 @@ export function Launcher({
           {renderGroupActions(group.id, t(group.label), group.actions)}
         </div>)}
     </>}
-    {visibleRecommendation && <div className={css.hint} aria-live="polite">{t('recommendationHint').replace('{actions}', recommendedActions.map(displayLabel).join(t('recommendationSeparator'))).replace('{reason}', t(visibleRecommendation.reason))}</div>}
+    {!setupReady && setup.status !== 'checking' && <div className={css.hint} role="status">
+      {setup.status === 'error' ? t('setupCheckFailed') : t('setupFirst')}
+      {setup.root === root && setup.missing.length ? ' ' + setup.missing.join('；') : ''}
+    </div>}
+    {visibleRecommendation && setupReady && <div className={css.hint} aria-live="polite">{t('recommendationHint').replace('{actions}', recommendedActions.map(displayLabel).join(t('recommendationSeparator'))).replace('{reason}', t(visibleRecommendation.reason))}</div>}
     {watching && <div className={`${css.progressWarning} ${planMayBeStale ? css.progressWarningActive : ''}`} role="status">
       {planMayBeStale ? t('todoStale').replace('{minutes}', String(unchangedMinutes)) : null}
     </div>}
