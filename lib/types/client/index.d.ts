@@ -20,6 +20,8 @@ export interface LauncherInjected {
         actionForm: ConfigForm<ActionSettings>;
     };
     fetchSkillNames: () => Promise<readonly string[]>;
+    projectRoot: string | undefined;
+    checkProjectSetup: () => Promise<import("./setup-readiness.js").ProjectSetupReport>;
     saveLayout: (json: string, revision?: number) => Promise<boolean>;
     todoStaleMs: number;
 }
