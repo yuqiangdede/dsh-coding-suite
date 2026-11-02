@@ -18,6 +18,8 @@ const bundleSource = readFileSync(bundlePath, 'utf8')
 const hostSource = readFileSync(new URL('../lib/index.js', import.meta.url), 'utf8')
 assert.doesNotMatch(bundleSource, /codingWorkflow|workflowCommands|WorkflowPanel/, 'browser bundle must not contain the retired workflow')
 assert.doesNotMatch(hostSource, /CodingWorkflowService|verificationTimeoutMs/, 'Host bundle must not load the retired workflow')
+assert.match(hostSource, /artifactRouting/, 'Host must inject document layout rules into bundled Skills')
+assert.match(hostSource, /content: content \+ "\\n\\n" \+ artifactRouting/, 'Host must apply artifact routing to skill content')
 
 const registered = []
 globalThis.window = {
