@@ -178,6 +178,19 @@ export function Launcher({
     finally { if (alive.current) setLayoutSaving(false) }
   }
   const available = input.phase === 'plain' && !pending && snapshot.status === 'ready'
+  // Fixed conversation utility, not a coding Skill: allow it before initialization.
+  // Never submit existing draft text or attachments as an accidental approval.
+  const confirmReady = available && !commandLock.current && latestReply.trim().length > 0
+    && entries.at(-1)?.failed !== true && input.draft.length === 0 && input.attachmentIds.length === 0
+  const confirmPrevious = () => {
+    if (!confirmReady || commandLock.current) return
+    const span = inputActions.captureInsertion()
+    if (span.start !== 0 || span.end !== 0) { setNotice(t('confirmDraft')); return }
+    if (!inputActions.insertText(t('confirmPrompt'), span)) { setNotice(t('draftChanged')); return }
+    setNotice('')
+    // DSH's public composer action submits the freshly inserted text once.
+    inputActions.submit()
+  }
   const insert = async (action: CodingAction) => {
     if (!available || commandLock.current) return
     setNotice('')
@@ -293,6 +306,10 @@ export function Launcher({
           onClick={() => { void insert(initializeAction) }} disabled={!available}>
           {t('setupLabel')}{!setupReady ? ' •' : ''}
         </button>
+        <button type="button" data-quick-confirm="previous-reply"
+          className={css.groupToggle} aria-label={t('confirmLabel')}
+          title={confirmReady ? t('confirmTooltip') : t('confirmUnavailable')}
+          disabled={!confirmReady} onClick={confirmPrevious}>{t('confirmLabel')}</button>
         <button type="button" className={css.groupToggle} onClick={startCommonEdit}
           disabled={Boolean(commonEdit) || Boolean(invalid) || layoutSaving || snapshot.status !== 'ready' || !snapshot.writable || snapshot.revision === undefined}>{t('editCommon')}</button>
       </div>}
