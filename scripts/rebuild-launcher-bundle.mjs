@@ -110,8 +110,11 @@ if (!globalName) throw new Error('Missing launcher config global')
 replaceRegion('index', compile('src/client/index.ts', '').replace(/\bLAUNCHER_CONFIG_GLOBAL\b/g, JSON.stringify(globalName)))
 // The helpers must be evaluated before either component reads them.
 const helpers = compile('src/client/launcher-layout.ts', '')
+const setupHelpers = compile('src/client/setup-readiness.ts', '')
 const settingsMarker = '\t\t//#region lib/types/client/Launcher.js\n'
 const previousHelper = '\t\t//#region lib/types/client/launcher-layout.js\n'
+const previousSetup = '\t\t//#region lib/types/client/setup-readiness.js\n'
+if (bundle.includes(previousSetup)) bundle = cutBefore(bundle, previousSetup, '\t\t//#region lib/types/client/Launcher.js\n', 'existing setup helpers')
 if (bundle.includes(previousHelper)) {
   const i = bundle.indexOf(previousHelper)
   const end = bundle.indexOf('\t\t//#endregion', i + previousHelper.length)
@@ -121,12 +124,15 @@ if (bundle.includes(previousHelper)) {
 bundle = expectReplace(bundle, settingsMarker,
   '\t\t//#region lib/types/client/launcher-layout.js\n' +
   helpers.trimEnd().split('\n').map(line => '\t\t' + line).join('\n') +
+  '\n\t\t//#endregion\n' +
+  '\t\t//#region lib/types/client/setup-readiness.js\n' +
+  setupHelpers.trimEnd().split('\n').map(line => '\t\t' + line).join('\n') +
   '\n\t\t//#endregion\n' + settingsMarker, 'launcher module anchor')
 bundle = cutIfPresent(bundle, '\t\t//#region lib/types/client/WorkflowPanel.js\n', '\t\t//#region lib/types/client/Launcher.js\n', 'retired workflow panel')
 replaceRegion('Launcher', compile('src/client/Launcher.tsx', 'Launcher_module_css_default'))
 replaceRegion('Settings', compile('src/client/Settings.tsx', 'Settings_module_css_default'))
 appendCss('xbJU_q', 'src/client/Launcher.module.css', 'css$1', 'Launcher_module_css_default', [
-  'groupToggles', 'groupControls', 'groupToggleLabel', 'groupToggle', 'groupToggleActive',
+  'groupToggles', 'groupControls', 'groupToggleLabel', 'groupToggle', 'groupToggleActive', 'setupRequired',
   'actionGroup', 'groupHeader', 'locked', 'hideGroup', 'commonEditor', 'commonChoices', 'commonChoiceGroup', 'commonChoice',
   'measureRow', 'history', 'historyTitle', 'historyList', 'historyItem',
 ])
@@ -173,6 +179,10 @@ if (!declarations.includes('    saveConfiguration:')) declarations = expectRepla
 if (!declarations.includes('    saveLayout:')) declarations = expectReplace(declarations, '    fetchSkillNames: () => Promise<readonly string[]>;',
   '    fetchSkillNames: () => Promise<readonly string[]>;\n    saveLayout: (json: string, revision?: number) => Promise<boolean>;',
   'launcher interface')
+if (!declarations.includes('    projectRoot: string | undefined;')) declarations = expectReplace(declarations,
+  '    fetchSkillNames: () => Promise<readonly string[]>;',
+  '    fetchSkillNames: () => Promise<readonly string[]>;\n    projectRoot: string | undefined;\n    checkProjectSetup: () => Promise<import("./setup-readiness.js").ProjectSetupReport>;',
+  'setup checker injection')
 // The withdrawn execution mode leaves no injected goal hook or mode command.
 declarations = declarations
   .replace(/^import type \{ GoalRef \} from '@deepseek-ai\/dsh-goal\/client';\n/m, '')
@@ -185,7 +195,7 @@ if (/WorkflowMode|GoalRef|pauseWorkflow|resumeWorkflow|setMode/.test(declaration
 write('lib/types/client/index.d.ts', declarations)
 // Keep portable generated modules and public layout types aligned with the shipped UI.
 const portable = ts.createProgram([
-  'actions', 'launcher-layout', 'locales', 'contextual-actions',
+  'actions', 'launcher-layout', 'locales', 'contextual-actions', 'setup-readiness',
 ].map(name => resolve(root, 'src/client/' + name + '.ts')), {
   target: ts.ScriptTarget.ES2022,
   module: ts.ModuleKind.ESNext,
