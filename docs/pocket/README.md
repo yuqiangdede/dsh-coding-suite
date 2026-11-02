@@ -1,6 +1,6 @@
 # Pocket — project knowledge map
 
-Pocket is the canonical Markdown home for this project's requirements, decisions, design, architecture, task knowledge, and pitfalls. The Git repository is the version history; no RAG index is required.
+本仓库已有的 Pocket 文档继续作为相应主题的权威来源。**Pocket 主要承担知识导航与缺失主题补位，不要求将现有需求、设计、接口和运维文件复制或迁移进来。** 其他目标项目优先复用它们已确认的文档目录与知识索引；Git 保存版本历史，小型项目不需要 RAG。参见 [文档单一权威位置协议](../../assets/skills/_shared/DOCUMENT_AUTHORITY.md)。
 
 ## Always read
 
@@ -8,7 +8,7 @@ Pocket is the canonical Markdown home for this project's requirements, decisions
 
 ## Select documents by task
 
-| Task/trigger | Canonical location | Required next read |
+| Task/trigger | Existing authority / fallback location | Required next read |
 | --- | --- | --- |
 | Clarify or freeze requirements | `requirements/` | Relevant feature requirements, then acceptance criteria |
 | Implement or review a feature | `requirements/`, `specs/`, `design/` | Current spec and acceptance, then related ADR |
@@ -16,9 +16,10 @@ Pocket is the canonical Markdown home for this project's requirements, decisions
 | Resolve a domain term or naming conflict | `meta/glossary.md` | Term entry and related ADR |
 | Investigate a bug or migration | `pitfalls/` | Relevant incident or migration record |
 | Track current work | GitHub issues ([tracker](../agents/issue-tracker.md)); local notes in `tasks/` | Relevant issue or task note |
+| Deployment, operations or project handoff | Existing runbook/deployment docs first; `operations/` only if missing | Current version, run instructions and recovery notes |
 | Manage skills, prompt sources, local changes or upstream upgrades | [Skill 与提示词管理台账](meta/skills-prompts.md) | Source/version inventory, change records and upgrade procedure |
 
-Only link to files that actually exist. No legacy paths are pending migration.
+Only link to files that actually exist. The table's directory names without links are fallback categories, not a command to create empty folders. **本仓库目前没有待迁移的既有权威文档；未来如发现非 Pocket 文档成为某主题的权威，应在这里列出真实路径，继续原位置维护。**
 
 ## Knowledge status
 
@@ -52,4 +53,4 @@ Create category documents and `meta/glossary.md` lazily when a confirmed fact ne
 
 ## Maintenance
 
-Review affected entries after requirement/design changes and significant PRs. Run `/pocket-maintenance` monthly or when duplication, contradictory instructions, or stale pointers appear.
+Review affected entries after requirement/design changes and significant PRs. Run `/pocket-maintenance` monthly or when duplication, contradictory instructions, or stale pointers appear. Maintenance audits the active index **and linked authoritative files outside Pocket**; no automatic cleanup is installed.

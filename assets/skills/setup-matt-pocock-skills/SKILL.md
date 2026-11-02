@@ -10,11 +10,11 @@ Scaffold the per-repo configuration that the engineering skills assume:
 
 - **Issue tracker**: where issues live (GitHub by default; local markdown is also supported out of the box)
 - **Triage labels**: the strings used for the five canonical triage roles
-- **Project knowledge**: a `docs/pocket/` knowledge map with task-triggered references, plus domain documentation rules and safe coexistence with legacy glossaries and ADRs
+- **Project knowledge**: an existing-documents-first authoritative map (reusing existing indexes if available; Pocket only as index/fallback), plus domain documentation rules and safe coexistence with existing glossaries and ADRs
 
 This is a prompt-driven skill, not a deterministic script. Explore, present what you found, confirm with the user, then write.
 
-**Fork-specific Pocket extension:** Apply [Pocket setup conventions](../_shared/POCKET_SETUP.md) while performing the existing steps below. There is no separate Pocket initializer. Pocket is a Markdown knowledge layout with progressive disclosure, **not** an RAG index.
+**Fork-specific Pocket extension:** Apply [single-authority document routing](../_shared/DOCUMENT_AUTHORITY.md) before [Pocket setup conventions](../_shared/POCKET_SETUP.md) while performing the existing steps below. There is no separate Pocket initializer. Pocket is a lightweight Markdown index and missing-topic fallback, **not** an RAG index or a mandatory parallel document tree.
 
 ## Process
 
@@ -27,7 +27,7 @@ Look at the current repo to understand its starting state. Read whatever exists;
 - `GLOSSARY.md` and `GLOSSARY-MAP.md` at the repo root
 - `docs/adr/` and any `src/*/docs/adr/` directories
 - `docs/agents/`: does this skill's prior output already exist?
-- `docs/pocket/`: does its README, knowledge policy, active requirements, design, or ADRs already exist? Identify which location is currently authoritative before changing paths.
+- Existing project documentation: check `docs/README.md`, `docs/pocket/`, `docs/Requirements/`, `docs/Design/`, `docs/adr/`, `knowledge/`, and project-specific requirement, interface, deployment and operations locations. Inspect real content/status and any knowledge policy; identify authoritative files **per topic**, not just by directory name.
 - Optional Graphify code navigation: check whether the `graphify` executable and `graphify-out/graph.json` exist. Report availability and offer the `graphify-navigation` skill for explicit setup; do not install, build, start a watcher, or modify hooks as part of this diagnostic.
 - `.scratch/`: a sign that a local-markdown issue tracker convention is already in use
 - Is the `triage` skill installed? (a `triage` skill folder alongside this one, or `triage` in your available skills.) This decides whether Section B runs at all.
@@ -60,9 +60,9 @@ If it is installed, ask exactly one question:
 
 The defaults are the five canonical roles, each label string equal to its name: `needs-triage`, `needs-info`, `ready-for-agent`, `ready-for-human`, `wontfix`. On **yes**, write them as-is. Only if the user says no, usually because their tracker already uses other names (e.g. `bug:triage` for `needs-triage`), collect the overrides so `triage` applies existing labels instead of creating duplicates.
 
-**Section C: Domain docs and Pocket.** This Fork defaults new project knowledge to **`docs/pocket/`**, using the conventions and templates in [Pocket setup conventions](../_shared/POCKET_SETUP.md). Keep the established tracker and triage configuration above. For a new single-context project, initialize only the small index and policy files; create glossary, requirements, ADRs, and other category documents lazily as facts are confirmed. For a genuine monorepo, retain one Pocket root but add context-specific index pointers as needed (no separate knowledge root).
+**Section C: Domain docs and Pocket.** First apply [single-authority document routing](../_shared/DOCUMENT_AUTHORITY.md). Map each theme (requirements, design, ADR, glossary, interface, operations) to its **existing authoritative file**. If an index already exists, update it rather than create a duplicate. If no index exists, propose a minimal Pocket index and policy on approval; even then existing documents stay where they are. For a genuinely large monorepo, use module links within the same active index, not a separate knowledge root.
 
-If a project already has `GLOSSARY.md`, `GLOSSARY-MAP.md`, `docs/adr/`, or other authoritative documentation, **do not silently relocate or copy it**. Show the existing authority and proposed migration, preserve it until explicitly approved, and list legacy paths in the Pocket index. Write `docs/agents/domain.md` with the actual project-specific canonical paths and backward-compatibility exceptions. Some imported Skills may still contain legacy path/output assumptions; inspect the actual bundled version before claiming its behavior follows the new layout. `to-spec` output follows the configured issue tracker.
+For a new project without document conventions, `docs/pocket/` may supply missing topic documents lazily. If existing documents such as `GLOSSARY.md`, `GLOSSARY-MAP.md`, `docs/adr/`, `docs/Requirements/` or `docs/Design/` are authoritative, **do not silently relocate, duplicate or reclassify them as legacy**. Report paths and status in the selected index and write `docs/agents/domain.md` with the actual paths. A migration requires a separate approved decision. Some imported Skills may still contain legacy path/output assumptions; inspect the bundled version before claiming full integration. `to-spec` output follows the issue tracker.
 
 ### 3. Confirm and edit
 
@@ -72,7 +72,7 @@ Show the user a draft of:
 
 - The `## Agent skills` block to add or update in each loaded root instruction file (`CLAUDE.md` and/or `AGENTS.md`; see step 4 for selection rules)
 - The contents of `docs/agents/issue-tracker.md`, `docs/agents/domain.md`, and `docs/agents/triage-labels.md` (the last only when `triage` is installed)
-- The small `docs/pocket/README.md`, `docs/pocket/meta/knowledge-policy.md`, and root Agent instruction pointer. Include any known legacy-to-Pocket migration decisions.
+- The existing index update **or**, if no index exists, the proposed small `docs/pocket/README.md` and policy, plus the root Agent instruction pointer to the actual index. Include authoritative existing paths and any approved migration decisions.
 
 Let them edit before writing.
 
@@ -109,7 +109,7 @@ The block:
 
 ### Project knowledge (Pocket)
 
-Before working on project requirements, design, or code, read `docs/pocket/README.md` and its task-specific pointers; see `docs/pocket/meta/knowledge-policy.md` for canonical ownership, update, and maintenance rules. New or changed decisions belong in the location the Pocket index records as authoritative (Pocket, or a retained legacy authority pending migration), not solely in chat. If source, existing docs, or task instructions conflict, report the discrepancy rather than silently rewriting requirements.
+Before working on project requirements, design, or code, read `[actual project knowledge index]` and its task-specific pointers. Follow the documented authoritative locations for each topic; reuse existing requirements, designs, ADRs and operations files before considering `docs/pocket/` for missing topics. Write confirmed decisions to their authoritative files, not solely in chat. If source, existing docs, or task instructions conflict, report the discrepancy rather than silently rewriting requirements. Replace the bracketed placeholder with the actual index path.
 ```
 
 Include the `### Triage labels` sub-block, and write `docs/agents/triage-labels.md`, only when `triage` is installed and Section B ran. When it isn't, both are omitted.
@@ -126,8 +126,8 @@ Then write the docs files using the seed templates in this skill folder as a sta
 
 For "other" issue trackers, write `docs/agents/issue-tracker.md` from scratch using the user's description.
 
-Using [Pocket setup conventions](../_shared/POCKET_SETUP.md), create `docs/pocket/README.md` and `docs/pocket/meta/knowledge-policy.md` if absent. Create no empty category documents. Merge existing content without overwriting user decisions. Avoid dangling links and duplicate Agent instruction headings; handle `CLAUDE.md` symlinks without replacing them. Validate index links and changed files (`git diff --check` when available). Do not automatically install RAG, relocate legacy docs, or commit changes.
+Using [Pocket setup conventions](../_shared/POCKET_SETUP.md), **reuse the existing knowledge index first**. Create `docs/pocket/README.md` and a minimal policy only when no suitable index exists and that proposal is approved; an existing Pocket index may be updated without creating another. Do not create empty category documents or second copies of requirements/designs/operations. Merge existing content without overwriting user decisions. Avoid dangling links and duplicate Agent instruction headings; handle `CLAUDE.md` symlinks without replacing them. Show target file diffs and confirm before writes; validate index links and changed files (`git diff --check` when available). Do not automatically install RAG, relocate existing docs, or commit changes.
 
 ### 5. Done
 
-Tell the user the setup is complete and which engineering skills will now read from these files. Summarize Pocket entry paths, any still-authoritative legacy docs, and the imported-Skill compatibility limitations. Mention they can edit `docs/agents/*.md` and Pocket Markdown directly later; rerun setup only to revise the layout or tracker. Recommend `/pocket-maintenance` for later evidence-based cleanup.
+Tell the user the setup is complete and which engineering skills will now read from these files. Summarize the chosen knowledge index, the real per-topic authoritative paths (including existing non-Pocket files), any Pocket fallback, and imported-Skill compatibility limitations. Mention they can edit `docs/agents/*.md` and Pocket Markdown directly later; rerun setup only to revise the layout or tracker. Recommend `/pocket-maintenance` for later evidence-based cleanup.

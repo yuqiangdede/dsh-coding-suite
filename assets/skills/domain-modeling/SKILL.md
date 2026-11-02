@@ -9,7 +9,7 @@ Actively build and sharpen the project's domain model as you design: challenge t
 
 ## Knowledge location
 
-Read the target project's `AGENTS.md` and knowledge index before choosing paths. In this repository Pocket is canonical: use `docs/pocket/meta/glossary.md` for resolved terms and `docs/pocket/adr/` for accepted decisions, creating files lazily and updating the Pocket index. Do not create a second root glossary or `docs/adr/`. In another project, follow its own documented authority rather than imposing this layout.
+Read the target project's `AGENTS.md`/`CLAUDE.md`, existing glossary/ADR files and knowledge index before choosing paths; follow [single-authority document routing](../_shared/DOCUMENT_AUTHORITY.md). Use existing approved glossary and ADR locations in-place. **Only if a theme has no suitable authoritative home** create a missing file under the project's existing document category or, as last fallback, `docs/pocket/meta/glossary.md` / `docs/pocket/adr/`, and update the active index. Never create a second root glossary, another ADR collection or duplicate content. Show the proposed change diff and obtain confirmation before writing accepted knowledge.
 
 ## During the session
 
