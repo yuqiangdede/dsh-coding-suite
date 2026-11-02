@@ -82,6 +82,11 @@ export function registerCodingSuiteSkills(ctx: Context, config: CodingSuiteSkill
   }
   if (candidates.length === 0) throw new Error(`coding-suite: no skill directories found in ${assetRoot}`)
 
+  // Single appended routing rule applies to every bundled Skill, including callers
+  // that invoke Skills directly rather than via the Launcher.
+  const artifactRouting = readFileSync(
+    fileURLToPath(new URL('../assets/skills/_shared/ARTIFACT_LAYOUT.md', import.meta.url)), 'utf8',
+  ).trim()
   const provider: SkillProvider = {
     name: 'coding-suite',
     list: () => Promise.resolve(candidates),
@@ -89,7 +94,7 @@ export function registerCodingSuiteSkills(ctx: Context, config: CodingSuiteSkill
       const { rank: _rank, locator, ...summary } = candidate
       const raw = await readFile(locator as string, { encoding: 'utf8', signal: options.signal })
       const { content } = parseSkill(raw, locator as string)
-      return { ...summary, content }
+      return { ...summary, content: content + '\n\n' + artifactRouting }
     },
   }
 

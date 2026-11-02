@@ -10,6 +10,7 @@ Scaffold the per-repo configuration that the engineering skills assume:
 
 - **Issue tracker**: where issues live (GitHub by default; local markdown is also supported out of the box)
 - **Triage labels**: the strings used for the five canonical triage roles
+- **Document and intermediate-artifact routing**: one project-wide `docs/agents/document-layout.md` and a real initialized task-work directory (with README). All output-producing skills share the same routes.
 - **Project knowledge**: an existing-documents-first authoritative map (reusing existing indexes if available; Pocket only as index/fallback), plus domain documentation rules and safe coexistence with existing glossaries and ADRs
 
 This is a prompt-driven skill, not a deterministic script. Explore, present what you found, confirm with the user, then write.
@@ -27,6 +28,7 @@ Look at the current repo to understand its starting state. Read whatever exists;
 - `GLOSSARY.md` and `GLOSSARY-MAP.md` at the repo root
 - `docs/adr/` and any `src/*/docs/adr/` directories
 - `docs/agents/`: does this skill's prior output already exist?
+- Existing path contract: check `docs/agents/document-layout.md`, the registered intermediate work-root README, and historical default output folders from bundled Skills. Inspect existing files without migrating them.
 - Existing project documentation: check `docs/README.md`, `docs/pocket/`, `docs/Requirements/`, `docs/Design/`, `docs/adr/`, `knowledge/`, and project-specific requirement, interface, deployment and operations locations. Inspect real content/status and any knowledge policy; identify authoritative files **per topic**, not just by directory name.
 - Optional Graphify code navigation: check whether the `graphify` executable and `graphify-out/graph.json` exist. Report availability and offer the `graphify-navigation` skill for explicit setup; do not install, build, start a watcher, or modify hooks as part of this diagnostic.
 - `.scratch/`: a sign that a local-markdown issue tracker convention is already in use
@@ -64,6 +66,8 @@ The defaults are the five canonical roles, each label string equal to its name: 
 
 For a new project without document conventions, `docs/pocket/` may supply missing topic documents lazily. If existing documents such as `GLOSSARY.md`, `GLOSSARY-MAP.md`, `docs/adr/`, `docs/Requirements/` or `docs/Design/` are authoritative, **do not silently relocate, duplicate or reclassify them as legacy**. Report paths and status in the selected index and write `docs/agents/domain.md` with the actual paths. A migration requires a separate approved decision. Some imported Skills may still contain legacy path/output assumptions; inspect the bundled version before claiming full integration. `to-spec` output follows the issue tracker.
 
+**Section D: Unified document and intermediate outputs.** Always complete after sections A–C. Inventory requirements/PRD, designs/ADRs, API/database, acceptance/handover/operations, external issue tracker, Gate/review records, intermediate extraction and conversion caches. Draft `docs/agents/document-layout.md` mapping each category to existing authoritative files or a fallback; choose a single task-specific intermediate work root. Recommend `docs/_work/` unless an established project work directory is preferable. Flag Skills whose historical output defaults disagree. Do not migrate old documents or create new folders until the user confirms the proposed file list and changes.
+
 ### 3. Confirm and edit
 
 Call the model-invocable **`writing-for-agents` Skill** before drafting. Apply its pointer-writing, progressive disclosure, single-owner, and pruning guidance to the Agent instruction block, the Pocket index, and the domain-document pointers. When that Skill cannot be loaded, state the limitation instead of claiming it ran.
@@ -71,7 +75,7 @@ Call the model-invocable **`writing-for-agents` Skill** before drafting. Apply i
 Show the user a draft of:
 
 - The `## Agent skills` block to add or update in each loaded root instruction file (`CLAUDE.md` and/or `AGENTS.md`; see step 4 for selection rules)
-- The contents of `docs/agents/issue-tracker.md`, `docs/agents/domain.md`, and `docs/agents/triage-labels.md` (the last only when `triage` is installed)
+- The full proposed contents of `docs/agents/document-layout.md` and its chosen work-root `README.md` (including actual location, any pre-existing files and conflicts), plus `docs/agents/issue-tracker.md`, `docs/agents/domain.md`, and `docs/agents/triage-labels.md` (the last only when `triage` is installed)
 - The existing index update **or**, if no index exists, the proposed small `docs/pocket/README.md` and policy, plus the root Agent instruction pointer to the actual index. Include authoritative existing paths and any approved migration decisions.
 
 Let them edit before writing.
@@ -107,6 +111,10 @@ The block:
 
 [one-line summary of active domain docs and legacy exceptions]. See `docs/agents/domain.md`.
 
+### Document and intermediate artifact layout
+
+Before creating, reading, or relying on any document, report, Gate result or intermediate file, read `docs/agents/document-layout.md` and its knowledge index. Reuse existing authorized formal destinations. Save intermediate files only under the mapped work-root's task subdirectory. Never override this layout with a hardcoded Skill default.
+
 ### Project knowledge (Pocket)
 
 Before working on project requirements, design, or code, read `[actual project knowledge index]` and its task-specific pointers. Follow the documented authoritative locations for each topic; reuse existing requirements, designs, ADRs and operations files before considering `docs/pocket/` for missing topics. Write confirmed decisions to their authoritative files, not solely in chat. If source, existing docs, or task instructions conflict, report the discrepancy rather than silently rewriting requirements. Replace the bracketed placeholder with the actual index path.
@@ -126,8 +134,10 @@ Then write the docs files using the seed templates in this skill folder as a sta
 
 For "other" issue trackers, write `docs/agents/issue-tracker.md` from scratch using the user's description.
 
+After the user approves the preview, adapt the bundled [layout template](./document-layout.md) and [work directory README](./work-readme.md). Create `docs/agents/document-layout.md` and the selected work-root `README.md`, making that directory if absent; keep the existing root instructions' pointers accurate. Never claim setup complete until both actual files are present and the layout refers to the project's correct knowledge index. Do not create unrelated business code or install missing Skills without separate permission.
+
 Using [Pocket setup conventions](../_shared/POCKET_SETUP.md), **reuse the existing knowledge index first**. Create `docs/pocket/README.md` and a minimal policy only when no suitable index exists and that proposal is approved; an existing Pocket index may be updated without creating another. Do not create empty category documents or second copies of requirements/designs/operations. Merge existing content without overwriting user decisions. Avoid dangling links and duplicate Agent instruction headings; handle `CLAUDE.md` symlinks without replacing them. Show target file diffs and confirm before writes; validate index links and changed files (`git diff --check` when available). Do not automatically install RAG, relocate existing docs, or commit changes.
 
 ### 5. Done
 
-Tell the user the setup is complete and which engineering skills will now read from these files. Summarize the chosen knowledge index, the real per-topic authoritative paths (including existing non-Pocket files), any Pocket fallback, and imported-Skill compatibility limitations. Mention they can edit `docs/agents/*.md` and Pocket Markdown directly later; rerun setup only to revise the layout or tracker. Recommend `/pocket-maintenance` for later evidence-based cleanup.
+Report the verified layout path, existing formal authorities, actual intermediate work directory/README, optional temporary-cache root and outstanding Skill output-path conflicts. If the layout or work root has not been created/verified, report setup as incomplete. Tell the user the setup is complete and which engineering skills will now read from these files. Summarize the chosen knowledge index, the real per-topic authoritative paths (including existing non-Pocket files), any Pocket fallback, and imported-Skill compatibility limitations. Mention they can edit `docs/agents/*.md` and Pocket Markdown directly later; rerun setup only to revise the layout or tracker. Recommend `/pocket-maintenance` for later evidence-based cleanup.
