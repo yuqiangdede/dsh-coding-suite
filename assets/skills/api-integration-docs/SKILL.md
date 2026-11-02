@@ -18,7 +18,7 @@ description: 从源码反推、项目需求与设计文档、其他参考文档�
 | 源码反推 | 项目根目录或多个组件路径、分支/版本、纳入模块；允许明确无源码 |
 | 项目需求与设计 | 项目内 docs、README、ADR、需求、设计、接口约定的位置；允许与源码目录一起提供 |
 | 其他参考文档 | 文件、目录、附件或可访问链接；标记为协议依据、内容补充、格式模板或兼用 |
-| 输出与范围 | 目标系统、调用方向、当前实现或目标契约、输出目录；未指定时默认当前实现、外部系统输入本系统、目标项目下 docs/integration/ |
+| 输出与范围 | 目标系统、调用方向、当前实现或目标契约、输出目录；未指定时默认当前实现、外部系统输入本系统、输出路径按项目 docs/agents/document-layout.md 的接口与数据库权威路径确定；已有目录按真实大小写复用 |
 
 三类来源均支持独立使用或组合使用，不要求三类必须齐备。区分明确无材料、尚未提供、不可读取；缺失会影响协议判定时追问，继续分析可独立处理的部分。仅有文档时称“文档约定，未核验实现”，不能宣称完成源码反推。没有目标项目目录时先确定输出位置，不向 skill 自身目录生成项目文档。
 
@@ -26,7 +26,7 @@ description: 从源码反推、项目需求与设计文档、其他参考文档�
 
 ## 2. 建立接口资产清单
 
-Within the confirmed project scope, discover and read existing requirements, overall design and outline design documents as additional references alongside source code, relevant SQL scripts and user-supplied reference documents. Check the project root and documentation directories (including `docs/Requirements/` and `docs/Design/`), then follow relevant document links. Use requirements for business intent and authorization constraints, overall design for integration boundaries and direction, and outline design for interface contracts, data semantics, state transitions and error handling. Reuse project-local documents without requiring a separate upload. These documents are optional: record missing or unreadable sources and their impact without requiring another document to be generated first. Include their paths, versions, scope and purpose in the source inventory, reconcile differences under the existing multi-source rules, and keep documented target contracts distinct from implemented endpoints and runtime verification.
+Within the confirmed project scope, discover and read existing requirements, overall design and outline design documents as additional references alongside source code, relevant SQL scripts and user-supplied reference documents. Follow the verified document layout, knowledge index and existing authoritative requirement/design files; do not assume legacy directory casing. Use requirements for business intent and authorization constraints, overall design for integration boundaries and direction, and outline design for interface contracts, data semantics, state transitions and error handling. Reuse project-local documents without requiring a separate upload. These documents are optional: record missing or unreadable sources and their impact without requiring another document to be generated first. Include their paths, versions, scope and purpose in the source inventory, reconcile differences under the existing multi-source rules, and keep documented target contracts distinct from implemented endpoints and runtime verification.
 
 有源码时读取 [源码反推指南](references/source-analysis.md)，按实际注册的外部输入边界盘点；有项目文档或其他参考文档时读取 [多来源融合规则](references/source-reconciliation.md)，提取接口契约与业务约束。
 
