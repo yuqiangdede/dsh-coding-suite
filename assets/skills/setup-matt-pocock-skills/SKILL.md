@@ -13,7 +13,7 @@ Scaffold the per-repo configuration that the engineering skills assume:
 - **Document and intermediate-artifact routing**: one project-wide `docs/agents/document-layout.md` and a real initialized task-work directory (with README). All output-producing skills share the same routes.
 - **Project knowledge**: an existing-documents-first authoritative map (reusing existing indexes if available; Pocket only as index/fallback), plus domain documentation rules and safe coexistence with existing glossaries and ADRs
 
-This is a prompt-driven skill, not a deterministic script. Explore, present what you found, confirm with the user, then write.
+This is a prompt-driven Skill supported by a safe reconciliation script. Read [automatic initialization decisions](../_shared/SETUP_AUTO_DECISIONS.md) before any setup work: **verify the project, auto-apply unambiguous non-destructive recommended fixes, and ask only for real exceptions**. This does not authorize editing approved business documents, deleting data, installing software or changing external systems.
 
 **Fork-specific Pocket extension:** Apply [single-authority document routing](../_shared/DOCUMENT_AUTHORITY.md) before [Pocket setup conventions](../_shared/POCKET_SETUP.md) while performing the existing steps below. There is no separate Pocket initializer. Pocket is a lightweight Markdown index and missing-topic fallback, **not** an RAG index or a mandatory parallel document tree.
 
@@ -35,9 +35,9 @@ Look at the current repo to understand its starting state. Read whatever exists;
 - Is the `triage` skill installed? (a `triage` skill folder alongside this one, or `triage` in your available skills.) This decides whether Section B runs at all.
 - Monorepo signals: a `pnpm-workspace.yaml`, a `workspaces` field in `package.json`, or a populated `packages/*` with its own `src/`. These are present only in a genuinely large multi-package repo; their absence means single-context, which is almost every repo.
 
-### 2. Present findings and ask
+### 2. Present findings, auto-apply safe defaults and ask only for exceptions
 
-Summarise what's present and what's missing. Then take the sections in order. One section, one answer, then the next.
+Summarise verified present/missing facts, classify each required change as AUTO or NEEDS_DECISION under SETUP_AUTO_DECISIONS.md, and automatically carry out safe recommended choices. Gather only genuinely ambiguous or high-impact decisions in one concise question; do not ask the user to approve an obvious default every time.
 
 Lead each section with the recommended answer so the user can accept it in a word. Give a one-line explainer only when the choice genuinely branches; skip the section entirely when exploration already settled it (Section B when `triage` isn't installed, Section C when there's no monorepo).
 
@@ -45,7 +45,7 @@ Lead each section with the recommended answer so the user can accept it in a wor
 
 > Explainer: The "issue tracker" is where issues live for this repo. Skills like `to-tickets`, `triage`, and `to-spec` read from and write to it. They need to know whether to call `gh issue create`, write a markdown file under `.scratch/`, or follow some other workflow you describe. Pick the place you actually track work for this repo.
 
-Default posture: these skills were designed for GitHub. If a `git remote` points at GitHub, propose that. If a `git remote` points at GitLab (`gitlab.com` or a self-hosted host), propose GitLab. Otherwise (or if the user prefers), offer:
+Auto-select the only clearly indicated Issue Tracker (GitHub/GitLab from an unambiguous remote, otherwise local Markdown in a new remote-less project). Ask only if existing project conventions conflict; writing remote labels or issues still requires separate permission. Default posture: these skills were designed for GitHub. If a `git remote` points at GitHub, propose that. If a `git remote` points at GitLab (`gitlab.com` or a self-hosted host), propose GitLab. Otherwise (or if the user prefers), offer:
 
 - **GitHub**: issues live in the repo's GitHub Issues (uses the `gh` CLI)
 - **GitLab**: issues live in the repo's GitLab Issues (uses the [`glab`](https://gitlab.com/gitlab-org/cli) CLI)
@@ -56,7 +56,7 @@ Record the choice in `docs/agents/issue-tracker.md`. The GitHub and GitLab templ
 
 **Section B: Triage label vocabulary.** Skip this section entirely if the `triage` skill isn't installed (exploration told you), since an uninstalled skill needs no labels.
 
-If it is installed, ask exactly one question:
+If installed and no conflicting label vocabulary already exists, use canonical defaults automatically and skip the approval question. Only if there is a real conflict, ask one focused question:
 
 > Do you want to keep the default triage labels? (recommended: **yes**)
 
@@ -66,9 +66,9 @@ The defaults are the five canonical roles, each label string equal to its name: 
 
 For a new project without document conventions, `docs/pocket/` may supply missing topic documents lazily. If existing documents such as `GLOSSARY.md`, `GLOSSARY-MAP.md`, `docs/adr/`, `docs/Requirements/` or `docs/Design/` are authoritative, **do not silently relocate, duplicate or reclassify them as legacy**. Report paths and status in the selected index and write `docs/agents/domain.md` with the actual paths. A migration requires a separate approved decision. Some imported Skills may still contain legacy path/output assumptions; inspect the bundled version before claiming full integration. `to-spec` output follows the issue tracker.
 
-**Section D: Unified document and intermediate outputs.** Always complete after sections A–C. Inventory requirements/PRD, designs/ADRs, API/database, acceptance/handover/operations, external issue tracker, Gate/review records, intermediate extraction and conversion caches. Draft `docs/agents/document-layout.md` mapping each category to existing authoritative files or a fallback; choose a single task-specific intermediate work root. Recommend `docs/_work/` unless an established project work directory is preferable. Flag Skills whose historical output defaults disagree. Do not migrate old documents or create new folders until the user confirms the proposed file list and changes.
+**Section D: Unified document and intermediate outputs.** Always complete after sections A–C. Inventory requirements/PRD, designs/ADRs, API/database, acceptance/handover/operations, external issue tracker, Gate/review records, intermediate extraction and conversion caches. Draft `docs/agents/document-layout.md` mapping each category to existing authoritative files or a fallback; choose a single task-specific intermediate work root. Recommend `docs/_work/` unless an established project work directory is preferable. Automatically resolve historical Skill default-path disagreements in favor of the project's already verified document layout, without creating a competing folder or migrating documents. Create missing setup-only layout and work-root README automatically when the safe criteria are satisfied; migration, collision, or editing approved documents still needs explicit approval.
 
-### 3. Confirm and edit
+### 3. Apply safe recommendations, confirm only exceptions
 
 Call the model-invocable **`writing-for-agents` Skill** before drafting. Apply its pointer-writing, progressive disclosure, single-owner, and pruning guidance to the Agent instruction block, the Pocket index, and the domain-document pointers. When that Skill cannot be loaded, state the limitation instead of claiming it ran.
 
@@ -78,7 +78,7 @@ Show the user a draft of:
 - The full proposed contents of `docs/agents/document-layout.md` and its chosen work-root `README.md` (including actual location, any pre-existing files and conflicts), plus `docs/agents/issue-tracker.md`, `docs/agents/domain.md`, and `docs/agents/triage-labels.md` (the last only when `triage` is installed)
 - The existing index update **or**, if no index exists, the proposed small `docs/pocket/README.md` and policy, plus the root Agent instruction pointer to the actual index. Include authoritative existing paths and any approved migration decisions.
 
-Let them edit before writing.
+For AUTO cases, minimally edit setup metadata and report completed paths/diffs without a redundant approval request. For NEEDS_DECISION cases, show proposed content and await specific approval before writing that item.
 
 ### 4. Write
 
@@ -86,7 +86,7 @@ Let them edit before writing.
 
 - If `CLAUDE.md` exists, edit it.
 - Else if `AGENTS.md` exists, edit it.
-- If neither exists, ask the user which one to create; don't pick for them.
+- If neither exists, create AGENTS.md as the default safe root instruction file unless a project rule explicitly requires a different filename.
 
 Never create `AGENTS.md` when `CLAUDE.md` already exists (or vice versa); always edit the one that's already there.
 
@@ -122,7 +122,7 @@ Before working on project requirements, design, or code, read `[actual project k
 
 Include the `### Triage labels` sub-block, and write `docs/agents/triage-labels.md`, only when `triage` is installed and Section B ran. When it isn't, both are omitted.
 
-When Section B ran on GitHub or GitLab, create each configured label the tracker lacks (`gh label create` / `glab label create`).
+When Section B ran on GitHub or GitLab AND the user separately authorized remote label modifications, create each configured label the tracker lacks (`gh label create` / `glab label create`).
 
 Then write the docs files using the seed templates in this skill folder as a starting point:
 
@@ -134,9 +134,11 @@ Then write the docs files using the seed templates in this skill folder as a sta
 
 For "other" issue trackers, write `docs/agents/issue-tracker.md` from scratch using the user's description.
 
-After the user approves the preview, adapt the bundled [layout template](./document-layout.md) and [work directory README](./work-readme.md). Create `docs/agents/document-layout.md` and the selected work-root `README.md`, making that directory if absent; keep the existing root instructions' pointers accurate. Never claim setup complete until both actual files are present and the layout refers to the project's correct knowledge index. Do not create unrelated business code or install missing Skills without separate permission.
+For AUTO scaffolding, proceed after confirming that the files do not collide with valid existing content; for exceptions await explicit approval. Adapt the bundled [layout template](./document-layout.md) and [work directory README](./work-readme.md). Create `docs/agents/document-layout.md` and the selected work-root `README.md`, making that directory if absent; keep the existing root instructions' pointers accurate. Never claim setup complete until both actual files are present and the layout refers to the project's correct knowledge index. Do not create unrelated business code or install missing Skills without separate permission.
 
-Using [Pocket setup conventions](../_shared/POCKET_SETUP.md), **reuse the existing knowledge index first**. Create `docs/pocket/README.md` and a minimal policy only when no suitable index exists and that proposal is approved; an existing Pocket index may be updated without creating another. Do not create empty category documents or second copies of requirements/designs/operations. Merge existing content without overwriting user decisions. Avoid dangling links and duplicate Agent instruction headings; handle `CLAUDE.md` symlinks without replacing them. Show target file diffs and confirm before writes; validate index links and changed files (`git diff --check` when available). Do not automatically install RAG, relocate existing docs, or commit changes.
+Using [Pocket setup conventions](../_shared/POCKET_SETUP.md), **reuse the existing knowledge index first**. Create `docs/pocket/README.md` and a minimal policy only when no suitable index exists and no competing authoritative index exists; an existing Pocket index may be updated without creating another. Do not create empty category documents or second copies of requirements/designs/operations. Merge existing content without overwriting user decisions. Avoid dangling links and duplicate Agent instruction headings; handle `CLAUDE.md` symlinks without replacing them. Show a summary/diff after AUTO technical changes, confirm only exceptions before writing; validate index links and changed files (`git diff --check` when available). Do not automatically install RAG, relocate existing docs, or commit changes.
+
+**Safe README path correction:** inspect the selected repository's real directory names, then run the bundled `scripts/auto_reconcile.py <project-root> --apply-safe` to fix only uniquely verifiable case-only self-path typos in `docs/<directory>/README.md`. The script skips dirty files and ambiguous paths. Report its `applied`/`skipped` outcome; never claim it handled content that it did not change. Legacy defaults such as `docs/Requirements/` and `docs/pocket/handover/` are only fallback hints and must not override the project layout.
 
 ### 5. Done
 
