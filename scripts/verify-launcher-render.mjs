@@ -76,11 +76,11 @@ function visit(value) {
 visit(tree)
 const buttons = nodes.filter(x => x.type === 'button')
 const toggles = buttons.filter(x => typeof x.props['aria-pressed'] === 'boolean'
-  && ['groupCommon', 'groupRequirementsAnalysis', 'groupDevelopment', 'groupDocuments', 'groupOthers'].includes([x.props.children].flat().filter(value => typeof value === 'string').join('')))
+  && ['groupCommon', 'groupRequirementsAnalysis', 'groupDevelopment', 'groupDocuments', 'groupHandoverDocs', 'groupOthers'].includes([x.props.children].flat().filter(value => typeof value === 'string').join('')))
 assert.equal(buttons.some(x => x.props.children === 'manualMode'
   || x.props.children === 'autoMode' || x.props.children === 'autoPrepare'), false, 'the withdrawn mode controls must not render')
-assert.deepEqual(toggles.map(x => [x.props.children].flat().filter(value => typeof value === 'string').join('')), ['groupCommon', 'groupRequirementsAnalysis', 'groupDevelopment', 'groupDocuments', 'groupOthers'])
-assert.deepEqual(toggles.map(x => x.props['aria-pressed']), [true, true, true, false, false])
+assert.deepEqual(toggles.map(x => [x.props.children].flat().filter(value => typeof value === 'string').join('')), ['groupCommon', 'groupRequirementsAnalysis', 'groupDevelopment', 'groupDocuments', 'groupHandoverDocs', 'groupOthers'])
+assert.deepEqual(toggles.map(x => x.props['aria-pressed']), [true, true, true, false, false, false])
 assert.equal(buttons.filter(x => x.props.children === '编码').length, 2)
 assert.equal(buttons.filter(x => x.props.children === '开发').length, 0)
 assert.equal(buttons.filter(x => x.props.children === 'Bug排查').length, 2, 'common and development both expose diagnosis')
