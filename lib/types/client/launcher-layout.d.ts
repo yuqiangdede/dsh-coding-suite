@@ -13,6 +13,10 @@ export declare const LAUNCHER_GROUPS: readonly [{
     readonly label: "groupDocuments";
     readonly actionIds: readonly ["api-docs", "requirements", "overview", "outline", "database", "doc-merge", "docx"];
 }, {
+    readonly id: "handover-docs";
+    readonly label: "groupHandoverDocs";
+    readonly actionIds: readonly ["handover-overview", "handover-features", "handover-flows", "handover-troubleshooting", "handover-maintain"];
+}, {
     readonly id: "others";
     readonly label: "groupOthers";
     readonly actionIds: readonly ["initialize", "graphify-navigation", "graphify-refresh", "ask", "health-acceptance", "doc-supplement", "tdd", "prototype", "architecture", "domain", "research", "retro", "handoff", "image", "prd-writing", "requirement-review"];
