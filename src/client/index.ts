@@ -199,7 +199,7 @@ export function apply(ctx: ClientContext): void {
           const skills = await ctx.remote.skills.list({ sessionId })
           if (!skills.ok) throw new Error(skills.error.message)
           return evaluateProjectSetup(async path => {
-            const result = await ctx.remote.workspaceFiles.read(sessionId, path, { offset: 1, limit: 300 })
+            const result = await ctx.remote.workspaceFiles.read(sessionId, path, { offset: 1, limit: 300 }, new AbortController().signal)
             if (!result.ok) {
               if (result.error.code === 'workspace-file/not-found') return null
               throw new Error(result.error.message)
