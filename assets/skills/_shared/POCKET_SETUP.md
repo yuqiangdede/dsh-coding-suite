@@ -6,7 +6,7 @@ Copy and adapt only the relevant sections; paths below are **inside the target p
 
 Before authoring any project file, apply [shared artifact routing](ARTIFACT_LAYOUT.md). Initialization MUST propose a real `docs/agents/document-layout.md`, enumerate existing authoritative paths by topic, and register a task-work root plus cache root. Adapt the [layout template](../setup-matt-pocock-skills/document-layout.md) to the *actual* project; it is a routing table, not a second index. For an approved new work directory use `docs/_work/` by default, or reuse an existing designated directory.
 
-After preview and **explicit user confirmation**, write the layout file and a [work-root README](../setup-matt-pocock-skills/work-readme.md) at the registered directory (creating that one directory). If it exists, preserve and integrate its contents. Root Agent instructions must link to the layout. Do not create every unused category directory or relocate existing formal docs. Task subdirectories `<task-id>/` are created only when producing files; plain discussions need no files.
+For uniquely verified non-destructive setup changes, adopt the default automatically under [safe setup decisions](SETUP_AUTO_DECISIONS.md), then write the layout file and a [work-root README](../setup-matt-pocock-skills/work-readme.md) at the registered directory (creating that one directory). If it exists, preserve and integrate its contents. Root Agent instructions must link to the layout. Do not create every unused category directory or relocate existing formal docs. Task subdirectories `<task-id>/` are created only when producing files; plain discussions need no files.
 
 ## Root Agent instruction: one source
 
