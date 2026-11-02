@@ -56,6 +56,8 @@ jobs:
           if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
           python -m unittest discover -s assets/skills/_shared/project-handover/scripts -p test_handover_write_guard.py
           if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          python -m unittest discover -s assets/skills/setup-matt-pocock-skills/scripts -p test_auto_reconcile.py
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
       - name: Commit generated runtime files
         if: github.event_name == 'push'
         shell: pwsh
