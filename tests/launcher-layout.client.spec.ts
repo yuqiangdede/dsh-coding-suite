@@ -11,14 +11,14 @@ describe('launcher business groups', () => {
     const layout = defaultLauncherLayout(actions)
     expect(layout.commonActionIds).toEqual([...DEFAULT_COMMON_IDS])
     expect(LAUNCHER_GROUPS.map(group => group.id)).toEqual(['requirements-analysis', 'development', 'documents', 'handover-docs', 'others'])
-    expect(LAUNCHER_GROUPS.map(group => group.actionIds.length)).toEqual([11, 15, 7, 5, 16])
+    expect(LAUNCHER_GROUPS.map(group => group.actionIds.length)).toEqual([11, 15, 7, 5, 15])
     expect(actionsForGroup('common', actions, layout).map(a => a.id)).toEqual([...DEFAULT_COMMON_IDS])
     expect(actionsForGroup('development', actions, layout).map(a => a.id)).toEqual([
       'discussion', 'visual', 'spec', 'plan', 'execute', 'bug', 'add-logs', 'analyze-logs', 'review', 'review-fix',
       'compile', 'health-acceptance', 'commit', 'doc-supplement', 'remote-debug',
     ])
     expect(actionsForGroup('documents', actions, layout)).toHaveLength(7)
-    expect(actionsForGroup('others', actions, layout)).toHaveLength(16)
+    expect(actionsForGroup('others', actions, layout)).toHaveLength(15)
     expect(actionsForGroup('common', actions, layout)[0]).toBe(actions.find(a => a.id === 'bug'))
   })
   it('defaults requirements and development to visible and preserves independent group switches', () => {
