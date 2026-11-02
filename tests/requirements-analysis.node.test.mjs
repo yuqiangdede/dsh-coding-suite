@@ -44,7 +44,7 @@ test('new group follows the full pipeline to image prompts while preserving exis
 test('old layout gains a hidden group; malformed existing and new fields still fail', () => {
   const old = { schemaVersion: 1, visibleGroups: { common: false, development: false, documents: true, others: false }, commonActionIds: ['custom'] }
   const parsed = parseLauncherLayout(JSON.stringify(old), DEFAULT_ACTIONS)
-  assert.deepEqual(parsed.visibleGroups, { ...old.visibleGroups, [groupId]: false })
+  assert.deepEqual(parsed.visibleGroups, { ...old.visibleGroups, [groupId]: false, 'handover-docs': false })
   assert.deepEqual(parsed.commonActionIds, old.commonActionIds)
   for (const value of [null, 0, 'true', [], {}]) {
     assert.throws(() => parseLauncherLayout(JSON.stringify({ ...old, visibleGroups: { ...old.visibleGroups, [groupId]: value } }), DEFAULT_ACTIONS))

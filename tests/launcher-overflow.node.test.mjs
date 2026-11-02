@@ -288,7 +288,7 @@ test('common editor groups all enabled actions and synchronizes repeated members
   nodes().find(n => n.type === 'button' && n.props.children === '编辑常用').props.onClick()
   const group = id => nodes().find(n => n.props?.['data-common-editor-group'] === id)
   const labels = id => h.nodes(group(id)).filter(n => n.type === 'label').map(n => n.props.children[1])
-  assert.deepEqual(['requirements-analysis', 'development', 'documents', 'others'].map(id => group(id).props['aria-label']), ['需求', '开发', '文档', '其他'])
+  assert.deepEqual(['requirements-analysis', 'development', 'documents', 'handover-docs', 'others'].map(id => group(id).props['aria-label']), ['需求', '开发', '验收文档', '交接文档', '其他'])
   assert.ok(labels('requirements-analysis').includes('全流程'))
   assert.ok(labels('development').includes('健康验收'))
   assert.ok(labels('others').includes('健康验收'))
