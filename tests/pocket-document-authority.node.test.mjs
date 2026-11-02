@@ -32,7 +32,7 @@ test('all document producers and Pocket lifecycle skills point to single-authori
   assert.ok(existsSync(path.join(root, protocol)));
   for (const file of [...skills, ...shared]) {
     const source = read(file);
-    const references = [...source.matchAll(/\]\(([^)]+DOCUMENT_AUTHORITY\.md)\)/g)];
+    const references = [...source.matchAll(/\]\(([^)]*DOCUMENT_AUTHORITY\.md)\)/g)];
     assert.ok(references.length > 0, file + ' must link the protocol');
     for (const [, relative] of references) {
       const target = path.resolve(root, path.dirname(file), relative);
