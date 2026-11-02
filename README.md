@@ -117,9 +117,11 @@ Pocket 是项目知识的**索引与兜底位置**，不是独立的业务文档
 
 ### 项目交接文档（交接分组）
 
-新增独立的「交接文档」（Project Handover）分组，默认隐藏，可在「显示分组」中启用；原「文档」只更名为「验收文档」（Acceptance Docs），保留原 ID 和七个按钮。交接分组包含「交接总览」「功能规则」「关键流程」「日志排查」「交接维护」五个独立 Skill。支持全项目/指定模块整理；优先复用目标项目的权威资料目录，否则推荐 Pocket。共享证据、冲突和写入规则位于 `assets/skills/_shared/project-handover/`。
+新增独立的「交接文档」（Project Handover）分组，默认隐藏，可在「显示分组」中启用；原「文档」只更名为「验收文档」（Acceptance Docs），保留原 ID 和七个按钮。交接分组包含「交接总览」「功能规则」「关键流程」「日志排查」「交接维护」六个独立 Skill（新增「需求汇总」）。支持全项目/指定模块整理；优先复用目标项目的权威资料目录，否则推荐 Pocket。共享证据、冲突和写入规则位于 `assets/skills/_shared/project-handover/`。
 
 点击按钮只插入可编辑草稿；实际整理会先核对仓库基线与事实依据，**创建和更新任何交接文档前必须显示具体差异并再次获得用户确认**。不会自动修改业务代码、远程环境或提交代码。已有 `actionsJson` 的用户需要在按钮设置点击「补齐缺失预设（待保存）」再保存，旧设置不会被覆盖。原 `handoff`「上下文交接」仍用于短期会话交接。
+
+「需求汇总」独立读取用户提供的 SVN 日志或经确认范围的只读 SVN 历史，按模块和业务能力对新增、变更、修复及非功能提交分类并去重，保留每项对应的 r 修订号。仅提交记录时标为推断，不等同于现行代码已核实或功能已经上线。默认只在会话展示；若要落盘，沿用初始化的文档布局，必须先预览再明确批准。参见 [SVN 需求汇总约定](docs/pocket/requirements/svn-requirement-summary.md)。
 
 参见 [正式需求](docs/pocket/requirements/project-handover.md)、[技术方案](docs/pocket/requirements/project-handover-implementation.md) 与 [30 项验收标准](docs/pocket/requirements/project-handover-acceptance.md)。
 
