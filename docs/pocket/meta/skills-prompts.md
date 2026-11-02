@@ -6,6 +6,24 @@
 
 范围：本仓库内置 Skill、附带规则/模板/脚本、按钮默认提示词、附加接收指令、系统注入及提醒。**不包含宿主 DSH 的完整默认提示词、其他插件/用户目录的 Skill、用户已保存的按钮配置正文。**
 
+## 2026-11-02 初始化安全推荐自动执行（用户需求，本地改造）
+
+来源：用户明确要求初始化过程尽可能不需要人工决策，非必须事项按推荐自动执行；本地改造，未引入第三方代码。保留已导入 Skill 的原来源和基线；此次变动以 Git 提交记录为差异依据，不宣称上游 Matt 已采用该策略。
+
+| 本地资产 | 变更与来源 |
+| --- | --- |
+| `assets/skills/_shared/SETUP_AUTO_DECISIONS.md` | 依据用户要求编写 AUTO / NEEDS_DECISION 分级及安全边界 |
+| `assets/skills/setup-matt-pocock-skills/SKILL.md` | Matt 导入 Skill 的本地适配；删除普通推荐项反复确认、保留风险例外 |
+| `assets/skills/setup-matt-pocock-skills/scripts/auto_reconcile.py` / `test_auto_reconcile.py` | 本地编写的无外部依赖、Git 未提交保护的目录大小写自述修复及测试 |
+| `assets/skills/requirements-spec/SKILL.md` / `references/document-flow.md` | 导入/适配的 Skill 本地输出路由修正，正式需求和中间稿按项目布局 |
+| `assets/skills/api-integration-docs/SKILL.md` / `references/markdown-templates.md` | 接口文档默认路径让位于项目权威目录 |
+| `assets/skills/overall-design/SKILL.md` / `references/delivery.md` | 设计文档默认路径和中间稿路由修正 |
+| `assets/skills/project-handover-requirement-summary/SKILL.md` | 本地 Skill 回退路径改为读取项目布局，不擅自新建 `docs/pocket/handover/` |
+| `src/client/actions.ts` / `initialize` | 用户要求下的默认按钮提示词更新；已持久化自定义提示词不被强行覆盖 |
+| `assets/skills/_shared/ARTIFACT_LAYOUT.md` / `DOCUMENT_AUTHORITY.md` / `POCKET_SETUP.md` | 明确统一路由与初始化安全默认授权的作用范围 |
+
+对实际业务项目的任何执行必须先读取该项目文件并核验安全前提，不能把本仓库的路径修正规则视为已修改其他项目文件。
+
 ## 2026-11-02 SVN 需求汇总 Skill / 按钮（本地新增）
 
 来源：用户提供的自然语言需求「根据这个 svn 的提交记录，整理一下做的功能点」，由本仓库本地编写并改写成可重复执行的 SVN 提交记录归并规程；未复制外部 Skill。技术语法参考 Apache Subversion 官方文档（https://svnbook.red-bean.com/，未复制正文）。许可：本仓库 MIT；上游固定版本：不适用。记录日期：2026-11-02；功能约定见 [SVN 需求汇总](../requirements/svn-requirement-summary.md)。

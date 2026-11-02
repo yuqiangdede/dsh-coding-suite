@@ -91,7 +91,7 @@ node scripts/verify-client-bundle.mjs
 输入框上方按场景分组；「初始化」和「确认」固定在显示分组控制栏（依次相邻）：
 - **快捷确认**：点击「确认」将当前会话中上一条已完成的模型回复所推荐的默认方案作为用户确认立即发送，无需再次按 Enter；仅要求上一条存在完整助手回复，不依赖项目初始化。模型回复进行中、失败或当前存在未发送草稿/附件时按钮禁用，避免误发或覆盖。遇到多个互斥选项而没有明确推荐时继续询问，不擅自决策；重要数据删除/覆盖、生产环境变更、凭据等高风险行为不能仅凭此快捷确认授权，需另外说明风险并取得明确批准。普通 Skill/提示词按钮继续仅插入草稿。
 
-- **项目初始化门禁**：根据 Session 根目录使用只读 Workspace Files 接口核对 AGENTS.md/CLAUDE.md、工程 Skills 指针、Issue Tracker、领域文档和知识索引。未完成则初始化高亮，其他操作要求先初始化；已有合规项目直接通过。重新打开、初始化完成后和执行操作前重新核验。点击初始化只插入原有只读检查提示词，不自动安装 Skill、修改配置或创建业务代码。
+- **项目初始化门禁**：根据 Session 根目录使用只读 Workspace Files 接口核对 AGENTS.md/CLAUDE.md、工程 Skills 指针、Issue Tracker、领域文档和知识索引。未完成则初始化高亮，其他操作要求先初始化；已有合规项目直接通过。重新打开、初始化完成后和执行操作前重新核验。点击「初始化」仅插入 Skill 指令；发送后按安全自动决策规程执行：可验证、非破坏性的项目初始化推荐项自动修复并报告，确实需要人工决定的例外才询问；不自动安装软件、不修改业务代码或远端系统。
 
 - **常用**默认显示，可编辑成员，也可隐藏后恢复。
 - **需求**以产品研发流水线为主干：需求全流程 → 澄清 → 分析 → 风险扫描 → 业务方案 → 模块边界 → 数据/状态 → 异常流程 → PRD/评审/页面规格 → 页面一致性 → 生图提示词。按行宽尽量展示，确实放不下时用「更多（剩余）」查看后续阶段。
@@ -113,7 +113,7 @@ Pocket 是项目知识的**索引与兜底位置**，不是独立的业务文档
 3. Pocket 或项目现有知识索引只记录文件路径、任务入口、状态与后继链接，不复制正文。重要变更先展示差异，确认后写入；不因运行 Skill 自动推送代码。
 4. 日常按需读取有关文档，每月可手工执行 `pocket-maintenance` 检查重复、冲突、断链和过期资料，归档/删除需要明确批准，不建立定时清理任务。
 
-参见 [文档单一权威位置协议](assets/skills/_shared/DOCUMENT_AUTHORITY.md)、[初始化规范](assets/skills/_shared/POCKET_SETUP.md) 和 [本仓库 Pocket 索引](docs/pocket/README.md)。本仓库已有的 Pocket 需求及问题文档保留原位置。
+参见 [初始化安全默认决策规程](assets/skills/_shared/SETUP_AUTO_DECISIONS.md)、[离线路径大小写修复脚本](assets/skills/setup-matt-pocock-skills/scripts/auto_reconcile.py)、[文档单一权威位置协议](assets/skills/_shared/DOCUMENT_AUTHORITY.md)、[初始化规范](assets/skills/_shared/POCKET_SETUP.md) 和 [本仓库 Pocket 索引](docs/pocket/README.md)。本仓库已有的 Pocket 需求及问题文档保留原位置。
 
 ### 项目交接文档（交接分组）
 

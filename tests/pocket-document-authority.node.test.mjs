@@ -56,6 +56,19 @@ test('initialized layout is shared by every bundled Skill', () => {
   assert.match(userPrompt, /统一文档及产物路由/);
   assert.ok(existsSync(path.join(root, 'docs/_work/README.md')));
 });
+test('setup uses automatic recommendations while retaining mandatory high-risk decisions', () => {
+  const auto = read('assets/skills/_shared/SETUP_AUTO_DECISIONS.md');
+  const setup = read('assets/skills/setup-matt-pocock-skills/SKILL.md');
+  const actions = read('src/client/actions.ts');
+  const script = read('assets/skills/setup-matt-pocock-skills/scripts/auto_reconcile.py');
+  assert.match(auto, /AUTO/);
+  assert.match(auto, /NEEDS_DECISION/);
+  assert.match(auto, /不重复询问/);
+  assert.match(setup, /auto-apply unambiguous non-destructive/);
+  assert.match(setup, /auto_reconcile\.py/);
+  assert.match(actions, /能自动就自动/);
+  assert.match(script, /uncommitted-file/);
+});
 test('knowledge capture does not scaffold a competing knowledge tree by default', () => {
   const capture = read('assets/skills/project-knowledge-capture/SKILL.md');
   const mapping = read('assets/skills/project-knowledge-capture/references/storage-contract.md');
