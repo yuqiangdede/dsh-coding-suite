@@ -3,7 +3,7 @@
 ## 默认文件
 
 ```text
-docs/integration/
+正式文档位置：目标项目 document-layout.md 中接口与数据库的权威位置或缺失回退目录；中间证据稿：初始化登记的任务工作区 `<task-id>/`。
 ├── README.md
 ├── api-index.md
 ├── connection-guide.md
