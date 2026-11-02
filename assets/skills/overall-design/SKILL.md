@@ -28,9 +28,9 @@ description: 先收集并核对用户提供的源码路径（含项目沉淀文�
 
 ## 1 输入与口径
 
-Within the confirmed project scope, discover and read existing requirements documents as additional references alongside source code, relevant SQL scripts and user-supplied reference documents. Check the project root and documentation directories (including `docs/Requirements/`), then follow relevant document links. Requirements define business scope, roles, scenarios and quality constraints for the overall design. Reuse documents found in the project without requiring a separate upload; an explicit absence of external reference documents does not exclude project-local documents. These documents are optional: record missing or unreadable sources and their impact without requiring another document to be generated first. Record each selected document's path, version, scope and purpose; reconcile conflicting baselines using the existing conflict rules, and distinguish requirements from verified implementation.
+Within the confirmed project scope, discover and read existing requirements documents as additional references alongside source code, relevant SQL scripts and user-supplied reference documents. Follow the active `docs/agents/document-layout.md`, its real requirements authority and knowledge index instead of assuming a historical casing for requirements. Requirements define business scope, roles, scenarios and quality constraints for the overall design. Reuse documents found in the project without requiring a separate upload; an explicit absence of external reference documents does not exclude project-local documents. These documents are optional: record missing or unreadable sources and their impact without requiring another document to be generated first. Record each selected document's path, version, scope and purpose; reconcile conflicting baselines using the existing conflict rules, and distinguish requirements from verified implementation.
 
-输入门槛通过后，在用户指定源码路径内读取适用的 AGENTS.md 和 [references/analysis.md](references/analysis.md)。优先使用已指定的需求、源码路径及项目范围；在已指定源码路径内盘点 docs/Requirements/ 和已有设计，不将多个版本自动视为同一基准。
+输入门槛通过后，在用户指定源码路径内读取适用的 AGENTS.md 和 [references/analysis.md](references/analysis.md)。优先使用已指定的需求、源码路径及项目范围；在已指定源码路径内按 document-layout.md 盘点项目当前有效需求目录和已有设计，不将多个版本自动视为同一基准。
 
 读取 [references/source-and-merge.md](references/source-and-merge.md)，识别参考文档、组件文档、源码与需求各自的用途，执行适用的借鉴、推导及融合分支。参考可来自文件、路径、链接或粘贴内容；已有材料不重复索要。
 
@@ -78,7 +78,7 @@ Within the confirmed project scope, discover and read existing requirements docu
 
 读取 [references/delivery.md](references/delivery.md)，中间与最终文档均仅生成 UTF-8 Markdown（.md），无需询问格式。另需 Word 时，先定稿 Markdown，再由独立的 `$markdown-to-docx` 技能转换。
 
-中间与最终目录/文件名均可指定，默认输出到目标项目 `docs/Design/`，中间分析放 `中间文档/总体设计/`，最终名为 `XX-总体设计说明书.md`。XX 用已知项目名称，未知时文件名为“总体设计说明书”；相对路径以目标项目根目录解析。
+中间与最终目录/文件名均可指定，默认以目标项目 `docs/agents/document-layout.md` 为准：正式总体设计沿用当前权威设计目录或“设计与架构”回退目录，中间分析写入登记的任务工作区 `<task-id>/overall-design/`，不得新建 Skill 历史默认的 `docs/Design/` 或 `中间文档/总体设计/` 并列树；最终名为 `XX-总体设计说明书.md`。XX 用已知项目名称，未知时文件名为“总体设计说明书”；相对路径以目标项目根目录解析。
 
 分别提供中间分析和最终文档链接，报告范围、未解决事项及实际内容/结构/视觉检查。专业版式不能替代架构真实性。仅操作文档及其图形资产，不修改业务代码、数据库或生产系统；不提交或推送代码。
 
@@ -92,7 +92,7 @@ Within the confirmed project scope, discover and read existing requirements docu
 
 调用示例：
 
-> 使用 $overall-design，先收集并核对源码路径（含项目沉淀文档）和参考文档，再开始工作。随后参考指定设计文档的格式、模块说明与流程写法，结合需求推导系统级流程并从源码核对架构，将多个组件文档融合为一份总体设计说明书；强制使用 diagram-design 制图，保存到 docs/Design/，交付 Markdown，不提交代码。
+> 使用 $overall-design，先收集并核对源码路径（含项目沉淀文档）和参考文档，再开始工作。随后参考指定设计文档的格式、模块说明与流程写法，结合需求推导系统级流程并从源码核对架构，将多个组件文档融合为一份总体设计说明书；强制使用 diagram-design 制图，保存到项目布局指定的设计权威路径，交付 Markdown，不提交代码。
 
 ## 执行补充：共享事实与增量文档
 
