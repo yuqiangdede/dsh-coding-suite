@@ -7,10 +7,12 @@ import type {} from '@deepseek-ai/dsh-client-ui-conversation/client'
 import type {} from '@deepseek-ai/dsh-client-ui-renderer/client'
 import type {} from '@deepseek-ai/dsh-client-ui-session/client'
 import type {} from '@deepseek-ai/dsh-api-remotes/client'
+import type {} from '@deepseek-ai/dsh-api-workspace-files/remote'
 import type {} from '@deepseek-ai/dsh-api-session-controller/client'
 import { LAUNCHER_CONFIG_GLOBAL, LauncherDeploymentSchema } from '../config.ts'
 import { Launcher } from './Launcher.tsx'
 import { LauncherSettings } from './Settings.tsx'
+import { evaluateProjectSetup, type ProjectSetupReport } from './setup-readiness.ts'
 /** Host-persisted launcher configuration. */
 export interface ActionSettings { actionsJson?: string; layoutJson?: string }
 /** Settings form and revision-checked save operation. */
@@ -23,6 +25,8 @@ export interface LauncherSettingsInjected {
 export interface LauncherInjected {
   hooks: { actionForm: ConfigForm<ActionSettings> }
   fetchSkillNames: ()=>Promise<readonly string[]>
+  projectRoot: string | undefined
+  checkProjectSetup: ()=>Promise<ProjectSetupReport>
   saveLayout: (json: string, revision?: number) => Promise<boolean>
   todoStaleMs: number
 }
@@ -168,7 +172,7 @@ function armLauncherDisappearanceProbe(): void {
   if (previous !== undefined) showProbeBanner(previous, '上次记录（刷新前）')
 }
 
-export const inject = ['locale', 'slots','sessions','remote','remote.skills','configForms']
+export const inject = ['locale', 'slots','sessions','remote','remote.skills','remote.workspaceFiles','configForms']
 export function apply(ctx: ClientContext): void {
   installLauncherDisappearanceProbe()
   ctx.effect(() => ctx.locale.register('mattSkillLauncher', { zh, en }), 'launcher dictionaries')
@@ -184,6 +188,25 @@ export function apply(ctx: ClientContext): void {
     inject: (sessionId): LauncherInjected => ({
         hooks: { actionForm: form },
         todoStaleMs: deployment.todoStaleMs,
+        projectRoot: ctx.sessions.list.getSnapshot().byId[sessionId]?.cwd
+          ?? (ctx.sessions.binding(sessionId)?.session.projections.faceOf('workingDirectory').getSnapshot() as string | null | undefined)
+          ?? undefined,
+        checkProjectSetup: async () => {
+          const root = ctx.sessions.list.getSnapshot().byId[sessionId]?.cwd
+            ?? (ctx.sessions.binding(sessionId)?.session.projections.faceOf('workingDirectory').getSnapshot() as string | null | undefined)
+          if (!root) return { ready: false, missing: ['无法识别当前项目工作区'] }
+          if (ctx.sessions.binding(sessionId) === undefined) throw new Error('当前 Session 不可用')
+          const skills = await ctx.remote.skills.list({ sessionId })
+          if (!skills.ok) throw new Error(skills.error.message)
+          return evaluateProjectSetup(async path => {
+            const result = await ctx.remote.workspaceFiles.read(sessionId, path, { offset: 1, limit: 300 })
+            if (!result.ok) {
+              if (result.error.code === 'workspace-file/not-found') return null
+              throw new Error(result.error.message)
+            }
+            return result.value.text
+          }, skills.value.skills.map(skill => skill.name))
+        },
         saveLayout: (json, rev) => form.mutate([{ op: 'set', path: ['layoutJson'], value: json }], rev),
         fetchSkillNames: async () => {
           if (ctx.sessions.binding(sessionId) === undefined) throw new Error('Session unavailable')
