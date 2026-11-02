@@ -6,7 +6,7 @@ export const LAUNCHER_GROUPS = [
   { id: 'development', label: 'groupDevelopment', actionIds: ['discussion', 'visual', 'spec', 'plan', 'execute', 'bug', 'add-logs', 'analyze-logs', 'review', 'review-fix', 'compile', 'health-acceptance', 'commit', 'doc-supplement', 'remote-debug'] },
   { id: 'documents', label: 'groupDocuments', actionIds: ['api-docs', 'requirements', 'overview', 'outline', 'database', 'doc-merge', 'docx'] },
   { id: 'handover-docs', label: 'groupHandoverDocs', actionIds: ['handover-overview', 'handover-features', 'handover-flows', 'handover-troubleshooting', 'handover-maintain'] },
-  { id: 'others', label: 'groupOthers', actionIds: ['initialize', 'graphify-navigation', 'graphify-refresh', 'ask', 'health-acceptance', 'doc-supplement', 'tdd', 'prototype', 'architecture', 'domain', 'research', 'retro', 'handoff', 'image', 'prd-writing', 'requirement-review'] },
+  { id: 'others', label: 'groupOthers', actionIds: ['graphify-navigation', 'graphify-refresh', 'ask', 'health-acceptance', 'doc-supplement', 'tdd', 'prototype', 'architecture', 'domain', 'research', 'retro', 'handoff', 'image', 'prd-writing', 'requirement-review'] },
 ] as const
 
 export type OptionalGroupId = typeof LAUNCHER_GROUPS[number]['id']
@@ -106,7 +106,7 @@ export function actionsForGroup(
   const ids: readonly string[] = groupId === 'common'
     ? layout.commonActionIds
     : LAUNCHER_GROUPS.find(group => group.id === groupId)?.actionIds ?? []
-  const ordered = ids.flatMap(id => {
+  const ordered = ids.filter(id => id !== 'initialize').flatMap(id => {
     const action = available.get(id)
     return action ? [action] : []
   })
@@ -116,7 +116,7 @@ export function actionsForGroup(
     ...DEFAULT_COMMON_IDS,
     ...LAUNCHER_GROUPS.flatMap(group => [...group.actionIds]),
   ])
-  return [...ordered, ...enabled.filter(a => a.enabled && !known.has(a.id))
+  return [...ordered, ...enabled.filter(a => a.enabled && a.id !== 'initialize' && !known.has(a.id))
     .sort((a, b) => a.order - b.order)]
 }
 
