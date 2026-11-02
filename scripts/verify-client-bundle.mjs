@@ -35,12 +35,13 @@ assert.ok(bundleSource.includes(`tag.dataset.plugin = ${JSON.stringify(pkg.name)
 const stub = {}
 const exports = registration.factory((specifier) => stub[specifier] ??= {})
 
-assert.deepEqual(exports.inject, ['locale', 'slots', 'sessions', 'remote', 'remote.skills', 'configForms'])
+assert.deepEqual(exports.inject, ['locale', 'slots', 'sessions', 'remote', 'remote.skills', 'remote.workspaceFiles', 'configForms'])
 assert.equal(typeof exports.apply, 'function')
 
 const registrations = []
 let dockOptions
 const source = {
+  list: { getSnapshot: () => ({ byId: { 'session-1': { cwd: 'C:/repo' } } }) },
   binding: () => ({
     session: {
       getSnapshot: () => ({ openState: 'open' }),
@@ -66,6 +67,8 @@ exports.apply(ctx)
 assert.deepEqual(registrations.map(options => options.name), ['conversation.input.dock', 'settings.section'])
 const injected = dockOptions.inject('session-1')
 assert.ok(injected.hooks.actionForm, 'launcher configuration must remain available')
+assert.equal(injected.projectRoot, 'C:/repo')
+assert.equal(typeof injected.checkProjectSetup, 'function')
 assert.equal('workflowCommands' in injected, false, 'retired workflow commands must be absent')
 
 console.log(`OK ${pkg.name}: client bundle registers itself, mounts the input dock, without retired workflow remotes.`)
