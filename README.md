@@ -18,6 +18,7 @@
 1. **Bundled Engineering and Product Skills**
    - High-leverage skills from Matt Pocock: `code-review`, `codebase-design`, `diagnosing-bugs`, `domain-modeling`, `grilling`, `prototype`, `tdd`, `to-spec`, `to-tickets`, `writing-for-agents`, etc.
    - Enterprise documentation & reverse engineering: `requirements-spec`, `api-integration-docs`, `database-design-doc`, `component-doc-merge`, `markdown-to-docx`.
+   - Project-wide document/artifact layout: initialization establishes `docs/agents/document-layout.md` plus the selected intermediate work directory README; all bundled Skills follow the same formal-document authority and task-scoped scratch paths. Existing approved project documents remain in place.
    - Pocket navigation & maintenance: reuse existing authoritative project documents first; initialize a lightweight index when needed, fill only missing topics and audit staleness with `pocket-maintenance`.
 
 2. **Client UI Launcher**

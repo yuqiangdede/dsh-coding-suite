@@ -42,6 +42,20 @@ test('all document producers and Pocket lifecycle skills point to single-authori
   }
 });
 
+test('initialized layout is shared by every bundled Skill', () => {
+  const provider = read('src/skill-provider.ts');
+  const contract = read('assets/skills/_shared/ARTIFACT_LAYOUT.md');
+  const setup = read('assets/skills/setup-matt-pocock-skills/SKILL.md');
+  const layout = read('docs/agents/document-layout.md');
+  const userPrompt = read('src/client/Launcher.tsx');
+  assert.match(provider, /artifactRouting/);
+  assert.match(provider, /content: content \+ '\\n\\n' \+ artifactRouting/);
+  assert.match(contract, /docs\/agents\/document-layout\.md/);
+  assert.match(setup, /work-readme\.md/);
+  assert.match(layout, /dsh-document-layout:v1/);
+  assert.match(userPrompt, /统一文档及产物路由/);
+  assert.ok(existsSync(path.join(root, 'docs/_work/README.md')));
+});
 test('knowledge capture does not scaffold a competing knowledge tree by default', () => {
   const capture = read('assets/skills/project-knowledge-capture/SKILL.md');
   const mapping = read('assets/skills/project-knowledge-capture/references/storage-contract.md');

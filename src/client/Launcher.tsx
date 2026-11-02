@@ -208,6 +208,9 @@ export function Launcher({
       setNotice(t('start')); return
     }
     let value = withEvidence(action.prompt, recommendation, action.id, entries, t('defaultLocale') === 'en')
+    if (action.id !== 'initialize') {
+      value += '\n\n统一文档及产物路由：在读取、写入或依赖正式文档、阶段中间稿、评审/Gate、转换缓存前，先读当前项目 docs/agents/document-layout.md 和其知识索引。沿用登记的正式权威文件，所有文件型中间产物进入登记的任务专属工作区，不因 Skill 默认输出路径创建第二套文档。改写正式文件先显示差异并取得确认，结束时列出实际文件路径。'
+    }
     if (action.kind === 'skill') {
       const skillId = action.skillId ?? ''
       commandLock.current = true

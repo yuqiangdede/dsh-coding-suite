@@ -52,7 +52,7 @@ jobs:
           if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
           node scripts/verify-launcher-render.mjs
           if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
-          node --experimental-transform-types --test tests/launcher-layout.node.test.mjs tests/setup-readiness.node.test.mjs tests/project-handover.node.test.mjs tests/diagnostic-shortcuts.node.test.mjs
+          node --experimental-transform-types --test tests/launcher-layout.node.test.mjs tests/setup-readiness.node.test.mjs tests/pocket-document-authority.node.test.mjs tests/project-handover.node.test.mjs tests/diagnostic-shortcuts.node.test.mjs
           if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
           python -m unittest discover -s assets/skills/_shared/project-handover/scripts -p test_handover_write_guard.py
           if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
