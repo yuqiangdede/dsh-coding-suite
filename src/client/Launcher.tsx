@@ -37,6 +37,7 @@ export function Launcher({
   const [expandedGroups, setExpandedGroups] = useState<Record<string, boolean>>({})
   // Measured per-row button budget; absent entries keep the fixed fallback.
   const [groupLimits, setGroupLimits] = useState<Record<string, number>>({})
+  const groupLimitsRef = useRef(groupLimits)
   const [layoutSaving, setLayoutSaving] = useState(false)
   const [commonEdit, setCommonEdit] = useState<{ ids: string[], revision: number } | null>(null)
   const [pending, setPending] = useState(false)
@@ -131,11 +132,13 @@ export function Launcher({
         )
         measured[group.id] = fitted >= group.actions.length ? group.actions.length : Math.max(1, fitted)
       }
-      setGroupLimits(previous => {
-        let changed = false
-        for (const id of Object.keys(measured)) if (previous[id] !== measured[id]) changed = true
-        return changed ? { ...previous, ...measured } : previous
-      })
+      // Avoid scheduling a synchronous layout update when measurement is stable.
+      // React can hit its nested-update limit even when an updater returns the
+      // previous state if it is dispatched on every layout effect.
+      if (Object.keys(measured).some(id => groupLimitsRef.current[id] !== measured[id])) {
+        groupLimitsRef.current = { ...groupLimitsRef.current, ...measured }
+        setGroupLimits(groupLimitsRef.current)
+      }
     }
     measure()
     if (typeof ResizeObserver === 'undefined') return
