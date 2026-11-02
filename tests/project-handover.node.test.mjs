@@ -8,10 +8,10 @@ import { en, zh, receivingInstructions } from '../src/client/locales.ts'
 
 const base = resolve(import.meta.dirname, '..')
 const skillRoot = resolve(base, 'assets/skills')
-const ids = ['handover-overview', 'handover-features', 'handover-flows', 'handover-troubleshooting', 'handover-maintain']
+const ids = ['handover-overview', 'handover-features', 'handover-flows', 'handover-troubleshooting', 'handover-maintain', 'handover-requirement-summary']
 const skillIds = ids.map(id => id.replace('handover-', 'project-handover-'))
 
-test('five standalone handover actions, canonical group and localized labels', () => {
+test('six standalone handover actions, canonical group and localized labels', () => {
   const groups = LAUNCHER_GROUPS.map(group => group.id)
   assert.deepEqual(groups, ['requirements-analysis', 'development', 'documents', 'handover-docs', 'others'])
   assert.deepEqual(LAUNCHER_GROUPS.find(g => g.id === 'handover-docs').actionIds, ids)
@@ -60,12 +60,17 @@ test('all bundled handover skills and shared resources are present offline', () 
   for (const name of ['protocol.md', 'evidence.md', 'templates.md', 'updates.md', 'scripts/handover_write_guard.py']) {
     assert(existsSync(resolve(skillRoot, '_shared/project-handover', name)), name)
   }
+  const svn = readFileSync(resolve(skillRoot, 'project-handover-requirement-summary/SKILL.md'), 'utf8')
+  assert.match(svn, /SVN.*提交|提交.*SVN/)
+  assert.match(svn, /svn log --xml -v/)
+  assert.match(svn, /去重|归并/)
+  assert.match(svn, /明确批准|明确确认/)
   const protocol = readFileSync(resolve(skillRoot, '_shared/project-handover/protocol.md'), 'utf8')
   assert.match(protocol, /explicit approval/)
   assert.match(protocol, /Production status/)
 })
 
-test('published browser bundle contains the same five new action defaults and group', () => {
+test('published browser bundle contains the same six action defaults and group', () => {
   const bundle = readFileSync(resolve(base, 'lib/client.js'), 'utf8')
   const m = /\t\tconst DEFAULT_ACTIONS = ([\s\S]*?\n\t\t\]);/.exec(bundle)
   assert(m)
