@@ -18,7 +18,7 @@
 1. **Bundled Engineering and Product Skills**
    - High-leverage skills from Matt Pocock: `code-review`, `codebase-design`, `diagnosing-bugs`, `domain-modeling`, `grilling`, `prototype`, `tdd`, `to-spec`, `to-tickets`, `writing-for-agents`, etc.
    - Enterprise documentation & reverse engineering: `requirements-spec`, `api-integration-docs`, `database-design-doc`, `component-doc-merge`, `markdown-to-docx`.
-   - Pocket maintenance & shared toolchain: `pocket-setup`, `pocket-reorganize`, `evidence_registry`, document QA scripts.
+   - Pocket navigation & maintenance: reuse existing authoritative project documents first; initialize a lightweight index when needed, fill only missing topics and audit staleness with `pocket-maintenance`.
 
 2. **Client UI Launcher**
    - Customizable quick actions launcher with full export/import settings form.
@@ -76,7 +76,7 @@ node scripts/verify-client-bundle.mjs
 1. **内置工程、产品需求技能与规范**
    - Matt Pocock 经典工程技能：`code-review`、`codebase-design`、`diagnosing-bugs`、`domain-modeling`、`grilling`、`prototype`、`tdd`、`to-spec`、`to-tickets`、`writing-for-agents` 等。
    - 文档与逆向工程体系：`requirements-spec`（逆向需求生成）、`api-integration-docs`、`database-design-doc`、`markdown-to-docx` 等。
-   - Pocket 知识库运维与共享工具链：`pocket-setup`、`pocket-reorganize`、证据登记表 (`evidence_registry.py`)、文档检索脚本等。
+   - Pocket 知识库索引与维护：由 `setup-matt-pocock-skills` 初始化、`pocket-maintenance` 按需检查；已有项目文档原位复用，无需另建 `knowledge/` 或复制到 Pocket。公共证据与文档校验脚本按需使用。
 
 2. **前端 UI 快速发射器**
    - 按场景分组展示快捷入口，并支持查看当前对话中识别出的按钮使用顺序。
@@ -99,6 +99,17 @@ node scripts/verify-client-bundle.mjs
 - 升级时保留原有已保存提示词及启用状态，旧自定义常用列表优先保留，旧默认快捷列表映射到当前常用预设；新阶段不自动加入常用。
 
 插件使用 `layoutJson` 保存版本化分类布局，不修改既有 `actionsJson` Schema v3 和 Host 编码阶段规则。安装时仍需携带仓库内的预编译 `lib/`，在 Windows CI 中校验运行时 bundle。
+
+### Pocket：复用现有文档，不做第二套知识库
+
+Pocket 是项目知识的**索引与兜底位置**，不是独立的业务文档副本。执行初始化、知识提炼、需求/设计/接口文档、验收或交接时：
+
+1. 优先读取项目现有的 `AGENTS.md`/`CLAUDE.md`、文档索引、需求、设计、ADR 与部署运维资料，识别各主题已确认的权威文件。
+2. 有现行文件则原位置增量维护；有对应现有目录则优先使用。**只有缺少合适位置时才按需使用 `docs/pocket/`**，不默认创建 `knowledge/`。
+3. Pocket 或项目现有知识索引只记录文件路径、任务入口、状态与后继链接，不复制正文。重要变更先展示差异，确认后写入；不因运行 Skill 自动推送代码。
+4. 日常按需读取有关文档，每月可手工执行 `pocket-maintenance` 检查重复、冲突、断链和过期资料，归档/删除需要明确批准，不建立定时清理任务。
+
+参见 [文档单一权威位置协议](assets/skills/_shared/DOCUMENT_AUTHORITY.md)、[初始化规范](assets/skills/_shared/POCKET_SETUP.md) 和 [本仓库 Pocket 索引](docs/pocket/README.md)。本仓库已有的 Pocket 需求及问题文档保留原位置。
 
 ### 健康验收
 

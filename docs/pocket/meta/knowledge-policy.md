@@ -1,10 +1,20 @@
 # Knowledge ownership and maintenance
 
-- Canonical knowledge: `docs/pocket/**/*.md`, except legacy paths that the Pocket index lists as authoritative pending migration; those remain authoritative until an approved migration moves them. Generated indexes and external issues are pointers, not second authoritative copies.
-- Code, executable tests, tool configuration, and dependency lockfiles remain authoritative for actual implementation and installed versions. If they contradict a requirement or ADR, flag and resolve; do not change accepted requirements to match code without approval.
-- New docs should state status (pending/accepted/superseded/deprecated), scope/owner where useful, and links to related requirements, tasks, and ADRs. Keep one authoritative location per fact. The Pocket index (`docs/pocket/README.md`) and this policy are status-exempt meta files.
-- Use progressive disclosure: load this policy and relevant active documents, then referenced detail as needed. Do not load the whole knowledge directory by default.
-- Keep secrets, credentials, user data, and raw session transcripts out of committed knowledge.
-- Prefer links over copying content. Do not duplicate large configuration/code inventories easily discovered from the repository.
-- After requirements, architectural changes, or substantial PRs, inspect affected knowledge and correct its index. Monthly, run `/pocket-maintenance` to propose duplicates, conflicts, stale docs, and archival candidates.
-- Maintain history through Git and explicit successor links. Never automatically delete an ADR, erase an unresolved decision, or silently rewrite an approved requirement.
+## Scope and authority
+
+- 本仓库 `dsh-coding-suite` 已有 `docs/pocket/README.md` 索引，现行 `docs/pocket/requirements/`、`docs/pocket/pitfalls/` 和 `docs/pocket/meta/` 中已确认文件继续在原位置维护。**这不意味着其他目标项目也必须使用同一套目录。**
+- 文档 Skill 在目标项目执行时，先遵循 [文档单一权威位置协议](../../../assets/skills/_shared/DOCUMENT_AUTHORITY.md)：用户认可的现有文档路径和知识索引优先；已有需求、设计、ADR、接口和运维文档仍是各自主题的权威；只有缺少合适位置时才按需使用 `docs/pocket/`。
+- 知识索引用于路由，不复制正文，不与非 Pocket 已批准文档争夺权威。不主动创建独立 `knowledge/` 目录；如果目标项目已有且认可该目录，应复用而非搬迁。
+- Code, executable tests, tool configuration, database migrations and dependency lockfiles remain authoritative for *implemented behavior and installed versions*. Approved requirements and ADRs remain authoritative for *intended behavior*. If these conflict, flag and reconcile; never rewrite approved requirements solely to match code.
+
+## Status and progressive disclosure
+
+- New knowledge should identify status (pending/accepted/superseded/deprecated), scope, source and applicable successors. The project index and this policy are status-exempt meta files.
+- Always-loaded instructions should point to the active index. Read task-relevant accepted docs first, then linked evidence/old history as needed; never load every Markdown document automatically.
+- Only link to files that exist; update pointers and status when canonical material changes. Avoid duplicated fact sheets, raw conversation transcripts, secrets, user data and large code/config inventories.
+
+## Changes and maintenance
+
+- Before adding or changing an authoritative document, identify the existing location, show the diff and affected references, and obtain confirmation. Preserve dirty working changes and do not silently migrate, rename or overwrite another authority.
+- After requirement/architecture changes or substantial PRs, check affected docs and the active index. Suggest a manual `/pocket-maintenance` review monthly to detect duplicates, conflicts, broken links, stale status and archival candidates; no background scheduler is installed.
+- Preserve ADR rationale, Git history, statuses and successor links. Never auto-delete a record, auto-resolve a domain conflict, silently accept a draft, or rewrite approved acceptance criteria.
