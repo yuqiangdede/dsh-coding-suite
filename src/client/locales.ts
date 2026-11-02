@@ -20,7 +20,8 @@ export const zh = {
   'groupCommon': '常用',
   'groupRequirementsAnalysis': '需求',
   'groupDevelopment': '开发',
-  'groupDocuments': '文档',
+  'groupDocuments': '验收文档',
+  'groupHandoverDocs': '交接文档',
   'groupOthers': '其他',
   'groupAlwaysVisible': '始终显示',
   'groupConfigHelp': '各分组可以独立开关。需求分组以完整流水线为主干，从澄清、分析与各阶段 Gate 一直到生图提示词。重复按钮引用同一份 Skill 或提示词。',
@@ -139,7 +140,8 @@ export const en: Record<LauncherLocaleKey, string> = {
   'groupCommon': 'Common',
   'groupRequirementsAnalysis': 'Requirements',
   'groupDevelopment': 'Development',
-  'groupDocuments': 'Documentation',
+  'groupDocuments': 'Acceptance Docs',
+  'groupHandoverDocs': 'Project Handover',
   'groupOthers': 'Others',
   'groupAlwaysVisible': 'Always visible',
   'groupConfigHelp': 'Groups can be toggled independently. Requirements follows the pipeline from clarification through every gate to UI image prompts. Duplicate buttons share one Skill or prompt.',
@@ -236,6 +238,11 @@ export const en: Record<LauncherLocaleKey, string> = {
 
 /** Receiving instructions inserted into user-editable action drafts, Chinese then English. */
 export const receivingInstructions: Readonly<Record<string, readonly [string, string]>> = {
+  'handover-overview': ['接收范围、仓库基线、权威目录和已有证据；只读核验并区分静态与运行事实；先展示具体文档差异，获得明确确认后才能写入；敏感信息脱敏，不改业务代码、不提交。', 'Read scope, baseline, canonical documentation and evidence; distinguish source claims from runtime proof. Preview exact changes and require approval before writing. Redact secrets; never change business code or commit.'],
+  'handover-features': ['接收范围、仓库基线、权威目录和已有证据；只读核验并区分静态与运行事实；先展示具体文档差异，获得明确确认后才能写入；敏感信息脱敏，不改业务代码、不提交。', 'Read scope, baseline, canonical documentation and evidence; distinguish source claims from runtime proof. Preview exact changes and require approval before writing. Redact secrets; never change business code or commit.'],
+  'handover-flows': ['接收范围、仓库基线、权威目录和已有证据；只读核验并区分静态与运行事实；先展示具体文档差异，获得明确确认后才能写入；敏感信息脱敏，不改业务代码、不提交。', 'Read scope, baseline, canonical documentation and evidence; distinguish source claims from runtime proof. Preview exact changes and require approval before writing. Redact secrets; never change business code or commit.'],
+  'handover-troubleshooting': ['接收范围、仓库基线、权威目录和已有证据；只读核验并区分静态与运行事实；先展示具体文档差异，获得明确确认后才能写入；敏感信息脱敏，不改业务代码、不提交。', 'Read scope, baseline, canonical documentation and evidence; distinguish source claims from runtime proof. Preview exact changes and require approval before writing. Redact secrets; never change business code or commit.'],
+  'handover-maintain': ['接收范围、仓库基线、权威目录和已有证据；只读核验并区分静态与运行事实；先展示具体文档差异，获得明确确认后才能写入；敏感信息脱敏，不改业务代码、不提交。', 'Read scope, baseline, canonical documentation and evidence; distinguish source claims from runtime proof. Preview exact changes and require approval before writing. Redact secrets; never change business code or commit.'],
   'product-risk-gate': ['接收有效上游产物、版本和 Gate 证据，仅执行对应流水线阶段；输出实际结论与回退位置，不能跳过前序门禁。', 'Receive valid upstream artifacts, versions and gate evidence; execute only this pipeline stage and report its actual outcome and return stage without bypassing prerequisites.'],
   'product-module-gate': ['接收有效上游产物、版本和 Gate 证据，仅执行对应流水线阶段；输出实际结论与回退位置，不能跳过前序门禁。', 'Receive valid upstream artifacts, versions and gate evidence; execute only this pipeline stage and report its actual outcome and return stage without bypassing prerequisites.'],
   'product-state-gate': ['接收有效上游产物、版本和 Gate 证据，仅执行对应流水线阶段；输出实际结论与回退位置，不能跳过前序门禁。', 'Receive valid upstream artifacts, versions and gate evidence; execute only this pipeline stage and report its actual outcome and return stage without bypassing prerequisites.'],
