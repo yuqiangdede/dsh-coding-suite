@@ -417,3 +417,9 @@ git status --short
 ### 2026-10-29：代码图谱建图与更新入口
 
 按用户要求，本地改写 `ACTION:graphify-navigation` 默认提示词并新增 `ACTION:graphify-refresh`，调整本地维护的 `SKILL:graphify-navigation` 以执行按钮请求；用户发送后建图或刷新，刷新时缺图则创建。来源为用户需求及本仓库原有资产，上游 Graphify 仅为外部 CLI 参考，未复制上游提示词或代码；上游版本及许可核验状态不变。修改前基线为 Git HEAD 对应资产，内容历史由 Git 保存；新按钮本地编写，项目许可见仓库 LICENSE。已保存按钮配置不自动覆盖，需在设置中更新旧提示词并添加缺失按钮；不启动后台监听。
+
+### 2026-11-03：文档融合通用入口
+
+按用户要求，本地修改 `ACTION:doc-merge` 默认提示词：用户指定待融合的文档和目标，未指定文档时先询问；支持不同类型文档，保留来源并标明冲突及待确认项。按钮由绑定 `component-doc-merge` 的 Skill 入口改为独立提示词入口，以避免原技能的组件需求/设计范围限制；两个分组仍共用同一动作 ID。来源为用户要求及本仓库既有动作，本地编写，无上游升级；原上游来源与许可信息不变。修改前基线为 Git HEAD `05dab9cdc51965b4e4e6bb5afa4f8553c4889e27`，可从该提交恢复默认动作；发布 bundle 和 portable 动作产物同步。已保存的用户配置不会自动覆盖，需在设置中更新对应按钮。
+
+验证：`tests/project-handover.node.test.mjs` 5 项通过；`scripts/verify-client-bundle.mjs` 和 `scripts/build-action-bundle.mjs --check` 通过。未执行真实宿主界面交互验证。用户确认更新本台账及交接需求规格。
