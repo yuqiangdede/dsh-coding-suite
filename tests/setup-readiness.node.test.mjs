@@ -29,6 +29,10 @@ test('accepts equivalent layout formatting and separate category rows', async ()
   const unsafe = layout.replace('docs/_work/<task-id>/tmp/', 'docs/_work/<task-id>/../../outside/')
   assert((await check({ ...complete, 'docs/agents/document-layout.md': unsafe })).missing.some(value => value.includes('临时缓存目录路径无效')))
 })
+test('accepts Markdown tables without an opening pipe', async () => {
+  const layout = complete['docs/agents/document-layout.md'].replace(/^\| /gm, '')
+  assert.deepEqual(await check({ ...complete, 'docs/agents/document-layout.md': layout }), { ready: true, missing: [] })
+})
 test('accepts a task workspace root and categories from an existing project', async () => {
   const layout = `<!-- dsh-document-layout:v1 -->
 - 知识索引: \`docs/pocket/README.md\`

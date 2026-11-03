@@ -25,7 +25,7 @@ export declare const zh: {
     readonly confirmDraft: "存在未发送内容或输入位置变化，未执行快捷确认。";
     readonly confirmPrompt: "确认。请按照你上一条回复中已明确推荐的默认方案或待确认事项继续推进；不要重新讨论已经确定的选择。如果你提出了多个互斥选项却没有明确推荐，或仍缺少必须由我决定的信息，请继续询问而不是替我选择。本次快捷确认不授权删除或覆盖重要数据、生产环境变更、凭据操作等高风险或不可逆操作；此类操作需另行说明具体范围与风险，并再次取得明确确认。";
     readonly setupFirst: "请先初始化当前项目。";
-    readonly setupReady: "当前项目的工程 Skills 配置已核实，可重新检查。";
+    readonly setupReady: "检查并完善当前项目的工程 Skills 配置和文档结构。";
     readonly setupCheckFailed: "项目初始化状态检查失败：";
     readonly groupRequirementsAnalysis: "需求";
     readonly groupDevelopment: "开发";

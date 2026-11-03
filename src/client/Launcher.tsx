@@ -8,7 +8,7 @@ import css from './Launcher.module.css'
 type Props = PropsRuntime<'conversation.input.dock'> & PropsLocale<'mattSkillLauncher'> & InjectFace<LauncherInjected>
 export function Launcher({
   useInput, useConversation, useSession, useProjection, inputActions, useActionForm, fetchSkillNames,
-  saveLayout, todoStaleMs, projectRoot, checkProjectSetup, t,
+  saveLayout, todoStaleMs, checkProjectSetup, t,
 }: Props) {
   const snapshot = useActionForm(x => x)
   const input = useInput(x => x)
@@ -42,11 +42,6 @@ export function Launcher({
   const [commonEdit, setCommonEdit] = useState<{ ids: string[], revision: number } | null>(null)
   const [pending, setPending] = useState(false)
   const [notice, setNotice] = useState('')
-  const [setup, setSetup] = useState<{
-    root: string; status: 'checking' | 'ready' | 'missing' | 'error'; missing: readonly string[]
-  }>({ root: '', status: 'checking', missing: [] })
-  const checkerRef = useRef(checkProjectSetup)
-  checkerRef.current = checkProjectSetup
   const alive = useRef(true)
   const groupRows = useRef<Record<string, HTMLDivElement | null>>({})
   const groupProbes = useRef<Record<string, HTMLDivElement | null>>({})
@@ -67,20 +62,7 @@ export function Launcher({
   // instead of guessing the stage from keywords inside that prompt.
   const entries = sessionRunning ? [] : chatEntries(chat)
   const history = conversationHistory(chat, actions)
-  const root = projectRoot ?? ''
   const latestReply = !sessionRunning && entries.at(-1)?.role === 'assistant' ? entries.at(-1)?.text : ''
-  // On new workspace or completed response, verify disk files again; no global completed flag.
-  useEffect(() => {
-    let cancelled = false
-    setSetup({ root, status: 'checking', missing: [] })
-    void checkerRef.current().then(report => {
-      if (!cancelled) setSetup({ root, status: report.ready ? 'ready' : 'missing', missing: report.missing })
-    }).catch(error => {
-      if (!cancelled) setSetup({ root, status: 'error', missing: [String(error)] })
-    })
-    return () => { cancelled = true }
-  }, [root, latestReply])
-  const setupReady = setup.root === root && setup.status === 'ready'
   const initializeAction = DEFAULT_ACTIONS.find(action => action.id === 'initialize')!
   const recommendation = recommend(entries, sessionRunning, enabledActions)
   const recommendedActions = recommendation
@@ -197,22 +179,19 @@ export function Launcher({
   const insert = async (action: CodingAction) => {
     if (!available || commandLock.current) return
     setNotice('')
+    let setupContext = ''
     if (action.id !== 'initialize') {
-      if (!setupReady) { setNotice(t('setupFirst')); return }
-      // Re-evaluate before each insert: manually deleted files re-lock the UI.
+      // Always re-evaluate: files may have changed since the last failed check.
       commandLock.current = true
       setPending(true)
       try {
         const report = await checkProjectSetup()
         if (!alive.current) return
-        setSetup({ root, status: report.ready ? 'ready' : 'missing', missing: report.missing })
-        if (!report.ready) { setNotice(t('setupFirst') + report.missing.join('；')); return }
+        if (!report.ready) setupContext = report.missing.join('；') || '初始化状态未就绪，缺项待核实'
       } catch (error) {
         if (alive.current) {
-          setSetup({ root, status: 'error', missing: [String(error)] })
-          setNotice(t('setupCheckFailed') + String(error))
+          setupContext = '自动检查失败：' + String(error)
         }
-        return
       } finally {
         commandLock.current = false
         if (alive.current) setPending(false)
@@ -225,6 +204,9 @@ export function Launcher({
     }
     let value = withEvidence(action.prompt, recommendation, action.id, entries, t('defaultLocale') === 'en')
     if (action.id !== 'initialize') {
+      if (setupContext) {
+        value += '\n\n执行上述任务前，先检查并补全当前项目缺失的初始化步骤与文档结构。检查线索（可能有误，请以项目文件为准）：' + setupContext + '。读取已安装的 setup-matt-pocock-skills Skill 及其 _shared/SETUP_AUTO_DECISIONS.md，复用现有文档权威；自动完成可验证、无冲突的工程初始化项，验证并报告实际变更。对冲突、覆盖或迁移已有资料等需要决定的事项，只暂停受影响部分并说明；其余可独立进行的任务继续。若 Skill 不可用，说明限制并依据项目现有规则尽力完成安全项，不要声称已执行该 Skill。完成可执行的初始化后继续上述任务。'
+      }
       value += '\n\n统一文档及产物路由：在读取、写入或依赖正式文档、阶段中间稿、评审/Gate、转换缓存前，先读当前项目 docs/agents/document-layout.md 和其知识索引。沿用登记的正式权威文件，所有文件型中间产物进入登记的任务专属工作区，不因 Skill 默认输出路径创建第二套文档。改写正式文件先显示差异并取得确认，结束时列出实际文件路径。'
     }
     if (action.kind === 'skill') {
@@ -304,10 +286,10 @@ export function Launcher({
           {!layout.visibleGroups[group.id] && groupHasRecommendation(group.id) ? ' •' : ''}
         </button>)}
         <button type="button" data-setup-action="initialize"
-          className={setupReady ? css.groupToggle : css.setupRequired}
-          aria-label={t('setupLabel')} title={setupReady ? t('setupReady') : t('setupFirst')}
+          className={css.groupToggle}
+          aria-label={t('setupLabel')} title={t('setupReady')}
           onClick={() => { void insert(initializeAction) }} disabled={!available}>
-          {t('setupLabel')}{!setupReady ? ' •' : ''}
+          {t('setupLabel')}
         </button>
         <button type="button" data-quick-confirm="previous-reply"
           className={css.groupToggle} aria-label={t('confirmLabel')}
@@ -364,11 +346,7 @@ export function Launcher({
           {renderGroupActions(group.id, t(group.label), group.actions)}
         </div>)}
     </>}
-    {!setupReady && setup.status !== 'checking' && <div className={css.hint} role="status">
-      {setup.status === 'error' ? t('setupCheckFailed') : t('setupFirst')}
-      {setup.root === root && setup.missing.length ? ' ' + setup.missing.join('；') : ''}
-    </div>}
-    {visibleRecommendation && setupReady && <div className={css.hint} aria-live="polite">{t('recommendationHint').replace('{actions}', recommendedActions.map(displayLabel).join(t('recommendationSeparator'))).replace('{reason}', t(visibleRecommendation.reason))}</div>}
+    {visibleRecommendation && <div className={css.hint} aria-live="polite">{t('recommendationHint').replace('{actions}', recommendedActions.map(displayLabel).join(t('recommendationSeparator'))).replace('{reason}', t(visibleRecommendation.reason))}</div>}
     {watching && <div className={`${css.progressWarning} ${planMayBeStale ? css.progressWarningActive : ''}`} role="status">
       {planMayBeStale ? t('todoStale').replace('{minutes}', String(unchangedMinutes)) : null}
     </div>}

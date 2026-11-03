@@ -1,5 +1,6 @@
 import assert from 'node:assert/strict'
 import { test } from 'node:test'
+import { readFile } from 'node:fs/promises'
 
 // Exercise the shipped browser bundle, not only its TypeScript source.
 const registrations = []
@@ -19,6 +20,7 @@ const modules = { react, 'react/jsx-runtime': { jsx, jsxs: jsx } }
 const client = registrations[0].factory(specifier => modules[specifier] ??= {})
 const registrationsBySlot = []
 const form = { status: 'ready', writable: true, revision: 1, value: {} }
+const remote = { skills: {}, workspaceFiles: {} }
 client.apply({
   effect: effect => effect(),
   on: () => () => {},
@@ -31,7 +33,7 @@ client.apply({
       projections: { faceOf: () => ({ getSnapshot: () => null }) },
     } }),
   },
-  remote: { skills: {}, workspaceFiles: {} },
+  remote,
   slots: {
     inject: (_, register) => register(),
     register: (options, component) => {
@@ -43,6 +45,20 @@ client.apply({
 const dock = registrationsBySlot.find(slot => slot.options.name === 'conversation.input.dock')
 assert.ok(dock)
 const injected = dock.options.inject('session')
+test('setup checker reads every page of workspace files', async () => {
+  remote.skills.list = async () => ({ ok: true, value: { skills: [{ name: 'setup-matt-pocock-skills' }] } })
+  remote.workspaceFiles.read = async (_session, path, { offset }) => {
+    try {
+      const lines = (await readFile(new URL('../' + path, import.meta.url), 'utf8')).split(/\r?\n/)
+      const page = lines.slice(offset - 1, offset + 1)
+      return { ok: true, value: { text: page.join('\n'), lines: page.length, eof: offset - 1 + page.length >= lines.length, version: '1' } }
+    } catch (error) {
+      if (error.code === 'ENOENT') return { ok: false, error: { code: 'workspace-file/not-found' } }
+      throw error
+    }
+  }
+  assert.deepEqual(await injected.checkProjectSetup(), { ready: true, missing: [] })
+})
 
 const reply = { legacy: { nodes: [
   { data: { node: { kind: 'user', text: 'May I proceed?' } } },
@@ -82,8 +98,29 @@ function renderConfirm(options = {}) {
   const initializeAt = nodes.findIndex(node => node.props['data-setup-action'] === 'initialize')
   const confirmAt = nodes.findIndex(node => node.props['data-quick-confirm'] === 'previous-reply')
   assert.ok(initializeAt >= 0 && confirmAt === initializeAt + 1, 'Confirm follows Initialize')
-  return { confirm: nodes[confirmAt], calls }
+  return { confirm: nodes[confirmAt], nodes, calls }
 }
+
+test('actions include automatic setup when missing or checking fails, and proceed normally when ready', async () => {
+  injected.fetchSkillNames = async () => ({ includes: () => true })
+  for (const result of [
+    { ready: false, missing: ['文档布局缺少类别：外部工单'] },
+    new Error('offline'),
+    { ready: true, missing: [] },
+  ]) {
+    injected.checkProjectSetup = async () => { if (result instanceof Error) throw result; return result }
+    const { nodes, calls } = renderConfirm()
+    const action = nodes.find(node => node.props.className?.includes('action') && typeof node.props.onClick === 'function')
+    assert.ok(action)
+    action.props.onClick()
+    await new Promise(resolve => setTimeout(resolve, 0))
+    assert.equal(calls.inserted.length, 1)
+    assert.equal(calls.inserted[0].text.includes('先检查并补全当前项目'), result instanceof Error || !result.ready)
+    if (result instanceof Error) assert.match(calls.inserted[0].text, /offline/)
+    else if (!result.ready) assert.match(calls.inserted[0].text, /外部工单/)
+    assert.equal(calls.submitted, 0)
+  }
+})
 
 test('one click confirms and submits a completed reply before project initialization', () => {
   const { confirm, calls } = renderConfirm()

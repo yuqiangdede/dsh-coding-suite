@@ -20,6 +20,7 @@
 | `assets/skills/overall-design/SKILL.md` / `references/delivery.md` | 设计文档默认路径和中间稿路由修正 |
 | `assets/skills/project-handover-requirement-summary/SKILL.md` | 本地 Skill 回退路径改为读取项目布局，不擅自新建 `docs/pocket/handover/` |
 | `src/client/actions.ts` / `initialize` | 用户要求下的默认按钮提示词更新；已持久化自定义提示词不被强行覆盖 |
+| `src/client/Launcher.tsx` / 自动初始化附加提示词 | 2026-11-03 依据用户要求本地编写，参考本仓库 `assets/skills/_shared/SETUP_AUTO_DECISIONS.md`；无外部上游，许可沿用项目 MIT，基线为本次变更前 Git 内容 |
 | `assets/skills/_shared/ARTIFACT_LAYOUT.md` / `DOCUMENT_AUTHORITY.md` / `POCKET_SETUP.md` | 明确统一路由与初始化安全默认授权的作用范围 |
 
 对实际业务项目的任何执行必须先读取该项目文件并核验安全前提，不能把本仓库的路径修正规则视为已修改其他项目文件。

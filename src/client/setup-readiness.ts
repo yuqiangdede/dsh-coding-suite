@@ -47,7 +47,7 @@ export async function evaluateProjectSetup(read: ProjectSetupReader, skills: rea
     if (!safe(cachePath) || !cachePath.endsWith('/') || (safe(work) && !cachePath.startsWith(work))) {
       missing.push('临时缓存目录路径无效或不在中间产物根目录内')
     }
-    const categories = layout.split(/\r?\n/).map(line => /^\s*\|\s*([^|]+)\s*\|/.exec(line)?.[1]?.replace(/\*\*/g, '').trim() ?? '')
+    const categories = layout.split(/\r?\n/).map(line => /^\s*\|?\s*([^|]+)\s*\|/.exec(line)?.[1]?.replace(/\*\*/g, '').trim() ?? '')
     const has = (term: string) => categories.some(category => category.includes(term))
     const kinds: [string, boolean][] = [
       ['正式需求', has('需求')], ['设计与架构', has('设计')],

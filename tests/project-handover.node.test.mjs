@@ -24,6 +24,7 @@ test('one handover action, canonical group and localized labels', () => {
   assert.equal(en.groupHandoverDocs, 'Project Handover')
   const actions = ids.map(id => DEFAULT_ACTIONS.find(a => a.id === id))
   assert(actions.every(Boolean))
+  assert.equal(actions[0].label, '追溯需求')
   assert.deepEqual(actions.map(a => a.skillId), skillIds)
   assert(actions.every(a => a.kind === 'skill' && a.enabled && !a.pinned))
   assert.deepEqual(actionsForGroup('handover-docs', DEFAULT_ACTIONS, defaultLauncherLayout(DEFAULT_ACTIONS)).map(a => a.id), [...ids, 'doc-merge'])
@@ -35,6 +36,14 @@ test('one handover action, canonical group and localized labels', () => {
   assert.deepEqual(actionsForGroup('common', old, layout), [])
   assert.deepEqual(actionsForGroup('others', old, layout), [])
   assert(retiredIds.every(id => !existsSync(resolve(skillRoot, 'project-' + id))))
+})
+
+test('the previous saved label is renamed without changing custom labels or bindings', () => {
+  const preset = DEFAULT_ACTIONS.find(a => a.id === ids[0])
+  const parse = action => parseActions(encodeActions([action]))[0]
+  assert.equal(parse({ ...preset, label: '需求汇总' }).label, '追溯需求')
+  assert.equal(parse({ ...preset, label: '自定义名称' }).label, '自定义名称')
+  assert.equal(parse({ ...preset, label: '需求汇总', skillId: 'custom-skill' }).label, '需求汇总')
 })
 
 test('old visibility, custom actions and pinned order survive migration', () => {

@@ -199,12 +199,23 @@ export function apply(ctx: ClientContext): void {
           const skills = await ctx.remote.skills.list({ sessionId })
           if (!skills.ok) throw new Error(skills.error.message)
           return evaluateProjectSetup(async path => {
-            const result = await ctx.remote.workspaceFiles.read(sessionId, path, { offset: 1, limit: 300 }, new AbortController().signal)
-            if (!result.ok) {
-              if (result.error.code === 'workspace-file/not-found') return null
-              throw new Error(result.error.message)
+            const pages: string[] = []
+            let offset = 1
+            let version: string | undefined
+            for (;;) {
+              const result = await ctx.remote.workspaceFiles.read(sessionId, path, { offset }, new AbortController().signal)
+              if (!result.ok) {
+                if (offset === 1 && result.error.code === 'workspace-file/not-found') return null
+                throw new Error(result.error.message)
+              }
+              const page = result.value
+              if (version !== undefined && page.version !== version) throw new Error('检查期间文件已更改：' + path)
+              version = page.version
+              pages.push(page.text)
+              if (page.eof) return pages.join('\n')
+              if (page.lines <= 0) throw new Error('文件读取未前进：' + path)
+              offset += page.lines
             }
-            return result.value.text
           }, skills.value.skills.map(skill => skill.name))
         },
         saveLayout: (json, rev) => form.mutate([{ op: 'set', path: ['layoutJson'], value: json }], rev),
