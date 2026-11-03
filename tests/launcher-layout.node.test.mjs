@@ -22,6 +22,7 @@ test('six group IDs, defaults, and ordered button references', () => {
   assert.match(drawing.prompt, /只有占位文字/ )
   assert.match(drawing.prompt, /先询问/)
   assert.match(drawing.prompt, /Mermaid 代码块/)
+  assert.match(drawing.prompt, /```mermaid/)
   assert.equal(actionsForGroup('common', DEFAULT_ACTIONS, layout)[0], DEFAULT_ACTIONS.find(a => a.id === 'bug'))
 })
 
