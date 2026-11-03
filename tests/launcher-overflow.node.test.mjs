@@ -161,11 +161,11 @@ test('development group is renamed in both the launcher and settings dictionary'
   assert.ok(!h.nodes(h.render()).some(n => n.props?.children === '需求开发'))
 })
 
-test('pipeline group renders eight then expands all eleven stages and inserts correct drafts without sending', async () => {
+test('pipeline group renders eight then expands all configured stages and inserts correct drafts without sending', async () => {
   const h = harness()
-  const expected = ['product-development-pipeline', 'requirement-clarification', 'requirement-analysis', 'product-risk-gate', 'solution-design', 'product-module-gate', 'product-state-gate', 'product-exception-gate', 'product-prd-pages', 'product-consistency-gate', 'product-image-prompt']
+  const expected = ['requirement-clarification', 'requirement-analysis', 'product-risk-gate', 'solution-design', 'product-module-gate', 'product-state-gate', 'product-exception-gate', 'prd-writing', 'requirement-review', 'product-prd-pages', 'product-consistency-gate', 'product-image-prompt']
   assert.equal(h.actionButtons('requirements-analysis').length, 8)
-  assert.equal(h.overflow('requirements-analysis').props.children, '更多（3）')
+  assert.equal(h.overflow('requirements-analysis').props.children, '更多（4）')
   h.overflow('requirements-analysis').props.onClick()
   assert.deepEqual(h.actionButtons('requirements-analysis').map(n => n.props.children), expected.map(id => DEFAULT_ACTIONS.find(a => a.id === id).label))
   for (const [index, id] of expected.entries()) {
@@ -209,34 +209,34 @@ test('default groups expand independently, preserve action order and retain over
   const h = harness()
   assert.equal(h.actionButtons('common').length, 8)
   assert.equal(h.actionButtons('development').length, 8)
-  assert.equal(h.overflow('development').props.children, '更多（7）')
+  assert.equal(h.overflow('development').props.children, '更多（13）')
   h.overflow('development').props.onClick()
-  assert.equal(h.actionButtons('development').length, 15)
+  assert.equal(h.actionButtons('development').length, 21)
   assert.equal(h.actionButtons('common').length, 8)
-  const developmentOrder = ['需求讨论', '可视化讨论', '固化需求', '拆分工单', '编码', 'Bug排查', '增加日志', '分析日志', '代码审查', '修复', '编译', '健康验收', '提交代码', '补充文档', '远程调试']
+  const developmentOrder = ['咨询', '资料研究', '需求讨论', '领域建模', '制作原型', '固化需求', '拆分工单', '架构优化', '测试驱动开发', '编码', 'Bug排查', '增加日志', '分析日志', '远程调试', '代码审查', '修复', '编译', '健康验收', '提交代码', '复盘', '上下文交接']
   assert.deepEqual(h.actionButtons('development').map(n => n.props.children), developmentOrder)
   h.overflow('development').props.onClick()
   h.data.messages = [{ role: 'user', text: '/implement' }, { role: 'assistant', text: '实现完成，测试通过' }]
   assert.match(h.overflow('development').props.children, /•/, 'hidden recommended Build remains discoverable')
   const english = harness({ english: true })
-  assert.equal(english.overflow('development').props.children, 'More (7)')
+  assert.equal(english.overflow('development').props.children, 'More (13)')
   assert.match(english.overflow('development').props['aria-label'], /Development/)
 })
 
 test('rows fill the available width and only collapse the buttons that do not fit', () => {
-  const widths = Array(15).fill(50)
+  const widths = Array(21).fill(50)
   const layout = { schemaVersion: 1, commonActionIds: [], visibleGroups: { common: false, 'requirements-analysis': false, development: true, documents: false, others: false } }
   const h = harness({ measured: true, rowWidth: 600, widths, moreWidth: 70, layout })
   h.render(); h.flush(); h.render()
   assert.equal(h.actionButtons('development').length, 9)
-  assert.equal(h.overflow('development').props.children, '更多（6）')
+  assert.equal(h.overflow('development').props.children, '更多（12）')
   h.row.clientWidth = 300
   h.render(); h.flush(); h.render()
   assert.equal(h.actionButtons('development').length, 4)
-  assert.equal(h.overflow('development').props.children, '更多（11）')
-  h.row.clientWidth = 1000
+  assert.equal(h.overflow('development').props.children, '更多（17）')
+  h.row.clientWidth = 1200
   h.render(); h.flush(); h.render()
-  assert.equal(h.actionButtons('development').length, 15)
+  assert.equal(h.actionButtons('development').length, 21)
   assert.equal(h.overflow('development'), undefined, 'no More when the whole row fits')
 })
 
@@ -292,14 +292,14 @@ test('common editor groups all enabled actions and synchronizes repeated members
   const group = id => nodes().find(n => n.props?.['data-common-editor-group'] === id)
   const labels = id => h.nodes(group(id)).filter(n => n.type === 'label').map(n => n.props.children[1])
   assert.deepEqual(['requirements-analysis', 'development', 'documents', 'handover-docs', 'others'].map(id => group(id).props['aria-label']), ['需求', '开发', '验收文档', '交接文档', '其他'])
-  assert.ok(labels('requirements-analysis').includes('全流程'))
+  assert.ok(labels('requirements-analysis').includes('风险扫描'))
   assert.ok(labels('development').includes('健康验收'))
-  assert.ok(labels('others').includes('健康验收'))
+  assert.ok(labels('handover-docs').includes('文档融合'))
   assert.ok(labels('development').includes('Bug排查'))
   assert.ok(!labels('others').includes('Bug排查'))
   assert.ok(labels('others').includes('Action 0'))
   assert.ok(!labels('others').includes('Action 1'))
-  const repeated = () => nodes().filter(n => n.type === 'label' && n.props.children[1] === '健康验收')
+  const repeated = () => nodes().filter(n => n.type === 'label' && n.props.children[1] === '文档融合')
     .map(label => h.nodes(label).find(n => n.type === 'input'))
   assert.equal(repeated().length, 2)
   repeated()[0].props.onChange({ target: { checked: true } })

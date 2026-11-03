@@ -33,7 +33,11 @@ let inserted = ''
 const form = {
   status: 'ready', writable: true, revision: 7,
   value: {},
-  mutate: async (...args) => { mutations.push(args); return true },
+  mutate: async (...args) => {
+    mutations.push(args)
+    for (const operation of args[0]) form.value[operation.path[0]] = operation.value
+    return true
+  },
 }
 const ctx = {
   effect: create => { create() },
@@ -84,11 +88,11 @@ assert.equal(buttons.some(x => x.props.children === 'manualMode'
   || x.props.children === 'autoMode' || x.props.children === 'autoPrepare'), false, 'the withdrawn mode controls must not render')
 assert.deepEqual(toggles.map(x => [x.props.children].flat().filter(value => typeof value === 'string').join('')), ['groupCommon', 'groupRequirementsAnalysis', 'groupDevelopment', 'groupDocuments', 'groupHandoverDocs', 'groupOthers'])
 assert.deepEqual(toggles.map(x => x.props['aria-pressed']), [true, true, true, false, false, false])
-assert.equal(buttons.filter(x => x.props.children === '编码').length, 2)
+assert.equal(buttons.filter(x => x.props.children === '编码').length, 1)
 assert.equal(buttons.filter(x => x.props.children === '开发').length, 0)
-assert.equal(buttons.filter(x => x.props.children === 'Bug排查').length, 2, 'common and development both expose diagnosis')
+assert.equal(buttons.filter(x => x.props.children === 'Bug排查').length, 1, 'diagnosis starts in the common row')
 assert.equal(buttons.filter(x => x.props.children === '需求讨论').length, 2)
-assert.equal(buttons.filter(x => x.props.children === '修复').length, 1, 'development action starts collapsed')
+assert.equal(buttons.filter(x => x.props.children === '修复').length, 1, 'repair is visible in common while development starts collapsed')
 assert.equal(buttons.filter(x => x.props.children === '继续').length, 0, 'ninth Common action starts collapsed')
 const overflow = buttons.filter(x => x.props['aria-expanded'] === false)
 assert.equal(overflow.length, 3, 'Common, Requirements Analysis and Development offer independent More controls')
@@ -96,6 +100,10 @@ for (const button of overflow) button.props.onClick()
 nodes.length = 0
 visit(render())
 assert.equal(nodes.filter(x => x.type === 'button' && x.props.children === '继续').length, 1)
+toggles[3].props.onClick()
+await Promise.resolve()
+nodes.length = 0
+visit(render())
 let supplement = nodes.find(x => x.type === 'button' && x.props.children === '补充文档')
 assert(supplement, 'Supplement Docs button missing')
 injected.checkProjectSetup = async () => ({ ready: false, missing: ['缺少知识索引'] })
@@ -119,8 +127,6 @@ assert(inserted.includes('来源：本会话'), 'supplement draft must default t
 assert(inserted.includes('时间段'), 'supplement draft must offer a time range')
 assert(inserted.includes('版本'), 'supplement draft must offer a version baseline')
 assert(inserted.includes('接收补充来源'), 'supplement draft must include receiving instructions')
-toggles[3].props.onClick()
-await Promise.resolve()
 assert.equal(mutations.length, 1)
 const [operations, revision] = mutations[0]
 assert.equal(revision, 7)
