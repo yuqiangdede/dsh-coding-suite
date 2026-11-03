@@ -203,6 +203,9 @@ export function Launcher({
       setNotice(t('start')); return
     }
     let value = withEvidence(action.prompt, recommendation, action.id, entries, t('defaultLocale') === 'en')
+    if (action.id === 'handover-requirement-summary' && action.kind === 'skill' && action.skillId === 'project-handover-requirement-summary') {
+      value += '\n\n成果物约定：本次追溯结果统一写成布局登记的中间产物根目录下 requirement-trace/<任务ID>/requirements-from-svn.md 工作稿；任务 ID 按仓库、分支和范围稳定确定，同一任务复用，不同任务不覆盖。先核查现有文件并按项目及 Skill 写入规程展示内容或差异并取得确认；正式交接内容仍复用现有权威位置。旧提示中的仅在对话展示由此成果物约定替代。'
+    }
     if (action.id !== 'initialize') {
       if (setupContext) {
         value += '\n\n执行上述任务前，先检查并补全当前项目缺失的初始化步骤与文档结构。检查线索（可能有误，请以项目文件为准）：' + setupContext + '。读取已安装的 setup-matt-pocock-skills Skill 及其 _shared/SETUP_AUTO_DECISIONS.md，复用现有文档权威；自动完成可验证、无冲突的工程初始化项，验证并报告实际变更。对冲突、覆盖或迁移已有资料等需要决定的事项，只暂停受影响部分并说明；其余可独立进行的任务继续。若 Skill 不可用，说明限制并依据项目现有规则尽力完成安全项，不要声称已执行该 Skill。完成可执行的初始化后继续上述任务。'

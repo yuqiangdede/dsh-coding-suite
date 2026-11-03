@@ -36,6 +36,8 @@
 | `assets/skills/project-handover-requirement-summary/SKILL.md` | 本地编写的 SVN 日志范围、去重、证据、输出与写入规程 |
 | `src/client/launcher-layout.ts` / `handover-docs` | 将新按钮加入交接分组末尾 |
 
+2026-11-03：依据用户要求本地改造 `assets/skills/project-handover-requirement-summary/SKILL.md` 和 `src/client/Launcher.tsx` 的追溯成果路径及兼容提示，参考本仓库文档布局和共享交接规程；无外部上游，许可沿用项目 MIT，基线为本次变更前 Git 内容。
+
 ## 2026-11-02 项目交接分组本地新增资产（实施分支）
 
 来源类别：**本地编写（依据用户确认的项目交接需求）**；提供者：dsh-coding-suite；日期：2026-11-02；外部上游版本/许可：不适用（未复制第三方正文）。基线：本次功能 PR 的 Git 提交历史。正式业务依据：[交接需求](../requirements/project-handover.md)；既有 [Pocket 约定](knowledge-policy.md)、[源码证据工具](../../../assets/skills/_shared/EVIDENCE.md) 为方法参考，不代表改写其来源和协议。
