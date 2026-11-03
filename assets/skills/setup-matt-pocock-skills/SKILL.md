@@ -17,6 +17,8 @@ This is a prompt-driven Skill supported by a safe reconciliation script. Read [a
 
 **Fork-specific Pocket extension:** Apply [single-authority document routing](../_shared/DOCUMENT_AUTHORITY.md) before [Pocket setup conventions](../_shared/POCKET_SETUP.md) while performing the existing steps below. There is no separate Pocket initializer. Pocket is a lightweight Markdown index and missing-topic fallback, **not** an RAG index or a mandatory parallel document tree.
 
+The Section E `docs/` root cleanup is a narrowly scoped relocation request: plan it explicitly and follow the target project's approval rules. General prohibitions on silent or unapproved migration still apply; they do not prevent an expressly authorized root cleanup.
+
 ## Process
 
 ### 1. Explore
@@ -68,9 +70,11 @@ For a new project without document conventions, `docs/pocket/` may supply missin
 
 **Section D: Unified document and intermediate outputs.** Always complete after sections A–C. Inventory requirements/PRD, designs/ADRs, API/database, acceptance/handover/operations, external issue tracker, Gate/review records, intermediate extraction and conversion caches. Draft `docs/agents/document-layout.md` mapping each category to existing authoritative files or a fallback; choose a single task-specific intermediate work root. Recommend `docs/_work/` unless an established project work directory is preferable. Automatically resolve historical Skill default-path disagreements in favor of the project's already verified document layout, without creating a competing folder or migrating documents. Create missing setup-only layout and work-root README automatically when the safe criteria are satisfied; migration, collision, or editing approved documents still needs explicit approval.
 
-**Section E: 中文目录指导。** 完成其他初始化写入后，递归盘点目标项目 `docs/` 中实际存在的目录和文件，在 `docs/文档目录说明.md` 生成中文指导，逐项列出相对 `docs/` 的路径及用途，包含该指导文件自身。根据文件内容、已有索引和目录约定核实用途；无法判断时写“用途待确认”，不要臆造。说明生成时间、这是某次初始化的快照及重新初始化后可能需要更新；它仅作导航，不替代现有知识索引或主题权威资料。列出无法读取或因权限、安全原因跳过的路径及原因，不复制文件正文、敏感内容或秘密；不跟随指向项目外的符号链接。包括工作区及其实际文件，不创建空分类目录。
+**Section E: docs 根目录整理与中文目录指导。** 完成其他初始化写入后，检查目标项目 `docs/` 根目录：允许保留 `docs/文档目录说明.md` 和已有项目文档索引文件（例如作为索引使用的 `docs/README.md`），不强制搬迁索引；其他文件应整理至下一级目录。根据文件内容、现有索引和项目约定，为需整理的文件选择合适的下一级分类目录；保持内容和主题权威关系，更新项目内受影响的相对链接、索引、配置及 Agent 指针，核对文件和引用。不得仅凭文件名判断是否为索引、覆盖同名文件或臆测分类；索引用途或目的地不明、目的地冲突、权限不足、脏文件或引用无法安全处理时，报告原因并暂停该项。搬迁正式资料前遵循目标项目规则展示源路径、目标路径及引用变更差异并取得必要确认；用户已明确授权具体搬迁时不重复询问。其余初始化独立继续，未解决的文件须报告，不能声称整理完成。不跟随指向项目外的符号链接。
 
-若 `docs/文档目录说明.md` 不存在且路径无冲突，作为初始化说明安全创建；若已存在，先读取并保留用户内容，展示拟议差异，未经明确确认不得覆盖或修改。若已有等用途说明，复用该文件而不生成重复说明，并遵循相同的差异确认规则。最后重新核对清单与实际路径，报告生成、跳过、无法读取和待确认项；若指导未能创建或更新，不得声称指导已完成。
+在 `docs/文档目录说明.md` 生成中文指导，只列实际存在的文件夹相对路径及用途（包括工作区文件夹），不逐个介绍或列举文件，也不将本说明文件列为目录条目。根据已有索引和目录约定核实用途，无法判断时写“用途待确认”；说明生成时间、快照性质及重新初始化后可能需要更新。该说明仅作导航，不替代知识索引或主题权威资料；列出无法读取或因权限、安全原因跳过的目录及原因，不复制正文或敏感信息，不创建空分类目录。
+
+若 `docs/文档目录说明.md` 不存在且路径无冲突，作为初始化说明安全创建；若已存在，先读取并保留用户内容，展示拟议差异，未经明确确认不得覆盖或修改。若已有同用途说明或索引，优先复用其已有导航和权威关系；如无法避免形成相互竞争的说明，报告并暂停该项。已有根目录索引不因创建目录指导而被强制搬迁。最后核对根目录、目录清单与引用，报告已保留索引、已移动、跳过、无法读取和待确认项；整理或指导未完成时，不得声称对应工作已完成。
 
 ### 3. Apply safe recommendations, confirm only exceptions
 
