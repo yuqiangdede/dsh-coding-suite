@@ -445,3 +445,7 @@ git status --short
 - `ACTION:handover-log-guide`（`src/client/actions.ts`）：本地编写；来源为用户需求和仓库既有交接规程；无外部上游路径或版本。
 - `SKILL:project-handover-log-guide`（`assets/skills/project-handover-log-guide/SKILL.md`）：本地编写；参考仓库共享交接规程和用户需求；未复制外部 Skill，具体个人作者身份未知。
 - 引入日期：2026-11-03；适配现有 Launcher 分组、离线技能发现和文档差异确认流程。仓库许可见根目录 LICENSE。
+
+### 2026-11-03：问题排查入口扩展
+
+按用户要求将日志排查扩展为问题排查。按钮提示词、接收指令与 Skill 均基于本仓库已有资产本地改写；来源为本次用户需求及既有交接规程，未引入外部资源。保留原 ID；旧默认名称定向兼容，自定义名称和提示词保留。修改前基线为 Git 提交 `348a0b3`。

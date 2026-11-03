@@ -50,7 +50,7 @@ SSH 连接信息：<请填写用户名、主机及端口，或 SSH 配置别名>
 
 /** Initial editable actions supplied when no configuration is saved. */
 export const DEFAULT_ACTIONS: readonly CodingAction[] = [
-  { id: 'handover-log-guide', label: '日志排查', kind: 'skill', skillId: 'project-handover-log-guide', prompt: '请整理关键流程的日志排查说明。范围：全项目或我指定的模块/流程。优先查找开发实现时确认的日志记录文档，并结合当前源码、日志配置、现有流程和运维资料核对；缺失或冲突要明确标注。按现象和流程提供日志来源、关联字段、只读定位步骤、异常分支、证据和待确认项，示例须脱敏。先展示逐文件拟议内容或差异并获得明确确认，再写入既有权威文档；不修改业务代码或操作生产环境。', enabled: true, pinned: false, order: 354, description: '结合开发时确认的日志记录、实际代码与配置，为关键流程生成可追溯的日志排查指南。', example: '例如：整理订单创建流程的日志关联字段、异常分支和只读排查步骤。' },
+  { id: 'handover-log-guide', label: '问题排查', kind: 'skill', skillId: 'project-handover-log-guide', prompt: '请整理关键业务流程的问题排查交接指南，范围为全项目或我指定的模块/流程。结合业务流程说明、页面现象、接口和调用链、数据库数据与状态、打印日志、配置权限、外部依赖及时间线，核对证据与缺口，给出关联字段和只读定位步骤。先展示逐文件拟议内容或差异并获得明确确认，再写入既有权威文档；不修改业务代码或操作生产环境。', enabled: true, pinned: false, order: 354, description: '结合业务、页面、接口、数据、日志与环境证据，整理关键流程问题排查指南。', example: '例如：整理订单异常时从页面提示、订单状态、接口响应到日志关联的排查步骤。' },
   {"id":"handover-requirement-summary","label":"追溯需求","kind":"skill","skillId":"project-handover-requirement-summary","prompt":"请使用需求汇总 Skill，基于 SVN 提交记录整理交接功能清单。\n输入来源：本会话已提供的日志/导出文件，或明确指定的 SVN 工作副本/URL。\n分析范围：优先使用所给记录的完整范围；若读取实时 SVN 且未明确范围，先界定修订区间/时间/模块。\n按模块和业务能力把多个提交归并成不重复的功能点，区分新增功能、功能调整、缺陷修复、性能安全优化及非功能变更；保留 r修订号、来源路径、时间和证据等级；对回滚、重复及当前生效状态单独核查。\n输出摘要、按模块功能清单、关联修订号、非功能项、修订反查索引、未覆盖和待确认项。仅日志时不得宣称已核验代码、测试、上线或原始需求。\n默认只读，先在对话展示；需要写入交接资料时遵循项目初始化确定的文档目录及权威文件，展示逐文件内容/差异并取得明确确认。不得修改业务代码、SVN 仓库、生产环境或提交推送。","enabled":true,"pinned":false,"order":355,"description":"根据 SVN 提交历史按模块归并功能点，区分新增、调整、缺陷与非功能变更，关联修订号并标注核验状态。","example":"例如：分析已提供的 SVN r1200–r1350 日志，汇总各模块完成的功能和修复项。"},
   { id: 'product-risk-gate', label: '风险扫描', kind: 'skill', skillId: 'product-risk-gate', prompt: '只执行产品研发流水线的「需求风险扫描」阶段；先读取项目规则、对应 steps 契约和有效上游产物版本，沿用已确认决定，不假造前序 Gate 或重跑整条流程。PASS 后进入业务方案；FAIL 回退 requirement-clarification 或 requirement-analysis。 输出证据、关闭条件、回退阶段与实际结果标记；不写业务代码、不提交、不实际生图。', enabled: true, order: 320, description: '方案设计前检查问题、用户、范围、成功标准与依赖；方向性风险未关闭时回退澄清或分析。', example: '例如：只完成本阶段并携带有效产物和 Gate 记录交给下一阶段。' },
   { id: 'product-module-gate', label: '边界审计', kind: 'skill', skillId: 'product-module-gate', prompt: '只执行产品研发流水线的「模块边界审计」阶段；先读取项目规则、对应 steps 契约和有效上游产物版本，沿用已确认决定，不假造前序 Gate 或重跑整条流程。PASS 后进入数据与状态校验；FAIL 回退 solution-design。 输出证据、关闭条件、回退阶段与实际结果标记；不写业务代码、不提交、不实际生图。', enabled: true, order: 321, description: '冻结业务模块前检查职责重叠、边界语义和变更扩散；通过后进入数据/状态校验。', example: '例如：只完成本阶段并携带有效产物和 Gate 记录交给下一阶段。' },
@@ -116,7 +116,7 @@ export function missingDefaultActions(actions: readonly CodingAction[]): CodingA
 
 /** Translate presentation metadata for unsaved defaults only; persisted custom labels stay unchanged. */
 export const ENGLISH_DEFAULT_PRESENTATION: Readonly<Record<string, Pick<CodingAction, 'label' | 'description' | 'example'>>> = {
-  'handover-log-guide': { label: 'Log Troubleshooting', description: 'Document evidence-based log investigation for key workflows', example: 'e.g. Trace order creation using correlation fields and read-only checks.' },
+  'handover-log-guide': { label: 'Troubleshooting', description: 'Document investigation across business flows, UI, APIs, data, logs and environment', example: 'e.g. Trace an order issue from the UI and data state to API responses and logs.' },
   'handover-requirement-summary': { label: 'SVN Requirement Summary', description: 'Group SVN revisions into evidence-linked feature changes and fixes', example: 'e.g. Summarize modules and features from SVN r1200–r1350.' },
   'product-risk-gate': { label: 'Requirements Risk Gate', description: 'Run this pipeline stage against versioned upstream artifacts; report evidence, gates, closing conditions and the return stage.', example: 'e.g. Complete this stage and hand off valid artifacts and gate records.' },
   'product-module-gate': { label: 'Module Boundary Gate', description: 'Run this pipeline stage against versioned upstream artifacts; report evidence, gates, closing conditions and the return stage.', example: 'e.g. Complete this stage and hand off valid artifacts and gate records.' },
@@ -221,6 +221,10 @@ export function parseActions(text: string | undefined): CodingAction[] {
   })
   const loaded = doc.schemaVersion === 1 ? migrateActions(actions) : actions
   return loaded.map(action => {
+    if (action.id === 'handover-log-guide' && action.kind === 'skill' &&
+        action.skillId === 'project-handover-log-guide' && action.label === '日志排查') {
+      return { ...action, label: '问题排查' }
+    }
     if (action.id === 'handover-requirement-summary' && action.kind === 'skill' &&
         action.skillId === 'project-handover-requirement-summary' && action.label === '需求汇总') {
       return { ...action, label: '追溯需求' }

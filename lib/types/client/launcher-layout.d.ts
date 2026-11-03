@@ -15,7 +15,7 @@ export declare const LAUNCHER_GROUPS: readonly [{
 }, {
     readonly id: "handover-docs";
     readonly label: "groupHandoverDocs";
-    readonly actionIds: readonly ["handover-requirement-summary", "doc-merge"];
+    readonly actionIds: readonly ["handover-log-guide", "handover-requirement-summary", "doc-merge"];
 }, {
     readonly id: "others";
     readonly label: "groupOthers";

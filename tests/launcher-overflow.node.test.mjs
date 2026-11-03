@@ -52,7 +52,7 @@ function harness({ actions, layout, english = false, measured = false, rowWidth 
     layoutEffects.length = 0
     const tree = Launcher({
       useActionForm: fn => fn({ status: 'ready', value: data.config, writable: data.writable, revision: data.revision }),
-      useInput: fn => fn({ phase: 'plain', draft: '' }),
+      useInput: fn => fn({ phase: 'plain', draft: '', attachmentIds: [] }),
       useConversation: fn => fn({ views: new Map([['chat', { messages: data.messages }]]) }),
       useSession: fn => fn({ running: data.running }),
       useProjection: () => [],
@@ -62,6 +62,7 @@ function harness({ actions, layout, english = false, measured = false, rowWidth 
         persistDraft: () => events.push(['persist']),
       },
       fetchSkillNames: async () => DEFAULT_ACTIONS.filter(a => a.kind === 'skill').map(a => a.skillId),
+      checkProjectSetup: async () => ({ ready: true, missing: [] }),
       saveLayout: async (json, revision) => { events.push(['save', json, revision]); if (data.saveOk) data.config.layoutJson = json; return data.saveOk },
       todoStaleMs: 90000, t: key => dictionary[key] ?? key,
     })
@@ -196,7 +197,9 @@ test('groups show eight actions; the ninth is expanded and collapsed without cha
     assert.deepEqual(h.events, [])
     h.actionButtons('common')[8].props.onClick()
     await new Promise(resolve => setImmediate(resolve))
-    assert.deepEqual(h.events, [['insert', 'Prompt 8'], ['persist']])
+    assert.equal(h.events[0][0], 'insert')
+    assert.match(h.events[0][1], /^Prompt 8\n\n统一文档及产物路由：/)
+    assert.deepEqual(h.events.slice(1), [['persist']])
     h.overflow('common').props.onClick()
     assert.equal(h.actionButtons('common').length, 8)
   }
