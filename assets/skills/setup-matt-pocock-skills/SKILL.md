@@ -68,6 +68,10 @@ For a new project without document conventions, `docs/pocket/` may supply missin
 
 **Section D: Unified document and intermediate outputs.** Always complete after sections A–C. Inventory requirements/PRD, designs/ADRs, API/database, acceptance/handover/operations, external issue tracker, Gate/review records, intermediate extraction and conversion caches. Draft `docs/agents/document-layout.md` mapping each category to existing authoritative files or a fallback; choose a single task-specific intermediate work root. Recommend `docs/_work/` unless an established project work directory is preferable. Automatically resolve historical Skill default-path disagreements in favor of the project's already verified document layout, without creating a competing folder or migrating documents. Create missing setup-only layout and work-root README automatically when the safe criteria are satisfied; migration, collision, or editing approved documents still needs explicit approval.
 
+**Section E: 中文目录指导。** 完成其他初始化写入后，递归盘点目标项目 `docs/` 中实际存在的目录和文件，在 `docs/文档目录说明.md` 生成中文指导，逐项列出相对 `docs/` 的路径及用途，包含该指导文件自身。根据文件内容、已有索引和目录约定核实用途；无法判断时写“用途待确认”，不要臆造。说明生成时间、这是某次初始化的快照及重新初始化后可能需要更新；它仅作导航，不替代现有知识索引或主题权威资料。列出无法读取或因权限、安全原因跳过的路径及原因，不复制文件正文、敏感内容或秘密；不跟随指向项目外的符号链接。包括工作区及其实际文件，不创建空分类目录。
+
+若 `docs/文档目录说明.md` 不存在且路径无冲突，作为初始化说明安全创建；若已存在，先读取并保留用户内容，展示拟议差异，未经明确确认不得覆盖或修改。若已有等用途说明，复用该文件而不生成重复说明，并遵循相同的差异确认规则。最后重新核对清单与实际路径，报告生成、跳过、无法读取和待确认项；若指导未能创建或更新，不得声称指导已完成。
+
 ### 3. Apply safe recommendations, confirm only exceptions
 
 Call the model-invocable **`writing-for-agents` Skill** before drafting. Apply its pointer-writing, progressive disclosure, single-owner, and pruning guidance to the Agent instruction block, the Pocket index, and the domain-document pointers. When that Skill cannot be loaded, state the limitation instead of claiming it ran.
