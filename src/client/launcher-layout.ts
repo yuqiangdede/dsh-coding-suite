@@ -2,11 +2,11 @@ import type { CodingAction } from './actions.ts'
 
 /** Visual-only groups. One action ID may be referenced by several groups. */
 export const LAUNCHER_GROUPS = [
-  { id: 'requirements-analysis', label: 'groupRequirementsAnalysis', actionIds: ['product-development-pipeline', 'requirement-clarification', 'requirement-analysis', 'product-risk-gate', 'solution-design', 'product-module-gate', 'product-state-gate', 'product-exception-gate', 'product-prd-pages', 'product-consistency-gate', 'product-image-prompt'] },
-  { id: 'development', label: 'groupDevelopment', actionIds: ['discussion', 'visual', 'spec', 'plan', 'execute', 'bug', 'add-logs', 'analyze-logs', 'review', 'review-fix', 'compile', 'health-acceptance', 'commit', 'doc-supplement', 'remote-debug'] },
-  { id: 'documents', label: 'groupDocuments', actionIds: ['api-docs', 'requirements', 'overview', 'outline', 'database', 'doc-merge', 'docx'] },
-  { id: 'handover-docs', label: 'groupHandoverDocs', actionIds: ['handover-log-guide', 'handover-requirement-summary', 'doc-merge'] },
-  { id: 'others', label: 'groupOthers', actionIds: ['graphify-navigation', 'graphify-refresh', 'mermaid-draw', 'ask', 'health-acceptance', 'doc-supplement', 'tdd', 'prototype', 'architecture', 'domain', 'research', 'retro', 'handoff', 'image', 'prd-writing', 'requirement-review'] },
+  { id: 'requirements-analysis', label: 'groupRequirementsAnalysis', actionIds: ['requirement-clarification', 'requirement-analysis', 'product-risk-gate', 'solution-design', 'product-module-gate', 'product-state-gate', 'product-exception-gate', 'prd-writing', 'requirement-review', 'product-prd-pages', 'product-consistency-gate', 'product-image-prompt'] },
+  { id: 'development', label: 'groupDevelopment', actionIds: ['ask', 'research', 'discussion', 'domain', 'prototype', 'spec', 'plan', 'architecture', 'tdd', 'execute', 'bug', 'add-logs', 'analyze-logs', 'remote-debug', 'review', 'review-fix', 'compile', 'health-acceptance', 'commit', 'retro', 'handoff'] },
+  { id: 'documents', label: 'groupDocuments', actionIds: ['requirements', 'overview', 'outline', 'database', 'api-docs', 'doc-supplement', 'doc-merge', 'docx'] },
+  { id: 'handover-docs', label: 'groupHandoverDocs', actionIds: ['handover-requirement-summary', 'handover-log-guide', 'doc-merge'] },
+  { id: 'others', label: 'groupOthers', actionIds: ['visual', 'graphify-navigation', 'graphify-refresh', 'mermaid-draw', 'image', 'continue'] },
 ] as const
 
 export type OptionalGroupId = typeof LAUNCHER_GROUPS[number]['id']
@@ -23,7 +23,7 @@ export interface LauncherLayout {
 const defaultVisibility: Record<GroupId, boolean> = {
   common: true, 'requirements-analysis': true, development: true, documents: false, 'handover-docs': false, others: false,
 }
-const retiredHandoverIds = new Set(['handover-overview', 'handover-features', 'handover-flows', 'handover-troubleshooting', 'handover-maintain'])
+const retiredHandoverIds = new Set(['handover-overview', 'handover-features', 'handover-flows', 'handover-troubleshooting', 'handover-maintain', 'product-development-pipeline'])
 const actionIdPattern = /^[a-z0-9][a-z0-9-]{0,63}$/
 
 export function defaultLauncherLayout(actions: readonly CodingAction[], hasSavedActions = false): LauncherLayout {

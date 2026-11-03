@@ -57,7 +57,7 @@ export function Launcher({
   let layout = defaultLauncherLayout(actions)
   try { layout = parseLauncherLayout(snapshot.value?.layoutJson, actions, Boolean(snapshot.value?.actionsJson)) }
   catch (error) { invalid = explain(error) }
-  const enabledActions = actions.filter(a => a.enabled).sort((a, b) => displayOrder(a) - displayOrder(b))
+  const enabledActions = actions.filter(a => a.enabled && a.id !== 'product-development-pipeline').sort((a, b) => displayOrder(a) - displayOrder(b))
   // Buttons travel with their own prompt, so the request can be attributed by id
   // instead of guessing the stage from keywords inside that prompt.
   const entries = sessionRunning ? [] : chatEntries(chat)
@@ -275,12 +275,12 @@ export function Launcher({
     {(hasActions || historyGroups.length > 0) && <div className={css.groupToggles}>
       {hasActions && <div className={css.groupControls} role="group" aria-label={t('groupVisibility')}>
         <span className={css.groupToggleLabel}>{t('groupVisibility')}</span>
-        <button type="button" className={layout.visibleGroups.common ? css.groupToggleActive : css.groupToggle}
+        <button type="button" title={t('groupCommonHelp')} className={layout.visibleGroups.common ? css.groupToggleActive : css.groupToggle}
           aria-pressed={layout.visibleGroups.common} disabled={layoutSaving || Boolean(commonEdit) || snapshot.status !== 'ready' || !snapshot.writable}
           onClick={() => { void toggleGroup('common') }}>
           {t('groupCommon')}{!layout.visibleGroups.common && groupHasRecommendation('common') ? ' •' : ''}
         </button>
-        {groups.map(group => <button key={group.id} type="button"
+        {groups.map(group => <button key={group.id} type="button" title={t(({ 'requirements-analysis': 'groupRequirementsHelp', development: 'groupDevelopmentHelp', documents: 'groupDocumentsHelp', 'handover-docs': 'groupHandoverHelp', others: 'groupOthersHelp' } as const)[group.id])}
           className={layout.visibleGroups[group.id] ? css.groupToggleActive : css.groupToggle}
           aria-pressed={layout.visibleGroups[group.id]}
           disabled={layoutSaving || snapshot.status !== 'ready' || !snapshot.writable}

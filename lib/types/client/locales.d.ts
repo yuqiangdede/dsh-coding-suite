@@ -18,6 +18,12 @@ export declare const zh: {
     readonly commonLimit: "常用按钮最多 100 个。";
     readonly groupVisibility: "显示分组";
     readonly groupCommon: "常用";
+    readonly groupCommonHelp: "常用入口可自行编辑；按当前任务选择，不要求逐个执行。";
+    readonly groupRequirementsHelp: "建议：澄清 → 分析 → 风险扫描 → 业务方案 → 边界、数据状态和异常检查 → PRD 与需求评审 → 页面一致性校验 → 生图提示词。PRD/页面已包含写作和评审，单独按钮可按需使用。";
+    readonly groupDevelopmentHelp: "建议：按需咨询、研究和需求讨论 → 固化需求 → 拆分工单 → 编码或测试驱动开发 → 代码审查 → 修复 → 编译 → 健康验收 → 提交代码。领域建模、原型、架构优化、排查和复盘按需使用。";
+    readonly groupDocumentsHelp: "建议：需求文档 → 总体设计 → 概要设计 → 数据库设计和接口文档；按需补充、融合，最后转换 Word。";
+    readonly groupHandoverHelp: "建议：先追溯需求，再整理排查流程；需要整合资料时使用文档融合。";
+    readonly groupOthersHelp: "按需使用：可视化讨论用于澄清界面决策；代码图谱先创建再更新；绘图和交互生成按任务选择。";
     readonly setupLabel: "初始化";
     readonly confirmLabel: "确认";
     readonly confirmTooltip: "一键确认上一条模型回复中明确推荐的方案并发送；高风险操作仍需单独批准。";

@@ -3,23 +3,23 @@ import type { CodingAction } from './actions.ts';
 export declare const LAUNCHER_GROUPS: readonly [{
     readonly id: "requirements-analysis";
     readonly label: "groupRequirementsAnalysis";
-    readonly actionIds: readonly ["product-development-pipeline", "requirement-clarification", "requirement-analysis", "product-risk-gate", "solution-design", "product-module-gate", "product-state-gate", "product-exception-gate", "product-prd-pages", "product-consistency-gate", "product-image-prompt"];
+    readonly actionIds: readonly ["requirement-clarification", "requirement-analysis", "product-risk-gate", "solution-design", "product-module-gate", "product-state-gate", "product-exception-gate", "prd-writing", "requirement-review", "product-prd-pages", "product-consistency-gate", "product-image-prompt"];
 }, {
     readonly id: "development";
     readonly label: "groupDevelopment";
-    readonly actionIds: readonly ["discussion", "visual", "spec", "plan", "execute", "bug", "add-logs", "analyze-logs", "review", "review-fix", "compile", "health-acceptance", "commit", "doc-supplement", "remote-debug"];
+    readonly actionIds: readonly ["ask", "research", "discussion", "domain", "prototype", "spec", "plan", "architecture", "tdd", "execute", "bug", "add-logs", "analyze-logs", "remote-debug", "review", "review-fix", "compile", "health-acceptance", "commit", "retro", "handoff"];
 }, {
     readonly id: "documents";
     readonly label: "groupDocuments";
-    readonly actionIds: readonly ["api-docs", "requirements", "overview", "outline", "database", "doc-merge", "docx"];
+    readonly actionIds: readonly ["requirements", "overview", "outline", "database", "api-docs", "doc-supplement", "doc-merge", "docx"];
 }, {
     readonly id: "handover-docs";
     readonly label: "groupHandoverDocs";
-    readonly actionIds: readonly ["handover-log-guide", "handover-requirement-summary", "doc-merge"];
+    readonly actionIds: readonly ["handover-requirement-summary", "handover-log-guide", "doc-merge"];
 }, {
     readonly id: "others";
     readonly label: "groupOthers";
-    readonly actionIds: readonly ["graphify-navigation", "graphify-refresh", "mermaid-draw", "ask", "health-acceptance", "doc-supplement", "tdd", "prototype", "architecture", "domain", "research", "retro", "handoff", "image", "prd-writing", "requirement-review"];
+    readonly actionIds: readonly ["visual", "graphify-navigation", "graphify-refresh", "mermaid-draw", "image", "continue"];
 }];
 export type OptionalGroupId = typeof LAUNCHER_GROUPS[number]['id'];
 export type GroupId = 'common' | OptionalGroupId;
