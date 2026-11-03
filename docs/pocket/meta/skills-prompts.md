@@ -429,3 +429,13 @@ git status --short
 新增 `ACTION:mermaid-draw` 纯提示词动作，用于根据用户明确指定的内容绘制 Mermaid 图；缺少关键内容时先询问。来源为本次用户要求，由本地编写，未引入外部提示词或 Skill；项目许可见仓库 LICENSE。已保存配置需通过“补齐缺失预设”添加。
 
 2026-11-03：按用户要求，明确 Mermaid 代码块使用 `mermaid` 语言标记及独立结束围栏。修改基于本仓库现有提示词，由本地编写，未引入外部资源。已保存的按钮配置不会自动覆盖。
+
+## 2026-11-03 Matt 上游全量内置
+
+来源：[mattpocock/skills](https://github.com/mattpocock/skills)，作者 Matt Pocock，MIT，包版本 `1.3.2`，旧基线 `5beb35b040e3de97e54fa9e386d7e42d15c295c2`，新基线 `4ae2317ddb22b046e26455e4f9c9b3aaaf62212d`，引入日期 2026-11-03。全部 39 个上游 Skill 及其目录资源平铺注册；[逐文件清单](../../../assets/skills/matt-source.json)记录本地路径、上游路径与双方 SHA-256，原始基线在 `assets/skills/_upstream/matt/skills`，许可见 `assets/skills/MATT-LICENSE`。旧记录保留为历史。
+
+本地改造通过旧上游、本地及新上游三方比较保留；文本冲突的 `ask-matt`、`code-review`、`diagnosing-bugs`、`domain-modeling`、`implement`、`improve-codebase-architecture`、`pr`、`setup-matt-pocock-skills`、`tdd` 保留本地文件。其中上游涉及新鲜子代理上下文和初始化远端配置的变更未应用到这些改写版本；完整最新版原件仍随包保存。其他可合并的上游改动已纳入；二级来源和许可随对应原文件保留。新增未改写 Skill 为上游导入，其依赖宿主能力、工具及权限，不保证每种宿主均可执行。
+
+产品研发来源的上游 HEAD 经核验仍为 `bfc391e4b48d40ca3b7dfd337b374432c61559d4`，无需更新。其他来源未知、仅参考或附件来源仍依原记录标记，不推断版本。
+
+`software-factory/SKILL.md` 的上游 description 含未引用的冒号，不符合 provider 所用 YAML 解析器；本地只加引号修复 frontmatter，原件保存在上游快照中。

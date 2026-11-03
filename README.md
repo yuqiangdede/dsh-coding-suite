@@ -175,7 +175,7 @@ node scripts/verify-client-bundle.mjs
 ```text
 dsh-coding-suite/
 ├── assets/
-│   └── skills/           # 28 个工程技能及共享工具、Pocket 规范
+│   └── skills/           # 内置工程及产品技能、共享工具与 Pocket 规范
 ├── src/
 │   ├── index.ts          # 插件 Host 主入口
 │   ├── skill-provider.ts # 技能注册服务
@@ -189,3 +189,56 @@ dsh-coding-suite/
 
 本项目采用 [MIT 许可证](LICENSE)。
 
+### 内置 Skill 来源与版本
+
+| 来源 | 版本与许可 | 内置及本地适配 |
+| --- | --- | --- |
+| [Matt Pocock Skills](https://github.com/mattpocock/skills) | `1.3.2`，提交 [`4ae2317`](https://github.com/mattpocock/skills/tree/4ae2317ddb22b046e26455e4f9c9b3aaaf62212d)，MIT | 39 个 Skill 全部内置；既有 Skill 保留 DSH 本地适配，上游原件另存于 `_upstream/matt`。 |
+| [My-Prompts 产品研发](https://github.com/yuqiangdede/My-Prompts) | 提交 [`bfc391e`](https://github.com/yuqiangdede/My-Prompts/tree/bfc391e4b48d40ca3b7dfd337b374432c61559d4)，Apache-2.0 | 产品研发总控和 9 个专项 Skill，含 DSH 路径及阶段适配；另有本地单阶段 Skill。 |
+| 其他本地、用户提供或参考资产 | 本项目 MIT 或原来源许可；未知项尚待核实 | 详见 [Skill 与提示词管理台账](docs/pocket/meta/skills-prompts.md)，不将借鉴或外部工具依赖称为已内置。 |
+
+Matt 上游 Skill 清单（路径相对于其仓库）：
+
+| Skill | 上游路径 |
+| --- | --- |
+| `ask-matt` | [`skills/engineering/ask-matt`](https://github.com/mattpocock/skills/tree/4ae2317ddb22b046e26455e4f9c9b3aaaf62212d/skills/engineering/ask-matt) |
+| `code-review` | [`skills/engineering/code-review`](https://github.com/mattpocock/skills/tree/4ae2317ddb22b046e26455e4f9c9b3aaaf62212d/skills/engineering/code-review) |
+| `codebase-design` | [`skills/engineering/codebase-design`](https://github.com/mattpocock/skills/tree/4ae2317ddb22b046e26455e4f9c9b3aaaf62212d/skills/engineering/codebase-design) |
+| `diagnosing-bugs` | [`skills/engineering/diagnosing-bugs`](https://github.com/mattpocock/skills/tree/4ae2317ddb22b046e26455e4f9c9b3aaaf62212d/skills/engineering/diagnosing-bugs) |
+| `domain-modeling` | [`skills/engineering/domain-modeling`](https://github.com/mattpocock/skills/tree/4ae2317ddb22b046e26455e4f9c9b3aaaf62212d/skills/engineering/domain-modeling) |
+| `grill-with-docs` | [`skills/engineering/grill-with-docs`](https://github.com/mattpocock/skills/tree/4ae2317ddb22b046e26455e4f9c9b3aaaf62212d/skills/engineering/grill-with-docs) |
+| `implement` | [`skills/engineering/implement`](https://github.com/mattpocock/skills/tree/4ae2317ddb22b046e26455e4f9c9b3aaaf62212d/skills/engineering/implement) |
+| `implement-spec` | [`skills/engineering/implement-spec`](https://github.com/mattpocock/skills/tree/4ae2317ddb22b046e26455e4f9c9b3aaaf62212d/skills/engineering/implement-spec) |
+| `improve-codebase-architecture` | [`skills/engineering/improve-codebase-architecture`](https://github.com/mattpocock/skills/tree/4ae2317ddb22b046e26455e4f9c9b3aaaf62212d/skills/engineering/improve-codebase-architecture) |
+| `pr` | [`skills/engineering/pr`](https://github.com/mattpocock/skills/tree/4ae2317ddb22b046e26455e4f9c9b3aaaf62212d/skills/engineering/pr) |
+| `prototype` | [`skills/engineering/prototype`](https://github.com/mattpocock/skills/tree/4ae2317ddb22b046e26455e4f9c9b3aaaf62212d/skills/engineering/prototype) |
+| `research` | [`skills/engineering/research`](https://github.com/mattpocock/skills/tree/4ae2317ddb22b046e26455e4f9c9b3aaaf62212d/skills/engineering/research) |
+| `retro` | [`skills/engineering/retro`](https://github.com/mattpocock/skills/tree/4ae2317ddb22b046e26455e4f9c9b3aaaf62212d/skills/engineering/retro) |
+| `setup-matt-pocock-skills` | [`skills/engineering/setup-matt-pocock-skills`](https://github.com/mattpocock/skills/tree/4ae2317ddb22b046e26455e4f9c9b3aaaf62212d/skills/engineering/setup-matt-pocock-skills) |
+| `tdd` | [`skills/engineering/tdd`](https://github.com/mattpocock/skills/tree/4ae2317ddb22b046e26455e4f9c9b3aaaf62212d/skills/engineering/tdd) |
+| `to-spec` | [`skills/engineering/to-spec`](https://github.com/mattpocock/skills/tree/4ae2317ddb22b046e26455e4f9c9b3aaaf62212d/skills/engineering/to-spec) |
+| `to-tickets` | [`skills/engineering/to-tickets`](https://github.com/mattpocock/skills/tree/4ae2317ddb22b046e26455e4f9c9b3aaaf62212d/skills/engineering/to-tickets) |
+| `triage` | [`skills/engineering/triage`](https://github.com/mattpocock/skills/tree/4ae2317ddb22b046e26455e4f9c9b3aaaf62212d/skills/engineering/triage) |
+| `wayfinder` | [`skills/engineering/wayfinder`](https://github.com/mattpocock/skills/tree/4ae2317ddb22b046e26455e4f9c9b3aaaf62212d/skills/engineering/wayfinder) |
+| `wizard` | [`skills/engineering/wizard`](https://github.com/mattpocock/skills/tree/4ae2317ddb22b046e26455e4f9c9b3aaaf62212d/skills/engineering/wizard) |
+| `chief-of-staff` | [`skills/in-progress/chief-of-staff`](https://github.com/mattpocock/skills/tree/4ae2317ddb22b046e26455e4f9c9b3aaaf62212d/skills/in-progress/chief-of-staff) |
+| `claude-handoff` | [`skills/in-progress/claude-handoff`](https://github.com/mattpocock/skills/tree/4ae2317ddb22b046e26455e4f9c9b3aaaf62212d/skills/in-progress/claude-handoff) |
+| `loop-me` | [`skills/in-progress/loop-me`](https://github.com/mattpocock/skills/tree/4ae2317ddb22b046e26455e4f9c9b3aaaf62212d/skills/in-progress/loop-me) |
+| `setup-ts-deep-modules` | [`skills/in-progress/setup-ts-deep-modules`](https://github.com/mattpocock/skills/tree/4ae2317ddb22b046e26455e4f9c9b3aaaf62212d/skills/in-progress/setup-ts-deep-modules) |
+| `software-factory` | [`skills/in-progress/software-factory`](https://github.com/mattpocock/skills/tree/4ae2317ddb22b046e26455e4f9c9b3aaaf62212d/skills/in-progress/software-factory) |
+| `writing-beats` | [`skills/in-progress/writing-beats`](https://github.com/mattpocock/skills/tree/4ae2317ddb22b046e26455e4f9c9b3aaaf62212d/skills/in-progress/writing-beats) |
+| `writing-fragments` | [`skills/in-progress/writing-fragments`](https://github.com/mattpocock/skills/tree/4ae2317ddb22b046e26455e4f9c9b3aaaf62212d/skills/in-progress/writing-fragments) |
+| `writing-shape` | [`skills/in-progress/writing-shape`](https://github.com/mattpocock/skills/tree/4ae2317ddb22b046e26455e4f9c9b3aaaf62212d/skills/in-progress/writing-shape) |
+| `git-guardrails-claude-code` | [`skills/misc/git-guardrails-claude-code`](https://github.com/mattpocock/skills/tree/4ae2317ddb22b046e26455e4f9c9b3aaaf62212d/skills/misc/git-guardrails-claude-code) |
+| `migrate-to-shoehorn` | [`skills/misc/migrate-to-shoehorn`](https://github.com/mattpocock/skills/tree/4ae2317ddb22b046e26455e4f9c9b3aaaf62212d/skills/misc/migrate-to-shoehorn) |
+| `scaffold-exercises` | [`skills/misc/scaffold-exercises`](https://github.com/mattpocock/skills/tree/4ae2317ddb22b046e26455e4f9c9b3aaaf62212d/skills/misc/scaffold-exercises) |
+| `setup-pre-commit` | [`skills/misc/setup-pre-commit`](https://github.com/mattpocock/skills/tree/4ae2317ddb22b046e26455e4f9c9b3aaaf62212d/skills/misc/setup-pre-commit) |
+| `grill-me` | [`skills/productivity/grill-me`](https://github.com/mattpocock/skills/tree/4ae2317ddb22b046e26455e4f9c9b3aaaf62212d/skills/productivity/grill-me) |
+| `grilling` | [`skills/productivity/grilling`](https://github.com/mattpocock/skills/tree/4ae2317ddb22b046e26455e4f9c9b3aaaf62212d/skills/productivity/grilling) |
+| `handoff` | [`skills/productivity/handoff`](https://github.com/mattpocock/skills/tree/4ae2317ddb22b046e26455e4f9c9b3aaaf62212d/skills/productivity/handoff) |
+| `teach` | [`skills/productivity/teach`](https://github.com/mattpocock/skills/tree/4ae2317ddb22b046e26455e4f9c9b3aaaf62212d/skills/productivity/teach) |
+| `to-questionnaire` | [`skills/productivity/to-questionnaire`](https://github.com/mattpocock/skills/tree/4ae2317ddb22b046e26455e4f9c9b3aaaf62212d/skills/productivity/to-questionnaire) |
+| `wait-what` | [`skills/productivity/wait-what`](https://github.com/mattpocock/skills/tree/4ae2317ddb22b046e26455e4f9c9b3aaaf62212d/skills/productivity/wait-what) |
+| `writing-for-agents` | [`skills/productivity/writing-for-agents`](https://github.com/mattpocock/skills/tree/4ae2317ddb22b046e26455e4f9c9b3aaaf62212d/skills/productivity/writing-for-agents) |
+
+逐文件来源、上游和本地 SHA-256 见 [Matt 来源清单](assets/skills/matt-source.json)；产品研发来源见 [清单](assets/skills/product-development-source.json)，历史和其他来源见 [管理台账](docs/pocket/meta/skills-prompts.md)。
