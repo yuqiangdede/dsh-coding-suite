@@ -38,8 +38,14 @@
 .groupToggle{border:1px solid var(--dsw-alias-border-l2);border-radius:6px;padding:3px 8px;background:transparent;color:var(--dsw-alias-label-secondary);font-size:11px;cursor:pointer}
 .setupRequired{composes:groupToggle;border-color:var(--dsw-alias-state-warning-primary,var(--dsw-alias-label-primary));color:var(--dsw-alias-label-primary);box-shadow:0 0 0 1px var(--dsw-alias-state-warning-primary,var(--dsw-alias-border-l2));font-weight:700}
 .groupToggleActive{composes:groupToggle;background:var(--dsw-alias-interactive-bg-hover);color:var(--dsw-alias-label-primary);font-weight:600}
-.groupToggle:focus-visible,.groupToggleActive:focus-visible,.hideGroup:focus-visible{outline:2px solid var(--dsw-alias-border-l2);outline-offset:2px}
-.groupToggle:disabled,.groupToggleActive:disabled,.hideGroup:disabled{opacity:.5;cursor:default}
+.utilityAction{display:inline-flex;align-items:center;gap:4px;border:1px solid var(--dsw-alias-border-l2);border-radius:6px;padding:3px 8px;background:var(--dsw-specific-input-major);color:var(--dsw-alias-label-primary);font-size:11px;cursor:pointer}
+.utilityAction::before{font-size:14px;line-height:1}
+.utilityAction[data-setup-action]::before{content:'↻'}
+.utilityAction[data-quick-confirm]::before{content:'✓'}
+.utilityAction[data-edit-common]::before{content:'✎'}
+.utilityAction:hover:not(:disabled){background:var(--dsw-alias-interactive-bg-hover)}
+.groupToggle:focus-visible,.groupToggleActive:focus-visible,.utilityAction:focus-visible,.hideGroup:focus-visible{outline:2px solid var(--dsw-alias-border-l2);outline-offset:2px}
+.groupToggle:disabled,.groupToggleActive:disabled,.utilityAction:disabled,.hideGroup:disabled{opacity:.5;cursor:default}
 .actionGroup{display:flex;flex-direction:column;gap:4px;position:relative}
 /* Off-screen row used only to measure button widths; it must never take layout space. */
 .measureRow{position:absolute;top:0;left:-9999px;width:max-content;display:flex;flex-wrap:nowrap;gap:5px;visibility:hidden;pointer-events:none}

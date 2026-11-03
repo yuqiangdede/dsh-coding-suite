@@ -256,6 +256,7 @@ export const en: Record<LauncherLocaleKey, string> = {
 
 /** Receiving instructions inserted into user-editable action drafts, Chinese then English. */
 export const receivingInstructions: Readonly<Record<string, readonly [string, string]>> = {
+  'handover-log-guide': ['整理关键流程的日志排查说明，核对开发记录、代码与配置，标明证据和缺口；写入文档前展示差异并取得明确确认。', 'Document key workflow log troubleshooting using implementation records, code and configuration; identify evidence and gaps, and obtain explicit approval of documentation diffs before writing.'],
   'handover-requirement-summary': ['根据用户提供的 SVN 记录或明确范围的只读查询整理功能与修复，按模块合并、保留修订证据、区分日志推断与核验事实；先展示差异并取得明确确认才能写文档，不改业务代码、不提交。', 'Summarize provided SVN history or an explicitly scoped read-only query by module, preserving revision evidence and separating inferred from verified behavior. Preview documentation changes and require explicit approval before writing; no business code changes or commits.'],
   'product-risk-gate': ['接收有效上游产物、版本和 Gate 证据，仅执行对应流水线阶段；输出实际结论与回退位置，不能跳过前序门禁。', 'Receive valid upstream artifacts, versions and gate evidence; execute only this pipeline stage and report its actual outcome and return stage without bypassing prerequisites.'],
   'product-module-gate': ['接收有效上游产物、版本和 Gate 证据，仅执行对应流水线阶段；输出实际结论与回退位置，不能跳过前序门禁。', 'Receive valid upstream artifacts, versions and gate evidence; execute only this pipeline stage and report its actual outcome and return stage without bypassing prerequisites.'],

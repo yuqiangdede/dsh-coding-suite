@@ -132,7 +132,7 @@ bundle = cutIfPresent(bundle, '\t\t//#region lib/types/client/WorkflowPanel.js\n
 replaceRegion('Launcher', compile('src/client/Launcher.tsx', 'Launcher_module_css_default'))
 replaceRegion('Settings', compile('src/client/Settings.tsx', 'Settings_module_css_default'))
 appendCss('xbJU_q', 'src/client/Launcher.module.css', 'css$1', 'Launcher_module_css_default', [
-  'groupToggles', 'groupControls', 'groupToggleLabel', 'groupToggle', 'groupToggleActive', 'setupRequired',
+  'groupToggles', 'groupControls', 'groupToggleLabel', 'groupToggle', 'groupToggleActive', 'setupRequired', 'utilityAction',
   'actionGroup', 'groupHeader', 'locked', 'hideGroup', 'commonEditor', 'commonChoices', 'commonChoiceGroup', 'commonChoice',
   'measureRow', 'history', 'historyTitle', 'historyList', 'historyItem',
 ])

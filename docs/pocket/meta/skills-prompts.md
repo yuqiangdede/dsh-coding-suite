@@ -439,3 +439,9 @@ git status --short
 产品研发来源的上游 HEAD 经核验仍为 `bfc391e4b48d40ca3b7dfd337b374432c61559d4`，无需更新。其他来源未知、仅参考或附件来源仍依原记录标记，不推断版本。
 
 `software-factory/SKILL.md` 的上游 description 含未引用的冒号，不符合 provider 所用 YAML 解析器；本地只加引号修复 frontmatter，原件保存在上游快照中。
+
+### 2026-11-03：交接日志排查入口
+
+- `ACTION:handover-log-guide`（`src/client/actions.ts`）：本地编写；来源为用户需求和仓库既有交接规程；无外部上游路径或版本。
+- `SKILL:project-handover-log-guide`（`assets/skills/project-handover-log-guide/SKILL.md`）：本地编写；参考仓库共享交接规程和用户需求；未复制外部 Skill，具体个人作者身份未知。
+- 引入日期：2026-11-03；适配现有 Launcher 分组、离线技能发现和文档差异确认流程。仓库许可见根目录 LICENSE。

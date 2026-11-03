@@ -9,7 +9,7 @@ import { en, zh, receivingInstructions } from '../src/client/locales.ts'
 const base = resolve(import.meta.dirname, '..')
 const skillRoot = resolve(base, 'assets/skills')
 const retiredIds = ['handover-overview', 'handover-features', 'handover-flows', 'handover-troubleshooting', 'handover-maintain']
-const ids = ['handover-requirement-summary']
+const ids = ['handover-log-guide', 'handover-requirement-summary']
 const skillIds = ids.map(id => id.replace('handover-', 'project-handover-'))
 
 test('one handover action, canonical group and localized labels', () => {
@@ -24,7 +24,7 @@ test('one handover action, canonical group and localized labels', () => {
   assert.equal(en.groupHandoverDocs, 'Project Handover')
   const actions = ids.map(id => DEFAULT_ACTIONS.find(a => a.id === id))
   assert(actions.every(Boolean))
-  assert.equal(actions[0].label, '追溯需求')
+  assert.deepEqual(actions.map(a => a.label), ['日志排查', '追溯需求'])
   assert.deepEqual(actions.map(a => a.skillId), skillIds)
   assert(actions.every(a => a.kind === 'skill' && a.enabled && !a.pinned))
   assert.deepEqual(actionsForGroup('handover-docs', DEFAULT_ACTIONS, defaultLauncherLayout(DEFAULT_ACTIONS)).map(a => a.id), [...ids, 'doc-merge'])
@@ -39,7 +39,7 @@ test('one handover action, canonical group and localized labels', () => {
 })
 
 test('the previous saved label is renamed without changing custom labels or bindings', () => {
-  const preset = DEFAULT_ACTIONS.find(a => a.id === ids[0])
+  const preset = DEFAULT_ACTIONS.find(a => a.id === 'handover-requirement-summary')
   const parse = action => parseActions(encodeActions([action]))[0]
   assert.equal(parse({ ...preset, label: '需求汇总' }).label, '追溯需求')
   assert.equal(parse({ ...preset, label: '自定义名称' }).label, '自定义名称')
@@ -76,6 +76,10 @@ test('all bundled handover skills and shared resources are present offline', () 
   for (const name of ['protocol.md', 'evidence.md', 'templates.md', 'updates.md', 'scripts/handover_write_guard.py']) {
     assert(existsSync(resolve(skillRoot, '_shared/project-handover', name)), name)
   }
+  const guide = readFileSync(resolve(skillRoot, 'project-handover-log-guide/SKILL.md'), 'utf8')
+  assert.match(guide, /开发实现阶段确认的日志记录/)
+  assert.match(guide, /不证明日志已经实现/)
+  assert.match(guide, /只读定位步骤/)
   const svn = readFileSync(resolve(skillRoot, 'project-handover-requirement-summary/SKILL.md'), 'utf8')
   assert.match(svn, /SVN.*提交|提交.*SVN/)
   assert.match(svn, /svn log --xml -v/)

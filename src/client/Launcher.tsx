@@ -289,16 +289,16 @@ export function Launcher({
           {!layout.visibleGroups[group.id] && groupHasRecommendation(group.id) ? ' •' : ''}
         </button>)}
         <button type="button" data-setup-action="initialize"
-          className={css.groupToggle}
+          className={css.utilityAction}
           aria-label={t('setupLabel')} title={t('setupReady')}
           onClick={() => { void insert(initializeAction) }} disabled={!available}>
           {t('setupLabel')}
         </button>
         <button type="button" data-quick-confirm="previous-reply"
-          className={css.groupToggle} aria-label={t('confirmLabel')}
+          className={css.utilityAction} aria-label={t('confirmLabel')}
           title={confirmReady ? t('confirmTooltip') : t('confirmUnavailable')}
           disabled={!confirmReady} onClick={confirmPrevious}>{t('confirmLabel')}</button>
-        <button type="button" className={css.groupToggle} onClick={startCommonEdit}
+        <button type="button" data-edit-common className={css.utilityAction} onClick={startCommonEdit}
           disabled={Boolean(commonEdit) || Boolean(invalid) || layoutSaving || snapshot.status !== 'ready' || !snapshot.writable || snapshot.revision === undefined}>{t('editCommon')}</button>
       </div>}
       {historyGroups.length > 0 && <div className={css.history} data-conversation-history>
