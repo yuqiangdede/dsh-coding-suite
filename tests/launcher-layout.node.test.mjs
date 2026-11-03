@@ -10,13 +10,18 @@ test('six group IDs, defaults, and ordered button references', () => {
   assert.deepEqual(Object.entries(layout.visibleGroups), [
     ['common', true], ['requirements-analysis', true], ['development', true], ['documents', false], ['handover-docs', false], ['others', false],
   ])
-  assert.deepEqual(LAUNCHER_GROUPS.map(g => g.actionIds.length), [11, 15, 7, 6, 15])
+  assert.deepEqual(LAUNCHER_GROUPS.map(g => g.actionIds.length), [11, 15, 7, 2, 16])
   assert.deepEqual(actionsForGroup('common', DEFAULT_ACTIONS, layout).map(a => a.id), [...DEFAULT_COMMON_IDS])
   assert.equal(actionsForGroup('documents', DEFAULT_ACTIONS, layout).length, 7)
   const others = actionsForGroup('others', DEFAULT_ACTIONS, layout).map(a => a.id)
-  assert.equal(others.length, 15)
+  assert.equal(others.length, 16)
   assert(!others.includes('initialize'))
-  assert.deepEqual(others.slice(0, 2), ['graphify-navigation', 'graphify-refresh'])
+  assert.deepEqual(others.slice(0, 3), ['graphify-navigation', 'graphify-refresh', 'mermaid-draw'])
+  const drawing = DEFAULT_ACTIONS.find(a => a.id === 'mermaid-draw')
+  assert.equal(drawing.kind, 'prompt')
+  assert.match(drawing.prompt, /只有占位文字/ )
+  assert.match(drawing.prompt, /先询问/)
+  assert.match(drawing.prompt, /Mermaid 代码块/)
   assert.equal(actionsForGroup('common', DEFAULT_ACTIONS, layout)[0], DEFAULT_ACTIONS.find(a => a.id === 'bug'))
 })
 

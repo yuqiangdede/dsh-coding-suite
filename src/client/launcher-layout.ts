@@ -6,7 +6,7 @@ export const LAUNCHER_GROUPS = [
   { id: 'development', label: 'groupDevelopment', actionIds: ['discussion', 'visual', 'spec', 'plan', 'execute', 'bug', 'add-logs', 'analyze-logs', 'review', 'review-fix', 'compile', 'health-acceptance', 'commit', 'doc-supplement', 'remote-debug'] },
   { id: 'documents', label: 'groupDocuments', actionIds: ['api-docs', 'requirements', 'overview', 'outline', 'database', 'doc-merge', 'docx'] },
   { id: 'handover-docs', label: 'groupHandoverDocs', actionIds: ['handover-requirement-summary', 'doc-merge'] },
-  { id: 'others', label: 'groupOthers', actionIds: ['graphify-navigation', 'graphify-refresh', 'ask', 'health-acceptance', 'doc-supplement', 'tdd', 'prototype', 'architecture', 'domain', 'research', 'retro', 'handoff', 'image', 'prd-writing', 'requirement-review'] },
+  { id: 'others', label: 'groupOthers', actionIds: ['graphify-navigation', 'graphify-refresh', 'mermaid-draw', 'ask', 'health-acceptance', 'doc-supplement', 'tdd', 'prototype', 'architecture', 'domain', 'research', 'retro', 'handoff', 'image', 'prd-writing', 'requirement-review'] },
 ] as const
 
 export type OptionalGroupId = typeof LAUNCHER_GROUPS[number]['id']
