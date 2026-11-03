@@ -5,7 +5,7 @@ export const LAUNCHER_GROUPS = [
   { id: 'requirements-analysis', label: 'groupRequirementsAnalysis', actionIds: ['product-development-pipeline', 'requirement-clarification', 'requirement-analysis', 'product-risk-gate', 'solution-design', 'product-module-gate', 'product-state-gate', 'product-exception-gate', 'product-prd-pages', 'product-consistency-gate', 'product-image-prompt'] },
   { id: 'development', label: 'groupDevelopment', actionIds: ['discussion', 'visual', 'spec', 'plan', 'execute', 'bug', 'add-logs', 'analyze-logs', 'review', 'review-fix', 'compile', 'health-acceptance', 'commit', 'doc-supplement', 'remote-debug'] },
   { id: 'documents', label: 'groupDocuments', actionIds: ['api-docs', 'requirements', 'overview', 'outline', 'database', 'doc-merge', 'docx'] },
-  { id: 'handover-docs', label: 'groupHandoverDocs', actionIds: ['handover-overview', 'handover-features', 'handover-flows', 'handover-troubleshooting', 'handover-maintain', 'handover-requirement-summary'] },
+  { id: 'handover-docs', label: 'groupHandoverDocs', actionIds: ['handover-requirement-summary', 'doc-merge'] },
   { id: 'others', label: 'groupOthers', actionIds: ['graphify-navigation', 'graphify-refresh', 'ask', 'health-acceptance', 'doc-supplement', 'tdd', 'prototype', 'architecture', 'domain', 'research', 'retro', 'handoff', 'image', 'prd-writing', 'requirement-review'] },
 ] as const
 
@@ -23,6 +23,7 @@ export interface LauncherLayout {
 const defaultVisibility: Record<GroupId, boolean> = {
   common: true, 'requirements-analysis': true, development: true, documents: false, 'handover-docs': false, others: false,
 }
+const retiredHandoverIds = new Set(['handover-overview', 'handover-features', 'handover-flows', 'handover-troubleshooting', 'handover-maintain'])
 const actionIdPattern = /^[a-z0-9][a-z0-9-]{0,63}$/
 
 export function defaultLauncherLayout(actions: readonly CodingAction[], hasSavedActions = false): LauncherLayout {
@@ -102,7 +103,7 @@ export function actionsForGroup(
   enabled: readonly CodingAction[],
   layout: LauncherLayout,
 ): CodingAction[] {
-  const available = new Map(enabled.filter(a => a.enabled).map(a => [a.id, a]))
+  const available = new Map(enabled.filter(a => a.enabled && !retiredHandoverIds.has(a.id)).map(a => [a.id, a]))
   const ids: readonly string[] = groupId === 'common'
     ? layout.commonActionIds
     : LAUNCHER_GROUPS.find(group => group.id === groupId)?.actionIds ?? []
@@ -116,7 +117,7 @@ export function actionsForGroup(
     ...DEFAULT_COMMON_IDS,
     ...LAUNCHER_GROUPS.flatMap(group => [...group.actionIds]),
   ])
-  return [...ordered, ...enabled.filter(a => a.enabled && a.id !== 'initialize' && !known.has(a.id))
+  return [...ordered, ...enabled.filter(a => a.enabled && a.id !== 'initialize' && !retiredHandoverIds.has(a.id) && !known.has(a.id))
     .sort((a, b) => a.order - b.order)]
 }
 

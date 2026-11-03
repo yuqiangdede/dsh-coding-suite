@@ -56,7 +56,7 @@ test('every launcher action stays clickable without a prior discussion conclusio
     useInput: fn => fn({ phase, draft: '' }),
     useConversation: fn => fn({ views: new Map([['chat', { messages }]]) }),
     useSession: fn => fn({ running }),
-    useWorkflow: fn => fn({ item: null }), useProjection: () => [],
+    useProjection: () => [],
     inputActions: {
       captureInsertion: () => ({ start: 0, end: 0 }),
       insertText: () => { insertions++; return true },
@@ -108,7 +108,7 @@ test('generic unavailability still disables actions', async () => {
     useInput: fn => fn({ phase, draft: '' }),
     useConversation: fn => fn({ views: new Map([['chat', { messages: [] }]]) }),
     useSession: fn => fn({ running: false }),
-    useWorkflow: fn => fn({ item: null }), useProjection: () => [],
+    useProjection: () => [],
     inputActions: {
       captureInsertion: () => ({ start: 0, end: 0 }),
       insertText: () => { insertions++; return true },

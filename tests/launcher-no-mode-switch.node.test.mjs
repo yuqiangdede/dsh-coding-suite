@@ -34,21 +34,7 @@ function nodes(node) {
   return [node, ...nodes(node.props?.children)]
 }
 
-/** One workflow record shaped like the Host wire value (no execution mode field). */
-function workItem(over = {}) {
-  const stages = Object.fromEntries(['S0', 'S1', 'S2', 'S3', 'S4', 'S5', 'S6', 'S7', 'S8', 'S9']
-    .map(stage => [stage, { status: 'pending', attempts: 0 }]))
-  return {
-    schemaVersion: 1, revision: 1, taskId: '11111111-1111-4111-8111-111111111111',
-    sessionId: 'session-1', workspaceRoot: '/repo', title: 'Task', status: 'ready',
-    currentStage: 'S1', branch: 'coding/abc12345', baseCommit: 'a'.repeat(40), commitRef: null,
-    stages, repairRounds: 0, noProgressRounds: 0, checks: null, allowedPaths: null,
-    review: null, verification: null, verificationRuns: [], approval: null, blocker: null,
-    createdAt: '2026-01-01T00:00:00.000Z', updatedAt: '2026-01-01T00:00:00.000Z', ...over,
-  }
-}
-
-/** Mount the dock with only the inputs the launcher still declares. */
+/** Mount the dock with the inputs in the current launcher contract. */
 function harness() {
   const registration = loadBundle()
   const hooks = reactHooks()
@@ -65,7 +51,7 @@ function harness() {
   mod.apply(ctx)
   const events = []
   const data = {
-    draft: '修复登录失败', running: false, item: null, span: { start: 0, end: 0 },
+    draft: '修复登录失败', running: false, span: { start: 0, end: 0 },
     skills: DEFAULT_ACTIONS.filter(action => action.kind === 'skill').map(action => action.skillId),
   }
   const render = () => { hooks.reset(); return dock.component({
@@ -74,7 +60,6 @@ function harness() {
     useInput: fn => fn({ phase: 'plain', draft: data.draft }),
     useConversation: fn => fn({ views: new Map() }),
     useSession: fn => fn({ running: data.running }),
-    useWorkflow: fn => fn({ item: data.item, loading: false, error: null }),
     useProjection: () => [],
     inputActions: {
       captureInsertion: () => data.span,
@@ -82,22 +67,17 @@ function harness() {
       persistDraft: () => events.push(['persist']),
     },
     fetchSkillNames: async () => data.skills,
-    workflowCommands: {
-      approve: async () => { events.push(['approve']); return { ok: true } },
-      pause: async () => { events.push(['pause']); return { ok: true } },
-      resume: async () => { events.push(['resume']); return { ok: true } },
-      cancel: async () => { events.push(['cancel']); return { ok: true } },
-    },
     todoStaleMs: 90000, t: key => zh[key] ?? key,
   }) }
   const settle = () => new Promise(resolve => setImmediate(resolve))
   return { mod, dock, data, events, render, settle }
 }
 
-test('the launcher exposes no execution-mode or prepare-automatic controls', async () => {
+test('the launcher has no retired S0–S9 workflow or execution-mode controls', async () => {
   const h = harness()
   const tree = h.render()
   const rendered = nodes(tree)
+  assert.equal(rendered.some(node => typeof node.type === 'function' && node.type.name === 'WorkflowPanel'), false)
   for (const label of ['手动', '全自动', '准备全自动任务']) {
     assert.equal(rendered.some(node => node.type === 'button' && node.props.children === label), false, label)
   }
@@ -112,22 +92,13 @@ test('the launcher exposes no execution-mode or prepare-automatic controls', asy
   assert.deepEqual(h.events.map(event => event[0]), ['insert', 'persist'])
 })
 
-test('the published dock no longer injects Goal hooks or a mode command', () => {
+test('the published dock contract contains no retired workflow hooks or commands', () => {
   const h = harness()
-  assert.equal(h.mod.inject.includes('remote.goals'), false)
+  assert.equal(Array.from(h.mod.inject).includes('remote.goals'), false)
+  assert.equal(Array.from(h.mod.inject).includes('remote.skills'), true)
   const injected = h.dock.options.inject('session-1')
-  assert.equal('pauseWorkflow' in injected, false)
-  assert.equal('resumeWorkflow' in injected, false)
-  assert.equal('workflowCommands' in injected, false)
-  assert.equal('useWorkflow' in injected, false)
+  for (const key of ['pauseWorkflow', 'resumeWorkflow', 'workflowCommands', 'useWorkflow', 'workflowTaskId'])
+    assert.equal(Object.hasOwn(injected, key), false, key)
   for (const key of ['workflowMode', 'manualMode', 'autoMode', 'autoPrepare', 'autoInstruction', 'autoHelp', 'workflowModeLabel'])
-    assert.equal(key in zh, false, key)
-})
-
-test('the published dock does not render the retired workflow panel', () => {
-  const h = harness()
-  h.data.item = workItem()
-  const tree = h.render()
-  const panel = nodes(tree).find(node => typeof node.type === 'function' && node.type.name === 'WorkflowPanel')
-  assert.equal(panel, undefined)
+    assert.equal(Object.hasOwn(zh, key), false, key)
 })

@@ -55,7 +55,7 @@ function harness({ actions, layout, english = false, measured = false, rowWidth 
       useInput: fn => fn({ phase: 'plain', draft: '' }),
       useConversation: fn => fn({ views: new Map([['chat', { messages: data.messages }]]) }),
       useSession: fn => fn({ running: data.running }),
-      useWorkflow: fn => fn({ item: null }), useProjection: () => [],
+      useProjection: () => [],
       inputActions: {
         captureInsertion: () => ({ start: 0, end: 0 }),
         insertText: text => { events.push(['insert', text]); return true },

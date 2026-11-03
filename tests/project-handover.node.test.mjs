@@ -8,13 +8,14 @@ import { en, zh, receivingInstructions } from '../src/client/locales.ts'
 
 const base = resolve(import.meta.dirname, '..')
 const skillRoot = resolve(base, 'assets/skills')
-const ids = ['handover-overview', 'handover-features', 'handover-flows', 'handover-troubleshooting', 'handover-maintain', 'handover-requirement-summary']
+const retiredIds = ['handover-overview', 'handover-features', 'handover-flows', 'handover-troubleshooting', 'handover-maintain']
+const ids = ['handover-requirement-summary']
 const skillIds = ids.map(id => id.replace('handover-', 'project-handover-'))
 
-test('six standalone handover actions, canonical group and localized labels', () => {
+test('one handover action, canonical group and localized labels', () => {
   const groups = LAUNCHER_GROUPS.map(group => group.id)
   assert.deepEqual(groups, ['requirements-analysis', 'development', 'documents', 'handover-docs', 'others'])
-  assert.deepEqual(LAUNCHER_GROUPS.find(g => g.id === 'handover-docs').actionIds, ids)
+  assert.deepEqual(LAUNCHER_GROUPS.find(g => g.id === 'handover-docs').actionIds, [...ids, 'doc-merge'])
   assert.deepEqual(LAUNCHER_GROUPS.find(g => g.id === 'documents').actionIds,
     ['api-docs', 'requirements', 'overview', 'outline', 'database', 'doc-merge', 'docx'])
   assert.equal(zh.groupDocuments, '验收文档')
@@ -25,9 +26,15 @@ test('six standalone handover actions, canonical group and localized labels', ()
   assert(actions.every(Boolean))
   assert.deepEqual(actions.map(a => a.skillId), skillIds)
   assert(actions.every(a => a.kind === 'skill' && a.enabled && !a.pinned))
-  assert.deepEqual(actionsForGroup('handover-docs', DEFAULT_ACTIONS, defaultLauncherLayout(DEFAULT_ACTIONS)).map(a => a.id), ids)
+  assert.deepEqual(actionsForGroup('handover-docs', DEFAULT_ACTIONS, defaultLauncherLayout(DEFAULT_ACTIONS)).map(a => a.id), [...ids, 'doc-merge'])
   assert(ids.every(id => !defaultLauncherLayout(DEFAULT_ACTIONS).commonActionIds.includes(id)))
   assert(ids.every(id => ENGLISH_DEFAULT_PRESENTATION[id] && receivingInstructions[id]?.length === 2))
+  assert(retiredIds.every(id => !DEFAULT_ACTIONS.some(a => a.id === id)))
+  const old = retiredIds.map(id => ({ id, label: id, kind: 'skill', skillId: 'project-' + id, prompt: '', enabled: true, order: 1, description: '', example: '' }))
+  const layout = { ...defaultLauncherLayout(old), commonActionIds: retiredIds }
+  assert.deepEqual(actionsForGroup('common', old, layout), [])
+  assert.deepEqual(actionsForGroup('others', old, layout), [])
+  assert(retiredIds.every(id => !existsSync(resolve(skillRoot, 'project-' + id))))
 })
 
 test('old visibility, custom actions and pinned order survive migration', () => {
@@ -70,7 +77,7 @@ test('all bundled handover skills and shared resources are present offline', () 
   assert.match(protocol, /Production status/)
 })
 
-test('published browser bundle contains the same six action defaults and group', () => {
+test('published browser bundle contains the same action defaults and group', () => {
   const bundle = readFileSync(resolve(base, 'lib/client.js'), 'utf8')
   const m = /\t\tconst DEFAULT_ACTIONS = ([\s\S]*?\n\t\t\]);/.exec(bundle)
   assert(m)

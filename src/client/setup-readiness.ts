@@ -30,9 +30,11 @@ export async function evaluateProjectSetup(read: ProjectSetupReader, skills: rea
   if (!layout?.trim()) missing.push('缺少 docs/agents/document-layout.md（统一文档及中间产物布局）')
   else {
     if (!layout.includes('<!-- dsh-document-layout:v1 -->')) missing.push('文档布局缺少 dsh-document-layout:v1 版本标记')
-    const index = /^- 知识索引:\s*`([^`]+)`/m.exec(layout)?.[1]
-    const work = /^- 中间产物根目录:\s*`([^`]+)`/m.exec(layout)?.[1]
-    const cache = /^- 临时缓存根目录:\s*`([^`]+)`/m.exec(layout)?.[1]
+    const field = (name: string) => new RegExp('^\\s*[-*]\\s*(?:\\*\\*)?' + name + '(?:\\*\\*)?\\s*[:：]\\s*`([^`]+)`', 'm').exec(layout)?.[1]
+    const directory = (value: string | undefined) => value && (value.endsWith('/') ? value : value + '/')
+    const index = field('知识索引')
+    const work = directory(field('中间产物根目录') ?? field('任务工作根'))?.replace(/<task-id>\/$/, '')
+    const cache = directory(field('临时缓存根目录') ?? field('临时缓存根'))
     const safe = (value: string | undefined): value is string =>
       !!value && !value.startsWith('/') && !value.startsWith('.') &&
       !value.includes('..') && !value.includes('\\') &&
@@ -41,11 +43,20 @@ export async function evaluateProjectSetup(read: ProjectSetupReader, skills: rea
     else if (!(await read(index))?.trim()) missing.push('文档布局指向的知识索引不存在：' + index)
     if (!safe(work) || !work.endsWith('/')) missing.push('中间产物目录路径无效')
     else if (!(await read(work + 'README.md'))?.trim()) missing.push('中间产物目录尚未初始化：' + work + 'README.md')
-    if (!safe(cache) || !cache.endsWith('/') || (safe(work) && !cache.startsWith(work))) {
+    const cachePath = cache?.replace('<task-id>/', 'task-id/')
+    if (!safe(cachePath) || !cachePath.endsWith('/') || (safe(work) && !cachePath.startsWith(work))) {
       missing.push('临时缓存目录路径无效或不在中间产物根目录内')
     }
-    for (const kind of ['正式需求', '设计与架构', '接口与数据库', '验收与交接', '中间阶段成果', '临时缓存', '外部工单']) {
-      if (!layout.includes('| ' + kind + ' |')) missing.push('文档布局缺少类别：' + kind)
+    const categories = layout.split(/\r?\n/).map(line => /^\s*\|\s*([^|]+)\s*\|/.exec(line)?.[1]?.replace(/\*\*/g, '').trim() ?? '')
+    const has = (term: string) => categories.some(category => category.includes(term))
+    const kinds: [string, boolean][] = [
+      ['正式需求', has('需求')], ['设计与架构', has('设计')],
+      ['接口与数据库', has('接口') && has('数据库')], ['验收与交接', has('验收') && has('交接')],
+      ['中间阶段成果', categories.some(category => /中间|阶段|Gate|评审/i.test(category))],
+      ['临时缓存', has('缓存')], ['外部工单', has('工单')],
+    ]
+    for (const [kind, present] of kinds) {
+      if (!present) missing.push('文档布局缺少类别：' + kind)
     }
   }
   for (const [name, value] of [['AGENTS.md', agents], ['CLAUDE.md', claude]] as const) {

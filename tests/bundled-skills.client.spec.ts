@@ -5,7 +5,7 @@ import { DEFAULT_ACTIONS } from '../src/client/actions.ts'
 
 const root = resolve(import.meta.dirname, '../assets/skills')
 
-describe('bundled coding skills', () => {
+describe('bundled launcher skills', () => {
   it('provides every default launcher skill with matching invocation metadata', () => {
     for (const action of DEFAULT_ACTIONS) {
       if (action.kind !== 'skill') continue
@@ -13,11 +13,10 @@ describe('bundled coding skills', () => {
       expect(source.split(/\r?\n/)).toContain(`name: ${action.skillId}`)
     }
   })
-  it('bundles the fork-owned automatic workflow and its safety instructions', () => {
-    const source = readFileSync(join(root, 'coding-workflow', 'SKILL.md'), 'utf8')
-    expect(source).toContain('name: coding-workflow')
-    expect(source).toContain('local-only Git commit')
-    expect(existsSync(join(root, 'coding-workflow', 'scripts', 'workflow-state.mjs'))).toBe(true)
+  it('does not bundle the retired S0–S9 coding workflow or its runtime helpers', () => {
+    expect(existsSync(join(root, 'coding-workflow'))).toBe(false)
+    expect(existsSync(join(root, 'coding-workflow', 'SKILL.md'))).toBe(false)
+    expect(existsSync(join(root, 'coding-workflow', 'scripts', 'workflow-state.mjs'))).toBe(false)
   })
   it('ships Matt support files and licenses without Superpowers skills', () => {
     const manifest = JSON.parse(readFileSync(join(root, 'matt-source.json'), 'utf8')) as { repository: string; revision: string; skills: string[] }

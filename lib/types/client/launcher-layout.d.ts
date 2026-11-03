@@ -15,11 +15,11 @@ export declare const LAUNCHER_GROUPS: readonly [{
 }, {
     readonly id: "handover-docs";
     readonly label: "groupHandoverDocs";
-    readonly actionIds: readonly ["handover-overview", "handover-features", "handover-flows", "handover-troubleshooting", "handover-maintain"];
+    readonly actionIds: readonly ["handover-requirement-summary", "doc-merge"];
 }, {
     readonly id: "others";
     readonly label: "groupOthers";
-    readonly actionIds: readonly ["initialize", "graphify-navigation", "graphify-refresh", "ask", "health-acceptance", "doc-supplement", "tdd", "prototype", "architecture", "domain", "research", "retro", "handoff", "image", "prd-writing", "requirement-review"];
+    readonly actionIds: readonly ["graphify-navigation", "graphify-refresh", "ask", "health-acceptance", "doc-supplement", "tdd", "prototype", "architecture", "domain", "research", "retro", "handoff", "image", "prd-writing", "requirement-review"];
 }];
 export type OptionalGroupId = typeof LAUNCHER_GROUPS[number]['id'];
 export type GroupId = 'common' | OptionalGroupId;

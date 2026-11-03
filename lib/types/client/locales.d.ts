@@ -18,6 +18,15 @@ export declare const zh: {
     readonly commonLimit: "常用按钮最多 100 个。";
     readonly groupVisibility: "显示分组";
     readonly groupCommon: "常用";
+    readonly setupLabel: "初始化";
+    readonly confirmLabel: "确认";
+    readonly confirmTooltip: "一键确认上一条模型回复中明确推荐的方案并发送；高风险操作仍需单独批准。";
+    readonly confirmUnavailable: "请先等待上一条模型回复完成，并清空未发送草稿或附件。";
+    readonly confirmDraft: "存在未发送内容或输入位置变化，未执行快捷确认。";
+    readonly confirmPrompt: "确认。请按照你上一条回复中已明确推荐的默认方案或待确认事项继续推进；不要重新讨论已经确定的选择。如果你提出了多个互斥选项却没有明确推荐，或仍缺少必须由我决定的信息，请继续询问而不是替我选择。本次快捷确认不授权删除或覆盖重要数据、生产环境变更、凭据操作等高风险或不可逆操作；此类操作需另行说明具体范围与风险，并再次取得明确确认。";
+    readonly setupFirst: "请先初始化当前项目。";
+    readonly setupReady: "当前项目的工程 Skills 配置已核实，可重新检查。";
+    readonly setupCheckFailed: "项目初始化状态检查失败：";
     readonly groupRequirementsAnalysis: "需求";
     readonly groupDevelopment: "开发";
     readonly groupDocuments: "验收文档";
@@ -42,7 +51,7 @@ export declare const zh: {
     readonly rejected: "DSH Host 拒绝保存；编辑内容已保留";
     readonly unsaved: "未保存：";
     readonly title: "编码按钮 / Skill Launcher";
-    readonly intro: "各业务分组可独立显示或隐藏。下方按钮设置可调整常用成员、Skill、提示词及排序。点击按钮只插入草稿，不自动发送。";
+    readonly intro: "各业务分组可独立显示或隐藏。下方按钮设置可调整常用成员、Skill、提示词及排序。普通按钮只插入草稿；显示分组栏的「确认」会在草稿为空时一键发送。";
     readonly skillRow: "Skill 类型按钮";
     readonly promptRow: "提示词类型按钮";
     readonly add: "新增";
