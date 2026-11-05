@@ -6,6 +6,44 @@ import { chatEntries, conversationHistory, recommend, withEvidence } from './con
 import { LAUNCHER_GROUPS, actionsForGroup, defaultLauncherLayout, fittedActionCount, parseLauncherLayout, type GroupId } from './launcher-layout.ts'
 import css from './Launcher.module.css'
 type Props = PropsRuntime<'conversation.input.dock'> & PropsLocale<'mattSkillLauncher'> & InjectFace<LauncherInjected>
+
+/** Attribute-safe selector value for a Chat node key. */
+function escapeSelectorValue(value: string): string {
+  const escape = (globalThis as { CSS?: { escape?: (input: string) => string } }).CSS?.escape
+  return typeof escape === 'function' ? escape(value) : value.replace(/["\\]/g, '\\$&')
+}
+
+/** Chat scrollport that renders this dock, or the single mounted one. */
+function chatScrollport(from: Element | null): Element | null {
+  if (typeof document === 'undefined') return null
+  const own = from?.closest?.('[data-conversation-scroll]')
+  if (own) return own
+  const mounted = document.querySelectorAll('[data-conversation-scroll]')
+  return mounted.length === 1 ? mounted[0] ?? null : null
+}
+
+/** Reveal one mounted Chat row: open folded ancestors, scroll it into view, then flash it. */
+function revealChatRow(row: HTMLElement, boundary: Element): void {
+  const folded: Element[] = []
+  for (let element = row.parentElement; element !== null && element !== boundary; element = element.parentElement) {
+    if (element.getAttribute('hidden') === 'until-found') folded.push(element)
+  }
+  // The host re-renders folded content after `beforematch`, exactly as browser find does.
+  if (typeof Event === 'function') for (const element of folded.reverse()) element.dispatchEvent(new Event('beforematch'))
+  const reduced = typeof window !== 'undefined' && typeof window.matchMedia === 'function'
+    && window.matchMedia('(prefers-reduced-motion: reduce)').matches
+  const apply = () => {
+    row.scrollIntoView?.({ block: 'center', behavior: reduced ? 'instant' : 'smooth' })
+    if (reduced || typeof row.animate !== 'function') return
+    row.animate([
+      { boxShadow: 'inset 0 0 0 2px var(--dsw-alias-state-info-primary, #4d6bfe)' },
+      { boxShadow: 'inset 0 0 0 2px transparent' },
+    ], { duration: 1400, easing: 'ease-out' })
+  }
+  // Folded ancestors need a paint before their opened geometry can be measured.
+  if (folded.length > 0 && typeof requestAnimationFrame === 'function') requestAnimationFrame(() => requestAnimationFrame(apply))
+  else apply()
+}
 export function Launcher({
   useInput, useConversation, useSession, useProjection, inputActions, useActionForm, fetchSkillNames,
   saveLayout, todoStaleMs, checkProjectSetup, t,
@@ -42,6 +80,7 @@ export function Launcher({
   const [commonEdit, setCommonEdit] = useState<{ ids: string[], revision: number } | null>(null)
   const [pending, setPending] = useState(false)
   const [notice, setNotice] = useState('')
+  const rootRef = useRef<HTMLDivElement>(null)
   const alive = useRef(true)
   const groupRows = useRef<Record<string, HTMLDivElement | null>>({})
   const groupProbes = useRef<Record<string, HTMLDivElement | null>>({})
@@ -235,14 +274,34 @@ export function Launcher({
     if (a.id === 'docx' && a.label === 'MD 转 Word') return 'MD转Word'
     return a.label
   }
-  const historyGroups: { label: string; count: number }[] = []
+  const historyGroups: { label: string; count: number; key?: string; text?: string }[] = []
   for (const entry of history) {
     const label = entry.id ? displayLabel(actions.find(action => action.id === entry.id)!) : entry.command ? '/' + entry.command : t('historyCustom')
     const previous = historyGroups[historyGroups.length - 1]
-    if (previous?.label === label) previous.count++
-    else historyGroups.push({ label, count: 1 })
+    if (previous?.label === label) {
+      previous.count++
+      // A grouped chip addresses its newest message, which is the one in view first.
+      previous.key = entry.key
+      previous.text = entry.text
+    } else historyGroups.push({ label, count: 1, key: entry.key, text: entry.text })
   }
   historyGroups.reverse()
+  // A recognized label only explains the request: locating it is a read-only jump
+  // to the mounted Chat row, never a replay, an edit or a resend.
+  const locateHistory = (group: { key?: string }) => {
+    setNotice('')
+    const scrollport = chatScrollport(rootRef.current)
+    const row = scrollport === null || group.key === undefined
+      ? null
+      : scrollport.querySelector<HTMLElement>(`[data-chat-node-key="${escapeSelectorValue(group.key)}"]`)
+    if (scrollport === null || row === null) { setNotice(t('historyMissing')); return }
+    revealChatRow(row, scrollport)
+  }
+  const historyTooltip = (group: { count: number; text?: string }): string => {
+    const head = group.count > 1 ? t('historyLocateNewest').replace('{count}', String(group.count)) : t('historyLocate')
+    const preview = group.text?.replace(/\s+/g, ' ').trim() ?? ''
+    return preview ? head + '\n' + (preview.length > 60 ? preview.slice(0, 59) + '…' : preview) : head
+  }
   const render = (a: CodingAction) => <button type="button" key={a.id} disabled={!available} className={visibleRecommendation?.ids.includes(a.id) ? css.recommended : css.action}
     title={a.description + '\n' + a.example + (visibleRecommendation?.ids.includes(a.id) ? '\n' + t('recommendationTooltip').replace('{reason}', t(visibleRecommendation.reason)) : '')} onClick={() => { void insert(a) }}>{displayLabel(a)}</button>
   // Expansion is local presentation state, independent of saved membership and action availability.
@@ -271,7 +330,7 @@ export function Launcher({
       </div>}
     </div>
   }
-  return <div className={css.root} data-matt-skill-launcher>
+  return <div ref={rootRef} className={css.root} data-matt-skill-launcher>
     {(hasActions || historyGroups.length > 0) && <div className={css.groupToggles}>
       {hasActions && <div className={css.groupControls} role="group" aria-label={t('groupVisibility')}>
         <span className={css.groupToggleLabel}>{t('groupVisibility')}</span>
@@ -304,7 +363,10 @@ export function Launcher({
       {historyGroups.length > 0 && <div className={css.history} data-conversation-history>
         <ol className={css.historyList} aria-label={t('historyTitle')} title={t('historyHelp')}>
           {(historyExpanded ? historyGroups : historyGroups.slice(0, 5)).map((entry, index) => <li key={index} className={css.historyItem}>
-            {entry.label + (entry.count > 1 ? '*' + entry.count : '')}
+            <button type="button" className={css.historyChip} data-history-key={entry.key ?? ''}
+              title={historyTooltip(entry)} onClick={() => { locateHistory(entry) }}>
+              {entry.label + (entry.count > 1 ? '*' + entry.count : '')}
+            </button>
           </li>)}
         </ol>
         {historyGroups.length > 5 && <button type="button" className={css.hideGroup} aria-expanded={historyExpanded}

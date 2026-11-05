@@ -16,7 +16,8 @@ test('diagnostic shortcuts provide editable inputs and respect existing configur
   for (const group of ['common', 'development']) {
     const ids = actionsForGroup(group, DEFAULT_ACTIONS, layout).map(a => a.id)
     assert.equal(ids[ids.indexOf('add-logs') + 1], 'analyze-logs')
-    assert.equal(ids.at(-1), 'remote-debug')
+    assert.ok(ids.includes('remote-debug'))
+    if (group === 'common') assert.equal(ids.at(-1), 'remote-debug')
   }
   const old = DEFAULT_ACTIONS.filter(a => !['analyze-logs', 'remote-debug'].includes(a.id))
   const saved = JSON.stringify({ schemaVersion: 3, actions: old })

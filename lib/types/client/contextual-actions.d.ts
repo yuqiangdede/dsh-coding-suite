@@ -40,11 +40,27 @@ export interface Recommendation {
  * @returns The latest text exchange in sequence order, excluding tool output.
  */
 export declare function chatEntries(view: unknown): ChatEntry[];
-/** User messages available in the chat view, in display order. */
-export declare function conversationHistory(view: unknown, actions: readonly ActionSignature[]): {
+/** One sent user message the launcher can attribute and, when keyed, reveal in Chat. */
+export interface HistoryEntry {
+    /** Matching button id, or `null` when no configured button explains the text. */
     id: string | null;
+    /** Slash command typed by hand, when the text names one. */
     command?: string;
-}[];
+    /**
+     * Stable Chat node key that mounts this message. Absent when the view only
+     * exposes compatibility nodes, so that chip cannot locate its row.
+     */
+    key?: string;
+    /** Message text, used only for the chip tooltip preview. */
+    text: string;
+}
+/**
+ * User messages available in the chat view, in display order.
+ * @param view - Chat view snapshot.
+ * @param actions - Enabled launcher buttons used to attribute each message.
+ * @returns One entry per sent user message, newest last.
+ */
+export declare function conversationHistory(view: unknown, actions: readonly ActionSignature[]): HistoryEntry[];
 /**
  * Attribute a request to the button that inserted it.
  * @param text - Request text before any inserted context excerpt.

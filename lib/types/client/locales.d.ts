@@ -5,6 +5,9 @@ export declare const zh: {
     readonly historyHelp: "根据已发送消息中的按钮内容识别；修改提示词、旧配置或手动输入可能影响识别，不代表执行结果。";
     readonly historyCustom: "自由对话";
     readonly historyMore: "查看全部（{count}）";
+    readonly historyLocate: "定位到这条消息";
+    readonly historyLocateNewest: "定位到最新一条（同名记录共 {count} 条）";
+    readonly historyMissing: "没有找到这条消息：可能已切换到其他视图，或该记录尚未加载。";
     readonly more: "更多";
     readonly moreCount: "更多（{count}）";
     readonly collapse: "收起";

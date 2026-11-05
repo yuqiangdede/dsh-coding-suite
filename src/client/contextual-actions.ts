@@ -127,14 +127,52 @@ export function chatEntries(view: unknown): ChatEntry[] {
   return entries.reverse()
 }
 
-/** User messages available in the chat view, in display order. */
-export function conversationHistory(view: unknown, actions: readonly ActionSignature[]): { id: string | null; command?: string }[] {
-  const snapshot = record(view)
-  if (!snapshot) return []
-  const legacy = record(snapshot.legacy)
-  const values = [legacy?.nodes, snapshot.items, snapshot.entries, snapshot.messages].find(Array.isArray)
-  if (!Array.isArray(values)) return []
-  const result: { id: string | null; command?: string }[] = []
+/** One sent user message the launcher can attribute and, when keyed, reveal in Chat. */
+export interface HistoryEntry {
+  /** Matching button id, or `null` when no configured button explains the text. */
+  id: string | null
+  /** Slash command typed by hand, when the text names one. */
+  command?: string
+  /**
+   * Stable Chat node key that mounts this message. Absent when the view only
+   * exposes compatibility nodes, so that chip cannot locate its row.
+   */
+  key?: string
+  /** Message text, used only for the chip tooltip preview. */
+  text: string
+}
+
+/** One user message in display order, with its Chat node key when available. */
+interface HistoryMessage {
+  text: string
+  key?: string
+}
+
+/**
+ * Read user rows through the keyed Chat snapshot, which is also what mounts
+ * `data-chat-node-key` in the DOM. Returns null when this view publishes no
+ * keyed store, so an older snapshot can still fall back to compatibility nodes.
+ */
+function keyedUserMessages(snapshot: Record<string, unknown>): HistoryMessage[] | null {
+  const order = snapshot.order
+  const store = record(snapshot.nodes)
+  if (!Array.isArray(order) || store === null || typeof store.get !== 'function') return null
+  const read = store.get as (key: string) => unknown
+  const messages: HistoryMessage[] = []
+  for (const key of order) {
+    if (typeof key !== 'string') continue
+    const node = record(read.call(store, key))
+    if (node === null || node.kind !== 'user') continue
+    const text = textBlocks(record(node.data)?.content)
+    if (!text.trim()) continue
+    messages.push({ text, key })
+  }
+  return messages
+}
+
+/** Read the same user rows from compatibility nodes, without a reveal target. */
+function legacyUserMessages(values: readonly unknown[]): HistoryMessage[] {
+  const messages: HistoryMessage[] = []
   for (const value of values) {
     const wrapper = record(value)
     if (!wrapper) continue
@@ -143,19 +181,51 @@ export function conversationHistory(view: unknown, actions: readonly ActionSigna
     if ((node.kind ?? node.role ?? wrapper.kind) !== 'user') continue
     const text = typeof node.text === 'string' ? node.text : textBlocks(node.content)
     if (!text.trim()) continue
-    // A manually typed slash command alone cannot establish which button was used.
-    const matches = actions.filter(action => {
-      if (!action.prompt) return false
-      if (action.kind === 'skill') {
-        return Boolean(action.skillId) && text.trimStart().startsWith('/' + action.skillId + ' ' + action.prompt)
-      }
-      return text.includes(action.prompt)
-    })
-    const id = matches.length === 1 ? matches[0]!.id : null
-    const command = !id ? /^\/([a-z][a-z0-9-]*)(?=\s|$)/i.exec(text.trimStart())?.[1] : undefined
-    result.push({ id, command })
+    messages.push({ text })
   }
-  return result
+  return messages
+}
+
+/** Attribute one sent request text to a configured button, or to its own slash command. */
+function attributeHistoryText(text: string, actions: readonly ActionSignature[]): { id: string | null; command?: string } {
+  // A button's exact insertion identifies it. A slash command that only one
+  // button inserts still identifies that button, because a revised prompt or
+  // extra hand-typed context keeps the command while changing the rest.
+  const matches = actions.filter(action => {
+    if (!action.prompt) return false
+    if (action.kind === 'skill') {
+      return Boolean(action.skillId) && text.trimStart().startsWith('/' + action.skillId + ' ' + action.prompt)
+    }
+    return text.includes(action.prompt)
+  })
+  const command = /^\/([a-z][a-z0-9-]*)(?=\s|$)/i.exec(text.trimStart())?.[1]
+  const owners = command
+    ? actions.filter(action => action.kind === 'skill' && action.skillId?.toLowerCase() === command.toLowerCase())
+    : []
+  let id: string | null = null
+  if (matches.length === 1) id = matches[0]!.id
+  // Two buttons sharing one skill stay unattributed: their content is the only tie-breaker.
+  else if (matches.length === 0 && owners.length === 1) id = owners[0]!.id
+  return { id, command: id ? undefined : command }
+}
+
+/**
+ * User messages available in the chat view, in display order.
+ * @param view - Chat view snapshot.
+ * @param actions - Enabled launcher buttons used to attribute each message.
+ * @returns One entry per sent user message, newest last.
+ */
+export function conversationHistory(view: unknown, actions: readonly ActionSignature[]): HistoryEntry[] {
+  const snapshot = record(view)
+  if (!snapshot) return []
+  const legacy = record(snapshot.legacy)
+  const values = [legacy?.nodes, snapshot.items, snapshot.entries, snapshot.messages].find(Array.isArray)
+  const messages = keyedUserMessages(snapshot) ?? (Array.isArray(values) ? legacyUserMessages(values) : [])
+  return messages.map(({ text, key }) => ({
+    ...attributeHistoryText(text, actions),
+    ...(key === undefined ? {} : { key }),
+    text,
+  }))
 }
 
 /** Defect evidence naming a severity or a file/line beside the problem. */

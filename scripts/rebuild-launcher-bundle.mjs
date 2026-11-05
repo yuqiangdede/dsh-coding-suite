@@ -134,7 +134,7 @@ replaceRegion('Settings', compile('src/client/Settings.tsx', 'Settings_module_cs
 appendCss('xbJU_q', 'src/client/Launcher.module.css', 'css$1', 'Launcher_module_css_default', [
   'groupToggles', 'groupControls', 'groupToggleLabel', 'groupToggle', 'groupToggleActive', 'setupRequired', 'utilityAction',
   'actionGroup', 'groupHeader', 'locked', 'hideGroup', 'commonEditor', 'commonChoices', 'commonChoiceGroup', 'commonChoice',
-  'measureRow', 'history', 'historyTitle', 'historyList', 'historyItem',
+  'measureRow', 'history', 'historyTitle', 'historyList', 'historyItem', 'historyChip',
 ])
 appendCss('v7HIVa', 'src/client/Settings.module.css', 'css', 'Settings_module_css_default', [
   'layoutSection', 'groupSettingRow',

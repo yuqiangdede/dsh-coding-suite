@@ -3,9 +3,9 @@ import type { CodingAction } from './actions.ts'
 /** Visual-only groups. One action ID may be referenced by several groups. */
 export const LAUNCHER_GROUPS = [
   { id: 'requirements-analysis', label: 'groupRequirementsAnalysis', actionIds: ['requirement-clarification', 'requirement-analysis', 'product-risk-gate', 'solution-design', 'product-module-gate', 'product-state-gate', 'product-exception-gate', 'prd-writing', 'requirement-review', 'product-prd-pages', 'product-consistency-gate', 'product-image-prompt'] },
-  { id: 'development', label: 'groupDevelopment', actionIds: ['ask', 'research', 'discussion', 'domain', 'prototype', 'spec', 'plan', 'architecture', 'tdd', 'execute', 'bug', 'add-logs', 'analyze-logs', 'remote-debug', 'review', 'review-fix', 'compile', 'health-acceptance', 'commit', 'retro', 'handoff'] },
+  { id: 'development', label: 'groupDevelopment', actionIds: ['discussion', 'spec', 'execute', 'review', 'review-fix', 'compile', 'bug', 'commit', 'add-logs', 'analyze-logs', 'ask', 'research', 'domain', 'prototype', 'plan', 'architecture', 'tdd', 'remote-debug', 'health-acceptance', 'retro', 'handoff'] },
   { id: 'documents', label: 'groupDocuments', actionIds: ['requirements', 'overview', 'outline', 'database', 'api-docs', 'doc-supplement', 'doc-merge', 'docx', 'xlsx', 'handover-requirement-summary', 'handover-log-guide'] },
-  { id: 'others', label: 'groupOthers', actionIds: ['visual', 'graphify-navigation', 'graphify-refresh', 'mermaid-draw', 'image', 'continue'] },
+  { id: 'others', label: 'groupOthers', actionIds: ['visual', 'graphify-navigation', 'graphify-refresh', 'maintain-document-directory', 'mermaid-draw', 'image', 'continue'] },
 ] as const
 
 export type OptionalGroupId = typeof LAUNCHER_GROUPS[number]['id']

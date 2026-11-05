@@ -6,7 +6,10 @@ import { zh, en } from '../src/client/locales.ts'
 import { DEFAULT_ACTIONS, encodeActions } from '../src/client/actions.ts'
 import { conversationHistory } from '../src/client/contextual-actions.ts'
 
-function harness({ actions, layout, english = false, measured = false, rowWidth = 0, widths = [], moreWidth = 0 } = {}) {
+/** Project each entry onto the attribution fields, so unrelated shape additions stay out of these cases. */
+const attributed = (view, actions) => conversationHistory(view, actions).map(({ id, command }) => ({ id, command }))
+
+function harness({ actions, layout, english = false, measured = false, rowWidth = 0, widths = [], moreWidth = 0, dom } = {}) {
   let registration, Launcher, cursor = 0
   const state = [], refs = [], events = [], layoutEffects = []
   const row = { clientWidth: rowWidth, getBoundingClientRect: () => ({ width: row.clientWidth }) }
@@ -23,6 +26,7 @@ function harness({ actions, layout, english = false, measured = false, rowWidth 
     sandbox.document = { querySelector: () => ({}) }
     sandbox.ResizeObserver = class { observe() {} disconnect() {} }
   }
+  if (dom) sandbox.document = dom
   runInNewContext(readFileSync(new URL('../lib/client.js', import.meta.url), 'utf8'), sandbox)
   const dictionary = english ? en : zh
   registration.factory(name => ({ react, 'react/jsx-runtime': { jsx, jsxs: jsx } })[name] ?? {}).apply({
@@ -34,7 +38,7 @@ function harness({ actions, layout, english = false, measured = false, rowWidth 
     } },
   })
   const config = { ...(actions ? { actionsJson: encodeActions(actions) } : {}), ...(layout ? { layoutJson: JSON.stringify(layout) } : {}) }
-  const data = { config, messages: [], writable: false, revision: 1, saveOk: true, running: false }
+  const data = { config, messages: [], chat: undefined, writable: false, revision: 1, saveOk: true, running: false }
   const assignRefs = node => {
     if (!measured || !node || typeof node !== 'object') return
     if (Array.isArray(node)) { node.forEach(assignRefs); return }
@@ -53,7 +57,7 @@ function harness({ actions, layout, english = false, measured = false, rowWidth 
     const tree = Launcher({
       useActionForm: fn => fn({ status: 'ready', value: data.config, writable: data.writable, revision: data.revision }),
       useInput: fn => fn({ phase: 'plain', draft: '', attachmentIds: [] }),
-      useConversation: fn => fn({ views: new Map([['chat', { messages: data.messages }]]) }),
+      useConversation: fn => fn({ views: new Map([['chat', data.chat ?? { messages: data.messages }]]) }),
       useSession: fn => fn({ running: data.running }),
       useProjection: () => [],
       inputActions: {
@@ -95,7 +99,7 @@ test('conversation history follows sent user messages, remains visible while run
   h.data.messages = [sent('discussion'), { role: 'assistant', text: 'done' }, sent('spec'),
     { role: 'user', text: '再讨论一下' }, sent('execute'), sent('review'), sent('commit')]
   const history = () => h.nodes(h.render()).find(n => n.props?.['data-conversation-history'] === true)
-  const labels = () => h.nodes(history()).filter(n => n.type === 'li').map(n => n.props.children)
+  const labels = () => h.nodes(history()).filter(n => n.type === 'li').map(n => n.props.children.props.children)
   assert.deepEqual(labels(), ['提交代码', '代码审查', '编码', '自由对话', '固化需求'])
   assert.equal(h.nodes(history()).some(n => n.type === 'span' && n.props.children === zh.historyTitle), false)
   assert.equal(h.nodes(history()).find(n => n.type === 'ol').props['aria-label'], zh.historyTitle)
@@ -105,12 +109,13 @@ test('conversation history follows sent user messages, remains visible while run
   const tree = h.render()
   const row = h.nodes(tree).find(n => Array.isArray(n.props?.children) && n.props.children.some(child => child?.props?.['aria-label'] === '显示分组') && n.props.children.some(child => child?.props?.['data-conversation-history']))
   assert.ok(row)
-  const expand = h.nodes(history()).find(n => n.type === 'button')
+  const expand = h.nodes(history()).find(n => n.type === 'button' && 'aria-expanded' in n.props)
   assert.equal(expand.props.children, '查看全部（6）')
   expand.props.onClick()
   assert.deepEqual(labels(), ['提交代码', '代码审查', '编码', '自由对话', '固化需求', '需求讨论'])
   h.data.messages = [{ role: 'user', text: '/implement 手动输入' }, { role: 'user', text: '另一个会话' }]
-  assert.deepEqual(labels(), ['自由对话', '/implement'])
+  // A hand-typed command still names the one button that binds that skill.
+  assert.deepEqual(labels(), ['自由对话', '编码'])
   h.data.messages = []
   assert.equal(history(), undefined)
 })
@@ -122,16 +127,16 @@ test('history merges only adjacent identical labels before limiting and expandin
   h.data.messages = [discussion(), discussion(), { role: 'user', text: 'one' }, discussion(), discussion(), discussion(), discussion(), discussion(),
     { role: 'user', text: 'two' }, { role: 'user', text: 'three' }]
   const history = () => h.nodes(h.render()).find(n => n.props?.['data-conversation-history'] === true)
-  const labels = () => h.nodes(history()).filter(n => n.type === 'li').map(n => n.props.children)
+  const labels = () => h.nodes(history()).filter(n => n.type === 'li').map(n => n.props.children.props.children)
   assert.deepEqual(labels(), ['自由对话*2', '需求讨论*5', '自由对话', '需求讨论*2'])
-  assert.equal(h.nodes(history()).find(n => n.type === 'button'), undefined)
+  assert.equal(h.nodes(history()).find(n => n.type === 'button' && 'aria-expanded' in n.props), undefined)
   h.data.messages.push({ role: 'user', text: '/manual one' }, { role: 'user', text: '/manual two' }, { role: 'user', text: '/other three' })
   assert.deepEqual(labels(), ['/other', '/manual*2', '自由对话*2', '需求讨论*5', '自由对话'])
-  const expand = h.nodes(history()).find(n => n.type === 'button')
+  const expand = h.nodes(history()).find(n => n.type === 'button' && 'aria-expanded' in n.props)
   assert.equal(expand.props.children, '查看全部（6）')
   expand.props.onClick()
   assert.deepEqual(labels(), ['/other', '/manual*2', '自由对话*2', '需求讨论*5', '自由对话', '需求讨论*2'])
-  h.nodes(history()).find(n => n.type === 'button').props.onClick()
+  h.nodes(history()).find(n => n.type === 'button' && 'aria-expanded' in n.props).props.onClick()
   assert.equal(labels().length, 5)
 })
 
@@ -149,8 +154,108 @@ test('history handles repeated actions, wrapped nodes, prompt buttons, and ambig
     { kind: 'tool-result', text: 'Unique inserted text' },
     { role: 'user', text: 'Unique inserted text' },
   ]
-  assert.deepEqual(conversationHistory({ legacy: { nodes } }, [action]), [{ id: 'custom', command: undefined }, { id: 'custom', command: undefined }])
-  assert.deepEqual(conversationHistory({ legacy: { nodes } }, [action, { ...action, id: 'other' }]), [{ id: null, command: undefined }, { id: null, command: undefined }])
+  assert.deepEqual(attributed({ legacy: { nodes } }, [action]), [{ id: 'custom', command: undefined }, { id: 'custom', command: undefined }])
+  assert.deepEqual(attributed({ legacy: { nodes } }, [action, { ...action, id: 'other' }]), [{ id: null, command: undefined }, { id: null, command: undefined }])
+})
+
+test('history attributes a slash command to the only button binding its skill', () => {
+  const skill = { id: 'handover', kind: 'skill', skillId: 'project-handover', prompt: 'Current prompt text' }
+  const sent = text => ({ legacy: { nodes: [{ kind: 'user', text }] } })
+  // A revised prompt or extra hand-typed context keeps the command, so the button stays identified.
+  assert.deepEqual(attributed(sent('/project-handover Older prompt from a previous release'), [skill]), [{ id: 'handover', command: undefined }])
+  assert.deepEqual(attributed(sent('/project-handover'), [skill]), [{ id: 'handover', command: undefined }])
+  assert.deepEqual(attributed(sent('/Project-Handover extra wording'), [skill]), [{ id: 'handover', command: undefined }])
+  // Unbound commands and prompt buttons never borrow a skill's button name.
+  assert.deepEqual(attributed(sent('/other-command text'), [skill]), [{ id: null, command: 'other-command' }])
+  assert.deepEqual(attributed(sent('/project-handover text'), [{ ...skill, kind: 'prompt' }]), [{ id: null, command: 'project-handover' }])
+  // Exact content still decides between two buttons sharing one skill; without it, remain unguessed.
+  const shared = [skill, { ...skill, id: 'second', prompt: 'Second prompt' }]
+  assert.deepEqual(attributed(sent('/project-handover Current prompt text'), shared), [{ id: 'handover', command: undefined }])
+  assert.deepEqual(attributed(sent('/project-handover Revised prompt text'), shared), [{ id: null, command: 'project-handover' }])
+})
+
+test('history entries keep the keyed user row used to locate the message', () => {
+  const spec = DEFAULT_ACTIONS.find(action => action.id === 'spec')
+  const text = '/' + spec.skillId + ' ' + spec.prompt
+  const view = {
+    order: ['chat:user:1', 'chat:assistant:1', 'chat:user:2'],
+    nodes: {
+      get: key => ({
+        'chat:user:1': { kind: 'user', data: { content: [{ type: 'text', text: '先随便聊聊' }] } },
+        'chat:assistant:1': { kind: 'assistant', data: { blocks: [{ kind: 'text', text: '好' }] } },
+        'chat:user:2': { kind: 'user', data: { content: [{ type: 'text', text }] } },
+      })[key],
+    },
+  }
+  // Tool-only and assistant rows never appear; each user row keeps the key its DOM row mounts.
+  assert.deepEqual(conversationHistory(view, [spec]), [
+    { id: null, command: undefined, key: 'chat:user:1', text: '先随便聊聊' },
+    { id: 'spec', command: undefined, key: 'chat:user:2', text },
+  ])
+})
+
+test('history chips locate their mounted message and report an unloaded one', () => {
+  const scrolled = []
+  const rows = {}
+  const row = key => ({
+    parentElement: null,
+    getAttribute: () => null,
+    scrollIntoView: options => scrolled.push([key, options]),
+    animate: () => ({ cancel() {} }),
+  })
+  const scrollport = { querySelector: selector => rows[/^\[data-chat-node-key="(.+)"\]$/.exec(selector)?.[1]] ?? null }
+  const dom = { querySelectorAll: () => [scrollport], querySelector: () => scrollport }
+  const h = harness({ dom })
+  const spec = DEFAULT_ACTIONS.find(action => action.id === 'spec')
+  h.data.chat = {
+    order: ['chat:user:1', 'chat:user:2'],
+    nodes: { get: key => ({
+      'chat:user:1': { kind: 'user', data: { content: [{ type: 'text', text: '先随便聊聊' }] } },
+      // Keyed rows carry the button-inserted prompt, so the chip is attributed and locatable.
+      'chat:user:2': { kind: 'user', data: { content: [{ type: 'text', text: '/' + spec.skillId + ' ' + spec.prompt }] } },
+    })[key] },
+  }
+  rows['chat:user:2'] = row('chat:user:2')
+  const history = () => h.nodes(h.render()).find(n => n.props?.['data-conversation-history'] === true)
+  const chips = () => h.nodes(history()).filter(n => n.type === 'button' && 'data-history-key' in n.props)
+  assert.deepEqual(chips().map(entry => [entry.props.children, entry.props['data-history-key']]), [['固化需求', 'chat:user:2'], ['自由对话', 'chat:user:1']])
+  assert.match(chips()[0].props.title, /定位到这条消息/)
+  chips()[0].props.onClick()
+  // Options are created inside the bundle's realm, so compare their primitive fields.
+  assert.deepEqual(scrolled.map(([key, options]) => [key, options.block, options.behavior]), [['chat:user:2', 'center', 'smooth']])
+  const notice = () => h.nodes(h.render()).find(n => n.props?.role === 'alert')
+  assert.equal(notice(), undefined)
+  // A row the Chat view no longer mounts cannot be located; the chip says so instead of guessing.
+  rows['chat:user:2'] = undefined
+  chips()[0].props.onClick()
+  assert.match(notice().props.children, /没有找到这条消息/)
+  assert.equal(scrolled.length, 1)
+})
+
+test('grouped history chips locate the newest message and keyless legacy chips do not scroll', () => {
+  const scrolled = []
+  const scrollport = { querySelector: () => ({ parentElement: null, getAttribute: () => null, scrollIntoView: options => scrolled.push(options), animate: () => ({}) }) }
+  const dom = { querySelectorAll: () => [scrollport], querySelector: () => scrollport }
+  const h = harness({ dom })
+  h.data.chat = {
+    order: ['chat:user:1', 'chat:user:2'],
+    nodes: { get: key => ({
+      'chat:user:1': { kind: 'user', data: { content: [{ type: 'text', text: '先随便聊聊' }] } },
+      'chat:user:2': { kind: 'user', data: { content: [{ type: 'text', text: '再随便聊聊' }] } },
+    })[key] },
+  }
+  const chips = () => h.nodes(h.render()).filter(n => n.type === 'button' && 'data-history-key' in n.props)
+  assert.equal(chips()[0].props.children, '自由对话*2')
+  assert.equal(chips()[0].props['data-history-key'], 'chat:user:2')
+  chips()[0].props.onClick()
+  assert.equal(scrolled.length, 1)
+  // Compatibility rows expose no key, so their chip reports instead of scrolling elsewhere.
+  const legacy = harness({ dom })
+  legacy.data.messages = [{ role: 'user', text: '旧消息' }]
+  const legacyChips = () => legacy.nodes(legacy.render()).filter(n => n.type === 'button' && 'data-history-key' in n.props)
+  assert.equal(legacyChips()[0].props['data-history-key'], '')
+  legacyChips()[0].props.onClick()
+  assert.match(legacy.nodes(legacy.render()).find(n => n.props?.role === 'alert').props.children, /没有找到这条消息/)
 })
 
 test('development group is renamed in both the launcher and settings dictionary', () => {
@@ -213,11 +318,11 @@ test('default groups expand independently, preserve action order and retain over
   h.overflow('development').props.onClick()
   assert.equal(h.actionButtons('development').length, 21)
   assert.equal(h.actionButtons('common').length, 8)
-  const developmentOrder = ['咨询', '资料研究', '需求讨论', '领域建模', '制作原型', '固化需求', '拆分工单', '架构优化', '测试驱动开发', '编码', 'Bug排查', '增加日志', '分析日志', '远程调试', '代码审查', '修复', '编译', '健康验收', '提交代码', '复盘', '上下文交接']
+  const developmentOrder = ['需求讨论', '固化需求', '编码', '代码审查', '修复', '编译', 'Bug排查', '提交代码', '增加日志', '分析日志', '咨询', '资料研究', '领域建模', '制作原型', '拆分工单', '架构优化', '测试驱动开发', '远程调试', '健康验收', '复盘', '上下文交接']
   assert.deepEqual(h.actionButtons('development').map(n => n.props.children), developmentOrder)
   h.overflow('development').props.onClick()
-  h.data.messages = [{ role: 'user', text: '/implement' }, { role: 'assistant', text: '实现完成，测试通过' }]
-  assert.match(h.overflow('development').props.children, /•/, 'hidden recommended Build remains discoverable')
+  h.data.messages = [{ role: 'user', text: '/to-spec 固化需求' }, { role: 'assistant', text: '规格已完成，验收标准已确认' }]
+  assert.match(h.overflow('development').props.children, /•/, 'hidden recommended tickets remain discoverable')
   const english = harness({ english: true })
   assert.equal(english.overflow('development').props.children, 'More (13)')
   assert.match(english.overflow('development').props['aria-label'], /Development/)
