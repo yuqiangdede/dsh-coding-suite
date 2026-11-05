@@ -280,7 +280,7 @@ export function Launcher({
           onClick={() => { void toggleGroup('common') }}>
           {t('groupCommon')}{!layout.visibleGroups.common && groupHasRecommendation('common') ? ' •' : ''}
         </button>
-        {groups.map(group => <button key={group.id} type="button" title={t(({ 'requirements-analysis': 'groupRequirementsHelp', development: 'groupDevelopmentHelp', documents: 'groupDocumentsHelp', 'handover-docs': 'groupHandoverHelp', others: 'groupOthersHelp' } as const)[group.id])}
+        {groups.map(group => <button key={group.id} type="button" title={t(({ 'requirements-analysis': 'groupRequirementsHelp', development: 'groupDevelopmentHelp', documents: 'groupDocumentsHelp', others: 'groupOthersHelp' } as const)[group.id])}
           className={layout.visibleGroups[group.id] ? css.groupToggleActive : css.groupToggle}
           aria-pressed={layout.visibleGroups[group.id]}
           disabled={layoutSaving || snapshot.status !== 'ready' || !snapshot.writable}

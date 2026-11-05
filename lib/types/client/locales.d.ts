@@ -35,7 +35,7 @@ export declare const zh: {
     readonly setupCheckFailed: "项目初始化状态检查失败：";
     readonly groupRequirementsAnalysis: "需求";
     readonly groupDevelopment: "开发";
-    readonly groupDocuments: "验收文档";
+    readonly groupDocuments: "文档";
     readonly groupHandoverDocs: "交接文档";
     readonly groupOthers: "其他";
     readonly groupAlwaysVisible: "始终显示";

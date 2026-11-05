@@ -24,6 +24,6 @@ test('diagnostic shortcuts provide editable inputs and respect existing configur
   assert.deepEqual(missingDefaultActions(parseActions(saved)).map(a => a.id), ['analyze-logs', 'remote-debug'])
   const custom = { ...layout, commonActionIds: ['bug'] }
   assert.deepEqual(parseLauncherLayout(JSON.stringify(custom), DEFAULT_ACTIONS, true), custom)
-  assert.equal(zh.groupDocuments, '验收文档')
-  assert.equal(en.groupDocuments, 'Acceptance Docs')
+  assert.equal(zh.groupDocuments, '文档')
+  assert.equal(en.groupDocuments, 'Documents')
 })

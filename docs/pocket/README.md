@@ -47,7 +47,7 @@ Only link to files that actually exist. The table's directory names without link
 
 - [健康验收按钮与内置技能](requirements/health-acceptance.md) — accepted；默认静态只读、资源固化与旧按钮配置兼容。
 
-- [项目交接文档分组](requirements/project-handover.md) — accepted（2026-11-02，需求已确认、尚未实现）；「文档」更名「验收文档」，新增默认隐藏的五按钮交接组，支持全项目/指定模块、事实核验、差异预览确认后写入。配套：[技术实施方案（建议）](requirements/project-handover-implementation.md)、[验收标准（未执行）](requirements/project-handover-acceptance.md)。
+- [项目交接文档分组](requirements/project-handover.md) — accepted；2026-11-05 确认将「验收文档」和「交接文档」合并为「文档」，历史五按钮方案与当前实现存在差异。支持全项目/指定模块、事实核验、差异预览确认后写入。配套：[技术实施方案（历史建议）](requirements/project-handover-implementation.md)、[验收标准](requirements/project-handover-acceptance.md)。
 
 - [补充文档按钮的增补来源](requirements/doc-supplement-sources.md) — accepted；默认本会话，可改为指定时间段或版本号之后的已提交代码改动。
 
