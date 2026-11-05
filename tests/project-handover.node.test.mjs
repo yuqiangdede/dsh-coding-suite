@@ -16,7 +16,7 @@ test('one handover action, canonical group and localized labels', () => {
   const groups = LAUNCHER_GROUPS.map(group => group.id)
   assert.deepEqual(groups, ['requirements-analysis', 'development', 'documents', 'others'])
   assert.deepEqual(LAUNCHER_GROUPS.find(g => g.id === 'documents').actionIds,
-    ['requirements', 'overview', 'outline', 'database', 'api-docs', 'doc-supplement', 'doc-merge', 'docx', 'handover-requirement-summary', 'handover-log-guide'])
+    ['requirements', 'overview', 'outline', 'database', 'api-docs', 'doc-supplement', 'doc-merge', 'docx', 'xlsx', 'handover-requirement-summary', 'handover-log-guide'])
   assert.equal(zh.groupDocuments, '文档')
   assert.equal(en.groupDocuments, 'Documents')
   assert.equal(zh.groupHandoverDocs, '交接文档')

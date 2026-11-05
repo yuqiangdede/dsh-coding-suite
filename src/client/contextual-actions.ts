@@ -369,5 +369,5 @@ export function withEvidence(
   return prompt + '\n\n' + instruction[english ? 1 : 0] + (policy ? '\n' + policy : '')
 }
 
-const documentActions = new Set(['api-docs', 'requirements', 'overview', 'outline', 'database', 'doc-merge', 'docx'])
+const documentActions = new Set(['api-docs', 'requirements', 'overview', 'outline', 'database', 'doc-merge', 'docx', 'xlsx'])
 const codeActions = new Set(['execute', 'bug', 'tdd', 'review-fix'])
