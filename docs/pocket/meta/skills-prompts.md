@@ -457,3 +457,7 @@ git status --short
 ### 2026-11-05：Markdown 转 Excel 入口
 
 ACTION:xlsx 与 SKILL:markdown-to-xlsx：根据用户要求参照仓库 MD转Word 入口本地编写；未引入外部 Skill 或提示词。项目许可见根目录 LICENSE；个人作者身份未知。已保存的按钮配置需补齐缺失预设。
+
+### 2026-11-05：排查入口改名
+
+按用户要求，将 ACTION:handover-log-guide 的默认显示名由「排查流程」改为「排查资料」，英文展示名改为 Troubleshooting Docs，文档分组提示中的对应表述同步改为「排查资料」；按钮 ID、默认提示词、接收指令、Skill 正文与绑定不变。旧默认名（日志排查、问题排查、排查流程）定向兼容，自定义名称保留。来源为本次用户需求，未引入外部资源。修改前基线为 Git 提交 `851eeaf`。
