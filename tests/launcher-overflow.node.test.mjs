@@ -67,7 +67,7 @@ function harness({ actions, layout, english = false, measured = false, rowWidth 
       },
       fetchSkillNames: async () => DEFAULT_ACTIONS.filter(a => a.kind === 'skill').map(a => a.skillId),
       checkProjectSetup: async () => ({ ready: true, missing: [] }),
-      saveLayout: async (json, revision) => { events.push(['save', json, revision]); if (data.saveOk) data.config.layoutJson = json; return data.saveOk },
+      saveLayout: async (json, revision) => { events.push(['save', json, revision]); if (data.saveWait) await data.saveWait; if (data.saveOk) data.config.layoutJson = json; return data.saveOk },
       todoStaleMs: 90000, t: key => dictionary[key] ?? key,
     })
     assignRefs(tree)
@@ -91,6 +91,22 @@ const makeActions = count => Array.from({ length: count }, (_, i) => ({
   enabled: true, pinned: true, order: i, description: `Description ${i}`, example: '',
 }))
 const commonLayout = ids => ({ schemaVersion: 1, commonActionIds: ids, visibleGroups: { development: false, documents: false, others: false } })
+
+test('group visibility responds before saving and rolls back on rejection', async () => {
+  const h = harness()
+  h.data.writable = true
+  let finish
+  h.data.saveWait = new Promise(resolve => { finish = resolve })
+  h.data.saveOk = false
+  const toggle = () => h.nodes(h.render()).find(n => n.type === 'button' && n.props.title === zh.groupDevelopmentHelp)
+  assert.equal(toggle().props['aria-pressed'], true)
+  toggle().props.onClick()
+  assert.equal(toggle().props['aria-pressed'], false)
+  finish()
+  await h.data.saveWait
+  await new Promise(resolve => setTimeout(resolve, 0))
+  assert.equal(toggle().props['aria-pressed'], true)
+})
 
 test('conversation history follows sent user messages, remains visible while running, and expands', async () => {
   const h = harness()

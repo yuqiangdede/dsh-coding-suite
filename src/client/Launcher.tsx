@@ -77,6 +77,10 @@ export function Launcher({
   const [groupLimits, setGroupLimits] = useState<Record<string, number>>({})
   const groupLimitsRef = useRef(groupLimits)
   const [layoutSaving, setLayoutSaving] = useState(false)
+  const [optimisticLayout, setOptimisticLayout] = useState<{ base: string | undefined, value: ReturnType<typeof defaultLauncherLayout> } | null>(null)
+  useEffect(() => {
+    if (optimisticLayout && snapshot.value?.layoutJson !== optimisticLayout.base) setOptimisticLayout(null)
+  }, [optimisticLayout, snapshot.value?.layoutJson])
   const [commonEdit, setCommonEdit] = useState<{ ids: string[], revision: number } | null>(null)
   const [pending, setPending] = useState(false)
   const [notice, setNotice] = useState('')
@@ -96,6 +100,7 @@ export function Launcher({
   let layout = defaultLauncherLayout(actions)
   try { layout = parseLauncherLayout(snapshot.value?.layoutJson, actions, Boolean(snapshot.value?.actionsJson)) }
   catch (error) { invalid = explain(error) }
+  if (optimisticLayout && snapshot.value?.layoutJson === optimisticLayout.base) layout = optimisticLayout.value
   const enabledActions = actions.filter(a => a.enabled && a.id !== 'product-development-pipeline').sort((a, b) => displayOrder(a) - displayOrder(b))
   // Buttons travel with their own prompt, so the request can be attributed by id
   // instead of guessing the stage from keywords inside that prompt.
@@ -127,6 +132,7 @@ export function Launcher({
     { id: 'common', actions: commonActions },
     ...groups.filter(group => layout.visibleGroups[group.id] && group.actions.length > 0),
   ]
+  const measurementKey = JSON.stringify([commonEdit !== null, layout.visibleGroups, measuredGroups.map(group => [group.id, group.actions.map(action => [action.id, action.label])]), t('moreCount')])
   useLayoutEffect(() => {
     if (!measurable) return
     const measure = () => {
@@ -168,18 +174,19 @@ export function Launcher({
     // Font or label changes resize the probe before the row itself changes.
     for (const probe of Object.values(groupProbes.current)) if (probe) observer.observe(probe)
     return () => { observer.disconnect() }
-  })
+  }, [measurable, measurementKey])
   const hasActions = enabledActions.length > 0
   const groupHasRecommendation = (id: GroupId) =>
     (id === 'common' ? commonActions : groups.find(group => group.id === id)?.actions ?? []).some(action => visibleRecommendation?.ids.includes(action.id))
   const toggleGroup = async (id: GroupId) => {
     if (layoutSaving || snapshot.status !== 'ready' || !snapshot.writable || snapshot.revision === undefined) return
+    const next = { ...layout, visibleGroups: { ...layout.visibleGroups, [id]: !layout.visibleGroups[id] } }
+    setOptimisticLayout({ base: snapshot.value?.layoutJson, value: next })
     setLayoutSaving(true)
     setNotice('')
     try {
-      const next = { ...layout, visibleGroups: { ...layout.visibleGroups, [id]: !layout.visibleGroups[id] } }
-      if (!await saveLayout(JSON.stringify(next), snapshot.revision)) setNotice(t('rejected'))
-    } catch (error) { setNotice(t('unsaved') + explain(error)) }
+      if (!await saveLayout(JSON.stringify(next), snapshot.revision)) { setOptimisticLayout(null); setNotice(t('rejected')) }
+    } catch (error) { setOptimisticLayout(null); setNotice(t('unsaved') + explain(error)) }
     finally { if (alive.current) setLayoutSaving(false) }
   }
   const startCommonEdit = () => {
