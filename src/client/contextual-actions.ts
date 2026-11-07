@@ -1,3 +1,4 @@
+import { DIAGNOSTIC_MODES } from './actions.ts'
 import { receivingInstructions, documentReceiving, codingDocPolicy } from './locales.ts'
 
 /** Read-only recommendations derived from finalized, visible chat messages. */
@@ -200,7 +201,9 @@ function attributeHistoryText(text: string, actions: readonly ActionSignature[])
   })
   const command = /^\/([a-z][a-z0-9-]*)(?=\s|$)/i.exec(text.trimStart())?.[1]
   const owners = command
-    ? actions.filter(action => action.kind === 'skill' && action.skillId?.toLowerCase() === command.toLowerCase())
+    ? actions.filter(action => action.kind === 'skill' && (action.skillId?.toLowerCase() === command.toLowerCase() ||
+      (action.id === 'add-logs' && DIAGNOSTIC_MODES.some(mode => mode.skillId === action.skillId) &&
+        DIAGNOSTIC_MODES.some(mode => mode.skillId === command.toLowerCase()))))
     : []
   let id: string | null = null
   if (matches.length === 1) id = matches[0]!.id

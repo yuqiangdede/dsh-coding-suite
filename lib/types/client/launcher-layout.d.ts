@@ -7,7 +7,7 @@ export declare const LAUNCHER_GROUPS: readonly [{
 }, {
     readonly id: "development";
     readonly label: "groupDevelopment";
-    readonly actionIds: readonly ["discussion", "spec", "execute", "review", "review-fix", "compile", "bug", "commit", "add-logs", "analyze-logs", "ask", "research", "domain", "prototype", "plan", "architecture", "tdd", "remote-debug", "health-acceptance", "retro", "handoff"];
+    readonly actionIds: readonly ["discussion", "spec", "execute", "review", "review-fix", "compile", "bug", "commit", "add-logs", "analyze-logs", "ask", "plan", "architecture", "tdd", "remote-debug", "health-acceptance"];
 }, {
     readonly id: "documents";
     readonly label: "groupDocuments";
@@ -15,7 +15,7 @@ export declare const LAUNCHER_GROUPS: readonly [{
 }, {
     readonly id: "others";
     readonly label: "groupOthers";
-    readonly actionIds: readonly ["visual", "graphify-navigation", "graphify-refresh", "maintain-document-directory", "mermaid-draw", "image", "continue"];
+    readonly actionIds: readonly ["research", "domain", "prototype", "retro", "handoff", "visual", "graphify-navigation", "graphify-refresh", "maintain-document-directory", "mermaid-draw", "image", "continue"];
 }];
 export type OptionalGroupId = typeof LAUNCHER_GROUPS[number]['id'];
 export type GroupId = 'common' | OptionalGroupId;

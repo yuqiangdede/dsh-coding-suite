@@ -1,6 +1,6 @@
 import { useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react'
 import type { InjectFace, PropsLocale, PropsRuntime } from '@deepseek-ai/dsh-client-ui-slots'
-import { DEFAULT_ACTIONS, parseActions, actionErrorKey, presentDefaultActions, displayOrder, type CodingAction } from './actions.ts'
+import { DEFAULT_ACTIONS, DIAGNOSTIC_MODES, parseActions, actionErrorKey, presentDefaultActions, displayOrder, type CodingAction } from './actions.ts'
 import type { LauncherInjected } from './index.ts'
 import { chatEntries, conversationHistory, recommend, withEvidence } from './contextual-actions.ts'
 import { LAUNCHER_GROUPS, actionsForGroup, defaultLauncherLayout, fittedActionCount, parseLauncherLayout, type GroupId } from './launcher-layout.ts'
@@ -82,6 +82,7 @@ export function Launcher({
     if (optimisticLayout && snapshot.value?.layoutJson !== optimisticLayout.base) setOptimisticLayout(null)
   }, [optimisticLayout, snapshot.value?.layoutJson])
   const [commonEdit, setCommonEdit] = useState<{ ids: string[], revision: number } | null>(null)
+  const [diagnosticAction, setDiagnosticAction] = useState<CodingAction | null>(null)
   const [pending, setPending] = useState(false)
   const [notice, setNotice] = useState('')
   const rootRef = useRef<HTMLDivElement>(null)
@@ -256,7 +257,6 @@ export function Launcher({
       if (setupContext) {
         value += '\n\n执行上述任务前，先检查并补全当前项目缺失的初始化步骤与文档结构。检查线索（可能有误，请以项目文件为准）：' + setupContext + '。读取已安装的 setup-matt-pocock-skills Skill 及其 _shared/SETUP_AUTO_DECISIONS.md，复用现有文档权威；自动完成可验证、无冲突的工程初始化项，验证并报告实际变更。对冲突、覆盖或迁移已有资料等需要决定的事项，只暂停受影响部分并说明；其余可独立进行的任务继续。若 Skill 不可用，说明限制并依据项目现有规则尽力完成安全项，不要声称已执行该 Skill。完成可执行的初始化后继续上述任务。'
       }
-      value += '\n\n统一文档及产物路由：在读取、写入或依赖正式文档、阶段中间稿、评审/Gate、转换缓存前，先读当前项目 docs/agents/document-layout.md 和其知识索引。沿用登记的正式权威文件，所有文件型中间产物进入登记的任务专属工作区，不因 Skill 默认输出路径创建第二套文档。改写正式文件先显示差异并取得确认，结束时列出实际文件路径。'
     }
     if (action.kind === 'skill') {
       const skillId = action.skillId ?? ''
@@ -310,7 +310,7 @@ export function Launcher({
     return preview ? head + '\n' + (preview.length > 60 ? preview.slice(0, 59) + '…' : preview) : head
   }
   const render = (a: CodingAction) => <button type="button" key={a.id} disabled={!available} className={visibleRecommendation?.ids.includes(a.id) ? css.recommended : css.action}
-    title={a.description + '\n' + a.example + (visibleRecommendation?.ids.includes(a.id) ? '\n' + t('recommendationTooltip').replace('{reason}', t(visibleRecommendation.reason)) : '')} onClick={() => { void insert(a) }}>{displayLabel(a)}</button>
+    title={a.description + '\n' + a.example + (visibleRecommendation?.ids.includes(a.id) ? '\n' + t('recommendationTooltip').replace('{reason}', t(visibleRecommendation.reason)) : '')} onClick={() => { if (a.id === 'add-logs' && a.kind === 'skill' && DIAGNOSTIC_MODES.some(mode => mode.skillId === a.skillId)) setDiagnosticAction(a); else void insert(a) }}>{displayLabel(a)}</button>
   // Expansion is local presentation state, independent of saved membership and action availability.
   const renderGroupActions = (id: string, label: string, members: CodingAction[]) => {
     const fallback = 8
@@ -418,6 +418,16 @@ export function Launcher({
           {renderGroupActions(group.id, t(group.label), group.actions)}
         </div>)}
     </>}
+    {diagnosticAction && <div className={css.actionGroup} role="group" aria-label={t('diagnosticChoose')} data-diagnostic-modes>
+      <div className={css.groupHeader}>{t('diagnosticChoose')}</div>
+      <div className={css.row}>
+        {DIAGNOSTIC_MODES.map(mode => <button type="button" key={mode.skillId} className={css.action} disabled={!available}
+          onClick={() => { setDiagnosticAction(null); void insert({ ...diagnosticAction, skillId: mode.skillId, prompt: diagnosticAction.prompt + '\n排查模式：' + mode.label }); }}>
+          {t('defaultLocale') === 'en' ? mode.english : mode.label}
+        </button>)}
+        <button type="button" className={css.action} onClick={() => setDiagnosticAction(null)}>{t('cancelCommon')}</button>
+      </div>
+    </div>}
     {visibleRecommendation && <div className={css.hint} aria-live="polite">{t('recommendationHint').replace('{actions}', recommendedActions.map(displayLabel).join(t('recommendationSeparator'))).replace('{reason}', t(visibleRecommendation.reason))}</div>}
     {watching && <div className={`${css.progressWarning} ${planMayBeStale ? css.progressWarningActive : ''}`} role="status">
       {planMayBeStale ? t('todoStale').replace('{minutes}', String(unchangedMinutes)) : null}

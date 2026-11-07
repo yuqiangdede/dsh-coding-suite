@@ -1,0 +1,102 @@
+--- a/docs/pocket/meta/skills-prompts.md
++++ b/docs/pocket/meta/skills-prompts.md
+@@ -461,3 +461,22 @@
+ ### 2026-11-05：排查入口改名
+ 
+ 按用户要求，将 ACTION:handover-log-guide 的默认显示名由「排查流程」改为「排查资料」，英文展示名改为 Troubleshooting Docs，文档分组提示中的对应表述同步改为「排查资料」；按钮 ID、默认提示词、接收指令、Skill 正文与绑定不变。旧默认名（日志排查、问题排查、排查流程）定向兼容，自定义名称保留。来源为本次用户需求，未引入外部资源。修改前基线为 Git 提交 `851eeaf`。
++
++## 2026-11-07 补充排查四模式（确认此差异后登记）
++
++来源：本次用户会话（提供者：项目用户；无公开 URL），提供功能排查页面与通用耗时排查提示词，并要求四个独立 Skill。本地基线：`b7d1baa7b3c9fac99f1fe9488eda74dfdd7507cc`；新资产此前不存在，原始用户提示词保留在会话，不复制第二份全文。外部上游仓库、固定版本/commit、原包指纹：不适用/未知，无可核验上游包；用户原文许可未知，不推断第三方授权，本地新增代码沿用仓库 MIT。引入日期：2026-11-07（Asia/Shanghai）。后续差异通过本次资产 Git 历史追溯；尚未提交。
++
++| 资产/稳定 ID | 来源类别 | 参考与本地变更 |
++| --- | --- | --- |
++| assets/skills/diagnose-function-page/SKILL.md | 参考改写 | 用户提供《通用业务功能排查——简化版实现提示词》；按现有项目路由、共享采集和真实场景适配 |
++| assets/skills/diagnose-performance-page/SKILL.md | 参考改写 | 用户提供《通用业务耗时排查功能》；补充重叠观测占比、测量范围及缺数据规则 |
++| assets/skills/diagnose-function-logs/SKILL.md | 本地编写 | 用户要求的功能日志模式，参考其功能页面提示词原则，改为关联日志输出 |
++| assets/skills/diagnose-performance-logs/SKILL.md | 本地编写 | 用户要求的性能日志模式，参考其耗时页面提示词原则，改为日志与摘要输出 |
++| assets/skills/_shared/business-diagnostics/protocol.md | 参考改写＋本地编写 | 用户上述两段提示词；复用项目文档路由和旧 TEMP-DIAG 生命周期，增加跨模式共享约定 |
++| src/client/actions.ts / ACTION:add-logs / DIAGNOSTIC_PROMPT、DIAGNOSTIC_MODES | 本地编写 | 本次用户替换按钮及四模式需求；旧 ADD_LOGS_PROMPT 仅保留精确迁移签名，原来源记录不变 |
++| src/client/locales.ts / diagnosticChoose；actions.ts / add-logs 英文展示 | 本地编写 | 与本次模式选择及作用范围对应的中英文 UI 文案 |
++| src/client/Launcher.tsx / 排查模式草稿后缀 | 本地编写 | 按本次用户四模式选择需求附加模式名，沿用现有接收及文档路由指令 |
++
++所有资产逐项来源如上；未引入外部 Skill。旧临时日志按钮的历史台账保留，现行 add-logs 指向补充排查及四模式；其他历史提示词来源和上游基线不变。
++
++实现补充：src/client/contextual-actions.ts 将四个模式命令识别为同一补充排查按钮，仅修改归属识别逻辑，无新增提示词。
+--- a/docs/pocket/README.md
++++ b/docs/pocket/README.md
+@@ -41,7 +41,7 @@
+ 
+ - [开发分组改名与更多按钮](requirements/launcher-overflow.md) — accepted；每组按可用宽度尽量展示，确实放不下才出现更多/收起（无测量环境回退前 8 个），常用分组可控制显示并在页面内编辑成员。
+ 
+-- [增加日志按钮与临时诊断生命周期](requirements/temporary-logging.md) — accepted；针对具体问题最小加日志，临时标识、清理清单与本会话移除提醒，不承诺跨会话自动提醒。
++- [补充排查按钮与诊断生命周期](requirements/temporary-logging.md) — accepted；以四个独立 Skill 为本对话已完成功能补充功能/性能与页面/日志排查；保留临时探针清理约定。
+ 
+ - [修复完成后仍推荐修复](pitfalls/repair-recommendation.md) — accepted；修复请求归位及遗留问题栏目误判的修正规则。
+ 
+--- a/docs/pocket/requirements/diagnostic-shortcuts.md
++++ b/docs/pocket/requirements/diagnostic-shortcuts.md
+@@ -7,3 +7,7 @@
+ - 远程调试提供 SSH 连接信息、远程运行路径和问题描述填写位置，缺项先询问；使用现有认证，优先只读诊断，远程变更先征求确认。不要在草稿中填写密码、私钥或令牌。
+ - 文档分组显示名改为“文档”，分组 ID 不变；英文仍为 Documentation。已保存的动作及布局不自动覆盖，旧用户可在按钮设置中补齐缺失预设并保存；自定义常用组需自行添加新动作。
+ - 默认提示词以 [actions.ts](../../../src/client/actions.ts) 为准；[回归测试](../../../tests/diagnostic-shortcuts.node.test.mjs)覆盖输入、顺序和配置兼容，发射器测试覆盖草稿插入。
++
++## 2026-11-07 替换入口
++
++“增加日志”拟替换为“补充排查”，内部 ID 不变；“分析日志”仍是独立只读日志分析入口，不受四种补充排查 Skill 影响。参见[排查主题](temporary-logging.md)。
+--- a/docs/pocket/requirements/launcher-overflow.md
++++ b/docs/pocket/requirements/launcher-overflow.md
+@@ -61,3 +61,7 @@
+ - 纯函数边界：恰好放下、多 1px 才保留更多、少 1px 提前折叠、不足一个按钮、未知更多宽度降级。
+ - 源码、portable 布局产物与发布 [bundle](<../../../lib/client.js>) 同步；57/57 Node 回归、`node --check`、`verify-client-bundle.mjs`、`verify-launcher-render.mjs`、`build-action-bundle.mjs --check` 通过。
+ - 限制：未在真实宿主 GUI 重载验证实际像素宽度与换行效果（离屏测量行为由 stub DOM 覆盖）；未安装 `vitest`，`.spec.ts` 套件未执行。
++
++## 补充排查替换增加日志（2026-11-07）
++
++按钮显示名与行为变更，沿用 add-logs ID 和既有分组位置；点击选择四种排查模式后插入对应 Skill 草稿。此前本文关于“增加日志”的显示名与纯提示词描述以[现行主题](temporary-logging.md)的新条款为准。其他分组布局不属于此次需求。
+--- a/docs/pocket/requirements/temporary-logging.md
++++ b/docs/pocket/requirements/temporary-logging.md
+@@ -1,6 +1,41 @@
+-# 增加日志按钮与临时诊断生命周期
++# 补充排查按钮与诊断生命周期
+ 
+-状态：accepted。来源：用户要求增加“增加日志”按钮，用于复现排查特定问题，临时日志后续须提醒取消；已确认按钮位置、提醒边界和测试范围。
++状态：accepted（确认此差异并应用后生效；用户于 2026-11-07 提出替换）。
++
++## 交互与范围
++
++- 按钮显示“补充排查”，常用组和开发组共享同一入口。内部沿用 add-logs ID，保持既有布局成员与位置。
++- 点击展开四个选项：功能排查-页面模式、功能排查-日志模式、性能排查-页面模式、性能排查-日志模式；依次调用 diagnose-function-page、diagnose-function-logs、diagnose-performance-page、diagnose-performance-logs。
++- 选模式后检查 Skill 可用性并插入可编辑草稿，由用户发送；取消不插入，不自动执行。沿用初始化检查、输入位置保护及通用禁用条件。
++- 默认针对本对话已完成编码的功能；未完成或目标含糊由 Skill 核实并询问。按钮不以关键词推断编码已完成，不声称自动判定执行结果。
++- 可识别且提示词完全未改的旧“增加日志”预设自动升级，保留启用/固定/顺序与自定义说明；自定义名称或提示词保留原状，不新增用户删除的动作。
++
++## 四种模式
++
++- 功能页面：结论、执行步骤、展开详情、基于证据的建议，区分接口技术成功、无数据/回退和最终业务结果；缺反馈标未验证。
++- 功能日志：按 runId 关联关键步骤、脱敏输入输出摘要、分支/回退和最终结论，不新增页面。
++- 性能页面：共享采集及组件，显示可靠总耗时、步骤耗时、耗时条、排序、最慢步骤和可比占比。
++- 性能日志：按 runId/步骤记录可靠耗时和摘要，不新增页面。两种性能模式使用单调计时器，不把并行/嵌套相加为总耗时，不拼接不同时间源为精确端到端耗时，缺数据标未采集。
++
++## 共用实施边界
++
++复用现有排查、logger、组件和计时能力，低侵入、不改变业务逻辑，采集异常不影响业务。额外采集主动启用，敏感信息白名单脱敏、限量。业务定义步骤，不将示例数据写死到通用组件；地图场景仅在目标项目存在时接入，否则用本对话当前功能验收。建议依据真实数据，不编造根因或实际验证结果。
++
++临时探针继续使用 TEMP-DIAG、清理清单和本会话结束取证时移除提醒；正式诊断能力与临时探针区分，关闭不等于移除，不承诺后台或跨会话提醒。
++
++## 实现与验证入口
++
++- 按钮与兼容：[actions.ts](../../../src/client/actions.ts)
++- 模式选择：[Launcher.tsx](../../../src/client/Launcher.tsx)
++- 技能共享规则：[protocol.md](../../../assets/skills/_shared/business-diagnostics/protocol.md)
++- 交互及旧配置回归：[launcher-overflow.node.test.mjs](../../../tests/launcher-overflow.node.test.mjs)、[temporary-logging.node.test.mjs](../../../tests/temporary-logging.node.test.mjs)
++
++仅静态检查和模拟宿主交互不能代表真实宿主重载或目标业务运行验证。
++
++## 历史约定（已由上文拟替代）
++
++
++原状态：accepted；保留为历史，替代条款确认后以上文为现行。来源：用户要求增加“增加日志”按钮，用于复现排查特定问题，临时日志后续须提醒取消；已确认按钮位置、提醒边界和测试范围。
+ 
+ ## 交互与范围
+ 

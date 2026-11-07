@@ -12,6 +12,24 @@ export interface CodingAction {
     description: string;
     example: string;
 }
+/** Stable ID preserves saved group membership when replacing the logging shortcut. */
+export declare const DIAGNOSTIC_MODES: readonly [{
+    readonly skillId: "diagnose-function-page";
+    readonly label: "功能排查-页面模式";
+    readonly english: "Function diagnostics · Page";
+}, {
+    readonly skillId: "diagnose-function-logs";
+    readonly label: "功能排查-日志模式";
+    readonly english: "Function diagnostics · Logs";
+}, {
+    readonly skillId: "diagnose-performance-page";
+    readonly label: "性能排查-页面模式";
+    readonly english: "Performance diagnostics · Page";
+}, {
+    readonly skillId: "diagnose-performance-logs";
+    readonly label: "性能排查-日志模式";
+    readonly english: "Performance diagnostics · Logs";
+}];
 /** Initial editable actions supplied when no configuration is saved. */
 export declare const DEFAULT_ACTIONS: readonly CodingAction[];
 /** Keep the old built-in visual action adjacent to text discussion without rewriting saved order. */

@@ -1,0 +1,708 @@
+{
+  "repository": "https://github.com/mattpocock/skills",
+  "revision": "4ae2317ddb22b046e26455e4f9c9b3aaaf62212d",
+  "previousRevision": "5beb35b040e3de97e54fa9e386d7e42d15c295c2",
+  "packageVersion": "1.3.2",
+  "importedOn": "2026-11-03",
+  "license": "MIT",
+  "licenseFile": "MATT-LICENSE",
+  "rawSnapshot": "assets/skills/_upstream/matt/skills",
+  "skills": [
+    "ask-matt",
+    "code-review",
+    "codebase-design",
+    "diagnosing-bugs",
+    "domain-modeling",
+    "grill-with-docs",
+    "implement",
+    "implement-spec",
+    "improve-codebase-architecture",
+    "pr",
+    "prototype",
+    "research",
+    "retro",
+    "setup-matt-pocock-skills",
+    "tdd",
+    "to-spec",
+    "to-tickets",
+    "triage",
+    "wayfinder",
+    "wizard",
+    "chief-of-staff",
+    "claude-handoff",
+    "loop-me",
+    "setup-ts-deep-modules",
+    "software-factory",
+    "writing-beats",
+    "writing-fragments",
+    "writing-shape",
+    "git-guardrails-claude-code",
+    "migrate-to-shoehorn",
+    "scaffold-exercises",
+    "setup-pre-commit",
+    "grill-me",
+    "grilling",
+    "handoff",
+    "teach",
+    "to-questionnaire",
+    "wait-what",
+    "writing-for-agents"
+  ],
+  "files": [
+    {
+      "path": "assets/skills/ask-matt/agents/openai.yaml",
+      "upstreamPath": "skills/engineering/ask-matt/agents/openai.yaml",
+      "upstreamSha256": "d30cfa5b0e84e2ca10b8d263b9dfcc13c3aa089ae6bc26096bc549fc037d274e",
+      "localSha256": "d30cfa5b0e84e2ca10b8d263b9dfcc13c3aa089ae6bc26096bc549fc037d274e"
+    },
+    {
+      "path": "assets/skills/ask-matt/PHASE-BOUNDARIES.md",
+      "upstreamPath": "skills/engineering/ask-matt/PHASE-BOUNDARIES.md",
+      "upstreamSha256": "4e2a891beb182df8c2eb2a7dfbff20ba43ae008d29c77ac41b005181018f7ccd",
+      "localSha256": "4e2a891beb182df8c2eb2a7dfbff20ba43ae008d29c77ac41b005181018f7ccd"
+    },
+    {
+      "path": "assets/skills/ask-matt/SKILL.md",
+      "upstreamPath": "skills/engineering/ask-matt/SKILL.md",
+      "upstreamSha256": "9153a87908838ed24838c16da0eaeec46877f3ab701efdeefea7a5579a4a474d",
+      "localSha256": "4bdccc7a3a1ca899c0ca1a180a4fa79db46a4717bae1fce315b2fbf04cb10c83"
+    },
+    {
+      "path": "assets/skills/code-review/agents/openai.yaml",
+      "upstreamPath": "skills/engineering/code-review/agents/openai.yaml",
+      "upstreamSha256": "3f72329747a916ac8ab2b4004490c79e1be6774a8a83e5b258d6ddc7e866abfe",
+      "localSha256": "3f72329747a916ac8ab2b4004490c79e1be6774a8a83e5b258d6ddc7e866abfe"
+    },
+    {
+      "path": "assets/skills/code-review/SKILL.md",
+      "upstreamPath": "skills/engineering/code-review/SKILL.md",
+      "upstreamSha256": "36847f010579f3bccd54c49793e1fd043f10cc49b4607bac5a3067522e528b91",
+      "localSha256": "848a57d865c4fb3a4f4d59f7fe2b8c8014020843c31543b931e2298c7d75a332"
+    },
+    {
+      "path": "assets/skills/codebase-design/agents/openai.yaml",
+      "upstreamPath": "skills/engineering/codebase-design/agents/openai.yaml",
+      "upstreamSha256": "967df5c80a2a00e8fea9ce0e7914fb57114c93d16baa3b7743347a4dfeed61fc",
+      "localSha256": "967df5c80a2a00e8fea9ce0e7914fb57114c93d16baa3b7743347a4dfeed61fc"
+    },
+    {
+      "path": "assets/skills/codebase-design/DEEPENING.md",
+      "upstreamPath": "skills/engineering/codebase-design/DEEPENING.md",
+      "upstreamSha256": "a67260cb384580b60430486edeb47a6e656ea5f8a42b7196b24461459031f00c",
+      "localSha256": "a67260cb384580b60430486edeb47a6e656ea5f8a42b7196b24461459031f00c"
+    },
+    {
+      "path": "assets/skills/codebase-design/DESIGN-IT-TWICE.md",
+      "upstreamPath": "skills/engineering/codebase-design/DESIGN-IT-TWICE.md",
+      "upstreamSha256": "43e788220bde5ce60c5f8932b6bde7a758ed63e22ddc0d658dbf6460d8950a6c",
+      "localSha256": "43e788220bde5ce60c5f8932b6bde7a758ed63e22ddc0d658dbf6460d8950a6c"
+    },
+    {
+      "path": "assets/skills/codebase-design/SKILL.md",
+      "upstreamPath": "skills/engineering/codebase-design/SKILL.md",
+      "upstreamSha256": "362b0bec828219d9f4b08ca7c466164e67253bdd817359258e60d2e9c5692a8f",
+      "localSha256": "362b0bec828219d9f4b08ca7c466164e67253bdd817359258e60d2e9c5692a8f"
+    },
+    {
+      "path": "assets/skills/diagnosing-bugs/agents/openai.yaml",
+      "upstreamPath": "skills/engineering/diagnosing-bugs/agents/openai.yaml",
+      "upstreamSha256": "167ab1659754b8c53706ecca7502ccc7fb219ff14f0c36bfb1db05ae31a8ac58",
+      "localSha256": "167ab1659754b8c53706ecca7502ccc7fb219ff14f0c36bfb1db05ae31a8ac58"
+    },
+    {
+      "path": "assets/skills/diagnosing-bugs/scripts/hitl-loop.template.sh",
+      "upstreamPath": "skills/engineering/diagnosing-bugs/scripts/hitl-loop.template.sh",
+      "upstreamSha256": "063ef14e7212113c7778258172e7c76e963926963e448934048f505d6e576e8f",
+      "localSha256": "063ef14e7212113c7778258172e7c76e963926963e448934048f505d6e576e8f"
+    },
+    {
+      "path": "assets/skills/diagnosing-bugs/SKILL.md",
+      "upstreamPath": "skills/engineering/diagnosing-bugs/SKILL.md",
+      "upstreamSha256": "aa87b0ac245c6d1b203c4678eb34dc101af02291448780c55c5e58ccc1619bd7",
+      "localSha256": "ff625a106e23f21eb202ae786079aabbeca1c15d38049d1592fdaddb74ca8349"
+    },
+    {
+      "path": "assets/skills/domain-modeling/ADR-FORMAT.md",
+      "upstreamPath": "skills/engineering/domain-modeling/ADR-FORMAT.md",
+      "upstreamSha256": "b7021c31a1c2485b07356a8110fd1fd1ae4facbab3e210983789f425f867d95b",
+      "localSha256": "b7021c31a1c2485b07356a8110fd1fd1ae4facbab3e210983789f425f867d95b"
+    },
+    {
+      "path": "assets/skills/domain-modeling/agents/openai.yaml",
+      "upstreamPath": "skills/engineering/domain-modeling/agents/openai.yaml",
+      "upstreamSha256": "ce496c77c77a090877bff10f198c9770fb52e23088351350ea0826380f948ff8",
+      "localSha256": "ce496c77c77a090877bff10f198c9770fb52e23088351350ea0826380f948ff8"
+    },
+    {
+      "path": "assets/skills/domain-modeling/GLOSSARY-FORMAT.md",
+      "upstreamPath": "skills/engineering/domain-modeling/GLOSSARY-FORMAT.md",
+      "upstreamSha256": "61fa9f6f9231070461dd4f7d4cfad377c33013c1e5668e1e6c0a8e4500944b3b",
+      "localSha256": "61fa9f6f9231070461dd4f7d4cfad377c33013c1e5668e1e6c0a8e4500944b3b"
+    },
+    {
+      "path": "assets/skills/domain-modeling/SKILL.md",
+      "upstreamPath": "skills/engineering/domain-modeling/SKILL.md",
+      "upstreamSha256": "b62d997256cc073e123d4303da8e9db00db0e28de9739660ca3e55ab76e09cdb",
+      "localSha256": "fedea0e1ab5370672bbcae97b87063c9ccfee7ca957bbfdc57868d5830f7688d"
+    },
+    {
+      "path": "assets/skills/grill-with-docs/agents/openai.yaml",
+      "upstreamPath": "skills/engineering/grill-with-docs/agents/openai.yaml",
+      "upstreamSha256": "81e6af95559517a292767439da8f46a468b4d88a6773a3316d511a428eb16ff3",
+      "localSha256": "81e6af95559517a292767439da8f46a468b4d88a6773a3316d511a428eb16ff3"
+    },
+    {
+      "path": "assets/skills/grill-with-docs/SKILL.md",
+      "upstreamPath": "skills/engineering/grill-with-docs/SKILL.md",
+      "upstreamSha256": "abc0fa7948db18b5fb0e1cc1c522ac5ff47d874e2da1e5df60619d79be11f38b",
+      "localSha256": "abc0fa7948db18b5fb0e1cc1c522ac5ff47d874e2da1e5df60619d79be11f38b"
+    },
+    {
+      "path": "assets/skills/implement/agents/openai.yaml",
+      "upstreamPath": "skills/engineering/implement/agents/openai.yaml",
+      "upstreamSha256": "8494f83602c58f8ab33d047d0516cdb90b8c29e6d564de0cef810daaca378bcb",
+      "localSha256": "8494f83602c58f8ab33d047d0516cdb90b8c29e6d564de0cef810daaca378bcb"
+    },
+    {
+      "path": "assets/skills/implement/SKILL.md",
+      "upstreamPath": "skills/engineering/implement/SKILL.md",
+      "upstreamSha256": "83042ad79e3d7ce616124bf59a38a5ebe79417adb36bedfc4e6223aab783be8c",
+      "localSha256": "759a8f4e14354725687aff4f291d571caa8121b966a794161c916b5d3ade097a"
+    },
+    {
+      "path": "assets/skills/implement-spec/agents/openai.yaml",
+      "upstreamPath": "skills/engineering/implement-spec/agents/openai.yaml",
+      "upstreamSha256": "143db4aaaee1dfee7db6da5dab41501fb3852be498fb719dd52f1e21f29a383f",
+      "localSha256": "143db4aaaee1dfee7db6da5dab41501fb3852be498fb719dd52f1e21f29a383f"
+    },
+    {
+      "path": "assets/skills/implement-spec/SKILL.md",
+      "upstreamPath": "skills/engineering/implement-spec/SKILL.md",
+      "upstreamSha256": "cdf23fc6e55aff30d5dd1e032da421eb4f2275739f0c9acd35b46b76eb514507",
+      "localSha256": "cdf23fc6e55aff30d5dd1e032da421eb4f2275739f0c9acd35b46b76eb514507"
+    },
+    {
+      "path": "assets/skills/improve-codebase-architecture/agents/openai.yaml",
+      "upstreamPath": "skills/engineering/improve-codebase-architecture/agents/openai.yaml",
+      "upstreamSha256": "6b69701fc3f4f31ec626c1ae5c090dc5c640fab147a63be81b575c2f9c5231fa",
+      "localSha256": "6b69701fc3f4f31ec626c1ae5c090dc5c640fab147a63be81b575c2f9c5231fa"
+    },
+    {
+      "path": "assets/skills/improve-codebase-architecture/HTML-REPORT.md",
+      "upstreamPath": "skills/engineering/improve-codebase-architecture/HTML-REPORT.md",
+      "upstreamSha256": "870acb4262373ae536af7d1f4a9b56d33e7e7faa632bd425c09edb4f897fb828",
+      "localSha256": "870acb4262373ae536af7d1f4a9b56d33e7e7faa632bd425c09edb4f897fb828"
+    },
+    {
+      "path": "assets/skills/improve-codebase-architecture/SKILL.md",
+      "upstreamPath": "skills/engineering/improve-codebase-architecture/SKILL.md",
+      "upstreamSha256": "ab526ca26246137fe96048b072d93aeff45f763da5e6c0eca5e51012dfd34433",
+      "localSha256": "e0581979e13a7c328980e75a24df3c987b929c060943411baf0bc3d107247f29"
+    },
+    {
+      "path": "assets/skills/pr/agents/openai.yaml",
+      "upstreamPath": "skills/engineering/pr/agents/openai.yaml",
+      "upstreamSha256": "33b71355c3ec06963d9a276baff9e9bf89a1ac69a5b9489a368c95021a8d6cc4",
+      "localSha256": "33b71355c3ec06963d9a276baff9e9bf89a1ac69a5b9489a368c95021a8d6cc4"
+    },
+    {
+      "path": "assets/skills/pr/CREDITS.md",
+      "upstreamPath": "skills/engineering/pr/CREDITS.md",
+      "upstreamSha256": "f5b7f7ead794f672324eb6a2cdc6986840e452abf15d72938084b645074bd149",
+      "localSha256": "f5b7f7ead794f672324eb6a2cdc6986840e452abf15d72938084b645074bd149"
+    },
+    {
+      "path": "assets/skills/pr/SKILL.md",
+      "upstreamPath": "skills/engineering/pr/SKILL.md",
+      "upstreamSha256": "57658baca2e50e9cf98fdb6b74a51f2afd34b71019d516f7c5d45a51a28354b0",
+      "localSha256": "0562c2ef1ca0a42747bac4fac9dca1a97539d731f2c21236469b8d2412cd015a"
+    },
+    {
+      "path": "assets/skills/prototype/agents/openai.yaml",
+      "upstreamPath": "skills/engineering/prototype/agents/openai.yaml",
+      "upstreamSha256": "cc1ce1ceaba1442c431dc76abb84b271ad72ecb94dcefee53130df742dc11787",
+      "localSha256": "cc1ce1ceaba1442c431dc76abb84b271ad72ecb94dcefee53130df742dc11787"
+    },
+    {
+      "path": "assets/skills/prototype/LOGIC.md",
+      "upstreamPath": "skills/engineering/prototype/LOGIC.md",
+      "upstreamSha256": "8d7e31de7ce73b8e62f207e3f3ecbd90a7a54fdc728f8965f5f0739976f9959a",
+      "localSha256": "8d7e31de7ce73b8e62f207e3f3ecbd90a7a54fdc728f8965f5f0739976f9959a"
+    },
+    {
+      "path": "assets/skills/prototype/SKILL.md",
+      "upstreamPath": "skills/engineering/prototype/SKILL.md",
+      "upstreamSha256": "f74ae01f4fc454d3a4ef21271920f1706e626271e715dda0559e489f45c792c3",
+      "localSha256": "f74ae01f4fc454d3a4ef21271920f1706e626271e715dda0559e489f45c792c3"
+    },
+    {
+      "path": "assets/skills/prototype/UI.md",
+      "upstreamPath": "skills/engineering/prototype/UI.md",
+      "upstreamSha256": "5ea83263ba72174c9055d58045f053d6577c0db6802c1e15bd1468dd16f78a0b",
+      "localSha256": "5ea83263ba72174c9055d58045f053d6577c0db6802c1e15bd1468dd16f78a0b"
+    },
+    {
+      "path": "assets/skills/research/agents/openai.yaml",
+      "upstreamPath": "skills/engineering/research/agents/openai.yaml",
+      "upstreamSha256": "73840328dfa6b689d81ee645d8aaf8570a0cc44d64a32b119ea6091d2828d412",
+      "localSha256": "73840328dfa6b689d81ee645d8aaf8570a0cc44d64a32b119ea6091d2828d412"
+    },
+    {
+      "path": "assets/skills/research/SKILL.md",
+      "upstreamPath": "skills/engineering/research/SKILL.md",
+      "upstreamSha256": "4422d07f1375712f0ecfadc05e6210bad2880f1d36eab32f62760eed344f935a",
+      "localSha256": "4422d07f1375712f0ecfadc05e6210bad2880f1d36eab32f62760eed344f935a"
+    },
+    {
+      "path": "assets/skills/retro/agents/openai.yaml",
+      "upstreamPath": "skills/engineering/retro/agents/openai.yaml",
+      "upstreamSha256": "61afaa61443da49b3ff8fcc9d04735362bfec03e213791226134a3a21a9c6fd3",
+      "localSha256": "61afaa61443da49b3ff8fcc9d04735362bfec03e213791226134a3a21a9c6fd3"
+    },
+    {
+      "path": "assets/skills/retro/SKILL.md",
+      "upstreamPath": "skills/engineering/retro/SKILL.md",
+      "upstreamSha256": "42110f533f169026d037cf141b9f6c2752c6d914903be4758c38a68349e83e78",
+      "localSha256": "42110f533f169026d037cf141b9f6c2752c6d914903be4758c38a68349e83e78"
+    },
+    {
+      "path": "assets/skills/setup-matt-pocock-skills/agents/openai.yaml",
+      "upstreamPath": "skills/engineering/setup-matt-pocock-skills/agents/openai.yaml",
+      "upstreamSha256": "53d0bf3786862a1cb5013ca78f12013b166d0819823dae0d3f9eb13eee2acdf2",
+      "localSha256": "53d0bf3786862a1cb5013ca78f12013b166d0819823dae0d3f9eb13eee2acdf2"
+    },
+    {
+      "path": "assets/skills/setup-matt-pocock-skills/domain.md",
+      "upstreamPath": "skills/engineering/setup-matt-pocock-skills/domain.md",
+      "upstreamSha256": "20ee347cfcb4bd2266a8b747c11ca6c3dec85ff4cc38319de88cc3cadc12c80b",
+      "localSha256": "20ee347cfcb4bd2266a8b747c11ca6c3dec85ff4cc38319de88cc3cadc12c80b"
+    },
+    {
+      "path": "assets/skills/setup-matt-pocock-skills/issue-tracker-github.md",
+      "upstreamPath": "skills/engineering/setup-matt-pocock-skills/issue-tracker-github.md",
+      "upstreamSha256": "f5d521ed1b95921613f5d2c10a98e64e91a752060a963964f0d943834e48fbb0",
+      "localSha256": "f5d521ed1b95921613f5d2c10a98e64e91a752060a963964f0d943834e48fbb0"
+    },
+    {
+      "path": "assets/skills/setup-matt-pocock-skills/issue-tracker-gitlab.md",
+      "upstreamPath": "skills/engineering/setup-matt-pocock-skills/issue-tracker-gitlab.md",
+      "upstreamSha256": "7dbf98d4fa091dd56b00fdb2f453f241f9f077934bf96486a2951b0a2e04c463",
+      "localSha256": "7dbf98d4fa091dd56b00fdb2f453f241f9f077934bf96486a2951b0a2e04c463"
+    },
+    {
+      "path": "assets/skills/setup-matt-pocock-skills/issue-tracker-local.md",
+      "upstreamPath": "skills/engineering/setup-matt-pocock-skills/issue-tracker-local.md",
+      "upstreamSha256": "a604b658f0730eae3107671b09323ed8382bd546e82dc3bedc265bccbeb35021",
+      "localSha256": "a604b658f0730eae3107671b09323ed8382bd546e82dc3bedc265bccbeb35021"
+    },
+    {
+      "path": "assets/skills/setup-matt-pocock-skills/SKILL.md",
+      "upstreamPath": "skills/engineering/setup-matt-pocock-skills/SKILL.md",
+      "upstreamSha256": "a5dd3406178c0e4cde95e3926ae07c6c6abd121587a674a12dc3b06cb5ed49dc",
+      "localSha256": "e98a753bdc6f7d9beb0290dce3bae35f971a8a3961ad873dac0b0eeeb4440c71"
+    },
+    {
+      "path": "assets/skills/setup-matt-pocock-skills/triage-labels.md",
+      "upstreamPath": "skills/engineering/setup-matt-pocock-skills/triage-labels.md",
+      "upstreamSha256": "713abcdd778059289bc4ed8278d14787f719707d429da716ae814e69a727843c",
+      "localSha256": "713abcdd778059289bc4ed8278d14787f719707d429da716ae814e69a727843c"
+    },
+    {
+      "path": "assets/skills/tdd/agents/openai.yaml",
+      "upstreamPath": "skills/engineering/tdd/agents/openai.yaml",
+      "upstreamSha256": "f8e2afc1fbcd6a6e1178c30f290ca9f2286c949a0b74b8b68fd14f198b78ebac",
+      "localSha256": "f8e2afc1fbcd6a6e1178c30f290ca9f2286c949a0b74b8b68fd14f198b78ebac"
+    },
+    {
+      "path": "assets/skills/tdd/mocking.md",
+      "upstreamPath": "skills/engineering/tdd/mocking.md",
+      "upstreamSha256": "73a10b6a26b56197c738a764c1e4205af98c74553f4a713795997f6bc35b917d",
+      "localSha256": "73a10b6a26b56197c738a764c1e4205af98c74553f4a713795997f6bc35b917d"
+    },
+    {
+      "path": "assets/skills/tdd/SKILL.md",
+      "upstreamPath": "skills/engineering/tdd/SKILL.md",
+      "upstreamSha256": "969583080caf842ae86a53501a0091eced13fd89cad65d3aa75c09112318ff33",
+      "localSha256": "a2b833ea20b98fd9427bb736db91bc085a764d6daf8d16b7717ef81c1b96a872"
+    },
+    {
+      "path": "assets/skills/tdd/tests.md",
+      "upstreamPath": "skills/engineering/tdd/tests.md",
+      "upstreamSha256": "0b401f98bd3684d2fea6440d6946afcf8f5f68ac6a65599dd7a2b90dd9f02eb5",
+      "localSha256": "0b401f98bd3684d2fea6440d6946afcf8f5f68ac6a65599dd7a2b90dd9f02eb5"
+    },
+    {
+      "path": "assets/skills/to-spec/agents/openai.yaml",
+      "upstreamPath": "skills/engineering/to-spec/agents/openai.yaml",
+      "upstreamSha256": "55037139831219743dda1f716fe69eab3366e922529f69cc988fea3b1d34c74a",
+      "localSha256": "55037139831219743dda1f716fe69eab3366e922529f69cc988fea3b1d34c74a"
+    },
+    {
+      "path": "assets/skills/to-spec/SKILL.md",
+      "upstreamPath": "skills/engineering/to-spec/SKILL.md",
+      "upstreamSha256": "c73a2250beac0479e384f5466e834bb54ce6e30b7f8705e9999ba840d9d59b36",
+      "localSha256": "c73a2250beac0479e384f5466e834bb54ce6e30b7f8705e9999ba840d9d59b36"
+    },
+    {
+      "path": "assets/skills/to-tickets/agents/openai.yaml",
+      "upstreamPath": "skills/engineering/to-tickets/agents/openai.yaml",
+      "upstreamSha256": "e396b8caaf6cdd95c94cf707a7ca2fa5c3a04b37ae5d4301b5b360a7ff7a34cb",
+      "localSha256": "e396b8caaf6cdd95c94cf707a7ca2fa5c3a04b37ae5d4301b5b360a7ff7a34cb"
+    },
+    {
+      "path": "assets/skills/to-tickets/SKILL.md",
+      "upstreamPath": "skills/engineering/to-tickets/SKILL.md",
+      "upstreamSha256": "b8eb6dca1085e85220b0f5990ed787ebf8a924844d090689f1073b06367e2f7a",
+      "localSha256": "b8eb6dca1085e85220b0f5990ed787ebf8a924844d090689f1073b06367e2f7a"
+    },
+    {
+      "path": "assets/skills/triage/AGENT-BRIEF.md",
+      "upstreamPath": "skills/engineering/triage/AGENT-BRIEF.md",
+      "upstreamSha256": "9160800ad5483816f5bcd7f5aa62cfb6dbb16e6343d0754b9bb739815145fa15",
+      "localSha256": "9160800ad5483816f5bcd7f5aa62cfb6dbb16e6343d0754b9bb739815145fa15"
+    },
+    {
+      "path": "assets/skills/triage/agents/openai.yaml",
+      "upstreamPath": "skills/engineering/triage/agents/openai.yaml",
+      "upstreamSha256": "d930356b9f23b89361f5b8f4fef87c911b35531b15a9005956c944a1058973ae",
+      "localSha256": "d930356b9f23b89361f5b8f4fef87c911b35531b15a9005956c944a1058973ae"
+    },
+    {
+      "path": "assets/skills/triage/OUT-OF-SCOPE.md",
+      "upstreamPath": "skills/engineering/triage/OUT-OF-SCOPE.md",
+      "upstreamSha256": "a48a2c63f0520eaa08cd68705030a77428e7ba6647834c7a644ad9cda396e4ae",
+      "localSha256": "a48a2c63f0520eaa08cd68705030a77428e7ba6647834c7a644ad9cda396e4ae"
+    },
+    {
+      "path": "assets/skills/triage/SKILL.md",
+      "upstreamPath": "skills/engineering/triage/SKILL.md",
+      "upstreamSha256": "797f4371a4cea1b564ecfdc7a603089acf3c023454e47ccb0b3307c62de279f8",
+      "localSha256": "797f4371a4cea1b564ecfdc7a603089acf3c023454e47ccb0b3307c62de279f8"
+    },
+    {
+      "path": "assets/skills/wayfinder/agents/openai.yaml",
+      "upstreamPath": "skills/engineering/wayfinder/agents/openai.yaml",
+      "upstreamSha256": "3e698cdff8e84d0e900d8dec535060e9e6d16d923b313eefd881e958d164e37a",
+      "localSha256": "3e698cdff8e84d0e900d8dec535060e9e6d16d923b313eefd881e958d164e37a"
+    },
+    {
+      "path": "assets/skills/wayfinder/SKILL.md",
+      "upstreamPath": "skills/engineering/wayfinder/SKILL.md",
+      "upstreamSha256": "da3b9ce26c5128c8bd5b0099f262132320e72341544146196d81987edc62b58a",
+      "localSha256": "da3b9ce26c5128c8bd5b0099f262132320e72341544146196d81987edc62b58a"
+    },
+    {
+      "path": "assets/skills/wizard/agents/openai.yaml",
+      "upstreamPath": "skills/engineering/wizard/agents/openai.yaml",
+      "upstreamSha256": "b9a0f4a716a64ada207aa4b38ce53981729cde053d87a39f2d51ad2dd30d3249",
+      "localSha256": "b9a0f4a716a64ada207aa4b38ce53981729cde053d87a39f2d51ad2dd30d3249"
+    },
+    {
+      "path": "assets/skills/wizard/SKILL.md",
+      "upstreamPath": "skills/engineering/wizard/SKILL.md",
+      "upstreamSha256": "dbefb750eae07d9f8b05ab1084f6acfdda2752df2a6b577c46a505e2bc790164",
+      "localSha256": "dbefb750eae07d9f8b05ab1084f6acfdda2752df2a6b577c46a505e2bc790164"
+    },
+    {
+      "path": "assets/skills/wizard/template.sh",
+      "upstreamPath": "skills/engineering/wizard/template.sh",
+      "upstreamSha256": "b1f2291a7d01062aee8359cb987f6dd9da7a9627b0055faa1cff540a7e770dd2",
+      "localSha256": "b1f2291a7d01062aee8359cb987f6dd9da7a9627b0055faa1cff540a7e770dd2"
+    },
+    {
+      "path": "assets/skills/chief-of-staff/agents/openai.yaml",
+      "upstreamPath": "skills/in-progress/chief-of-staff/agents/openai.yaml",
+      "upstreamSha256": "93759642f8834b9b28e8204eb4949eab4873cc6b1709f40daa5b14806b514d01",
+      "localSha256": "93759642f8834b9b28e8204eb4949eab4873cc6b1709f40daa5b14806b514d01"
+    },
+    {
+      "path": "assets/skills/chief-of-staff/SKILL.md",
+      "upstreamPath": "skills/in-progress/chief-of-staff/SKILL.md",
+      "upstreamSha256": "138cd7bea0e2e4f3618bb4693f6a5fe9e440325de0360a0fb73da1d84e5a6f1b",
+      "localSha256": "138cd7bea0e2e4f3618bb4693f6a5fe9e440325de0360a0fb73da1d84e5a6f1b"
+    },
+    {
+      "path": "assets/skills/claude-handoff/agents/openai.yaml",
+      "upstreamPath": "skills/in-progress/claude-handoff/agents/openai.yaml",
+      "upstreamSha256": "c49d051126b7ef690418b431a4317298a5bbb2bcf4cb0661d3a06f115ce12263",
+      "localSha256": "c49d051126b7ef690418b431a4317298a5bbb2bcf4cb0661d3a06f115ce12263"
+    },
+    {
+      "path": "assets/skills/claude-handoff/SKILL.md",
+      "upstreamPath": "skills/in-progress/claude-handoff/SKILL.md",
+      "upstreamSha256": "24853e92b98dea61e5e6cdfeb929e47f98d61d9ccb21e8bb952f917d29980970",
+      "localSha256": "24853e92b98dea61e5e6cdfeb929e47f98d61d9ccb21e8bb952f917d29980970"
+    },
+    {
+      "path": "assets/skills/loop-me/agents/openai.yaml",
+      "upstreamPath": "skills/in-progress/loop-me/agents/openai.yaml",
+      "upstreamSha256": "ec257a7995d8eba46b6a95471f5fb569798aa975a1b1c438542b1a9c82bc33d3",
+      "localSha256": "ec257a7995d8eba46b6a95471f5fb569798aa975a1b1c438542b1a9c82bc33d3"
+    },
+    {
+      "path": "assets/skills/loop-me/SKILL.md",
+      "upstreamPath": "skills/in-progress/loop-me/SKILL.md",
+      "upstreamSha256": "38ac316635d244abfdc1526edec49596f9284b36595f5a212fc5983894b6094a",
+      "localSha256": "38ac316635d244abfdc1526edec49596f9284b36595f5a212fc5983894b6094a"
+    },
+    {
+      "path": "assets/skills/setup-ts-deep-modules/agents/openai.yaml",
+      "upstreamPath": "skills/in-progress/setup-ts-deep-modules/agents/openai.yaml",
+      "upstreamSha256": "bf3d58c59b0e68ef3b0287ac3ab3d165b066dfd31e146ecf278e56e4df664610",
+      "localSha256": "bf3d58c59b0e68ef3b0287ac3ab3d165b066dfd31e146ecf278e56e4df664610"
+    },
+    {
+      "path": "assets/skills/setup-ts-deep-modules/dependency-cruiser.config.cjs",
+      "upstreamPath": "skills/in-progress/setup-ts-deep-modules/dependency-cruiser.config.cjs",
+      "upstreamSha256": "d80c982bc496ff6fb65c91bfa5b3ffccd64396cd488f556779ce3f1bd770f376",
+      "localSha256": "d80c982bc496ff6fb65c91bfa5b3ffccd64396cd488f556779ce3f1bd770f376"
+    },
+    {
+      "path": "assets/skills/setup-ts-deep-modules/SKILL.md",
+      "upstreamPath": "skills/in-progress/setup-ts-deep-modules/SKILL.md",
+      "upstreamSha256": "3709fc7d62ea75cd7da1d6f21e33d58d758766fb8f5247a859687d7ed63c213e",
+      "localSha256": "3709fc7d62ea75cd7da1d6f21e33d58d758766fb8f5247a859687d7ed63c213e"
+    },
+    {
+      "path": "assets/skills/software-factory/EXAMPLE-TASKS.md",
+      "upstreamPath": "skills/in-progress/software-factory/EXAMPLE-TASKS.md",
+      "upstreamSha256": "38f3c91f262281a1f0b57a86dae0e72547b60f3434bd07aed4e0eb1969333405",
+      "localSha256": "38f3c91f262281a1f0b57a86dae0e72547b60f3434bd07aed4e0eb1969333405"
+    },
+    {
+      "path": "assets/skills/software-factory/GIT-HOSTS.md",
+      "upstreamPath": "skills/in-progress/software-factory/GIT-HOSTS.md",
+      "upstreamSha256": "e80e076bd7add483af411566e8f22da9e5b5d323ee4b4d0cabd3f39a7ac99436",
+      "localSha256": "e80e076bd7add483af411566e8f22da9e5b5d323ee4b4d0cabd3f39a7ac99436"
+    },
+    {
+      "path": "assets/skills/software-factory/OBSERVABILITY-PLATFORMS.md",
+      "upstreamPath": "skills/in-progress/software-factory/OBSERVABILITY-PLATFORMS.md",
+      "upstreamSha256": "766a6363516ea30a001580c82c8ea31cf8955c730fe3ae61c21db7931ae34691",
+      "localSha256": "766a6363516ea30a001580c82c8ea31cf8955c730fe3ae61c21db7931ae34691"
+    },
+    {
+      "path": "assets/skills/software-factory/RUNNERS.md",
+      "upstreamPath": "skills/in-progress/software-factory/RUNNERS.md",
+      "upstreamSha256": "6b4bc8e46e2485921a6eb893eaca2319b18ebcd8f676aedb98e4e6f4c999cd93",
+      "localSha256": "6b4bc8e46e2485921a6eb893eaca2319b18ebcd8f676aedb98e4e6f4c999cd93"
+    },
+    {
+      "path": "assets/skills/software-factory/SKILL.md",
+      "upstreamPath": "skills/in-progress/software-factory/SKILL.md",
+      "upstreamSha256": "7b43b4461ef7bb2617aa7cbc7426e7b4d527a8ac5e8e8784e72a1941285a8019",
+      "localSha256": "4b2b7022af7b75489ebb1cdc442105dc58be10698e7ce9c0ef5e5343d9f80799"
+    },
+    {
+      "path": "assets/skills/software-factory/TICKET-TRACKERS.md",
+      "upstreamPath": "skills/in-progress/software-factory/TICKET-TRACKERS.md",
+      "upstreamSha256": "158abf3c0cbb9e7e401c3137b45799b4c4b9c27cb1ee8eea58d3427590f97a85",
+      "localSha256": "158abf3c0cbb9e7e401c3137b45799b4c4b9c27cb1ee8eea58d3427590f97a85"
+    },
+    {
+      "path": "assets/skills/writing-beats/agents/openai.yaml",
+      "upstreamPath": "skills/in-progress/writing-beats/agents/openai.yaml",
+      "upstreamSha256": "30ad45c6d16b7e3e58d656c8d2619c68916d14b96e218de3c042cac89ef85a84",
+      "localSha256": "30ad45c6d16b7e3e58d656c8d2619c68916d14b96e218de3c042cac89ef85a84"
+    },
+    {
+      "path": "assets/skills/writing-beats/SKILL.md",
+      "upstreamPath": "skills/in-progress/writing-beats/SKILL.md",
+      "upstreamSha256": "b23f7851987dab7828c83d42df98090ccebff586b64908ce6a5e772440214621",
+      "localSha256": "b23f7851987dab7828c83d42df98090ccebff586b64908ce6a5e772440214621"
+    },
+    {
+      "path": "assets/skills/writing-fragments/agents/openai.yaml",
+      "upstreamPath": "skills/in-progress/writing-fragments/agents/openai.yaml",
+      "upstreamSha256": "d082f54a16e95d0eb5c3bcf3e2ff7b78b8c5b2e142c5d1b8897d7f3282adbedb",
+      "localSha256": "d082f54a16e95d0eb5c3bcf3e2ff7b78b8c5b2e142c5d1b8897d7f3282adbedb"
+    },
+    {
+      "path": "assets/skills/writing-fragments/SKILL.md",
+      "upstreamPath": "skills/in-progress/writing-fragments/SKILL.md",
+      "upstreamSha256": "3be6ffe9386ddd6de8b320c331295953995792fd65d0972aa2a28524ead73e90",
+      "localSha256": "3be6ffe9386ddd6de8b320c331295953995792fd65d0972aa2a28524ead73e90"
+    },
+    {
+      "path": "assets/skills/writing-shape/agents/openai.yaml",
+      "upstreamPath": "skills/in-progress/writing-shape/agents/openai.yaml",
+      "upstreamSha256": "7f82f71f0849ada3acb686dfe9977a7b5b1af3c1fc049ac5275b8fdf3a18c299",
+      "localSha256": "7f82f71f0849ada3acb686dfe9977a7b5b1af3c1fc049ac5275b8fdf3a18c299"
+    },
+    {
+      "path": "assets/skills/writing-shape/SKILL.md",
+      "upstreamPath": "skills/in-progress/writing-shape/SKILL.md",
+      "upstreamSha256": "c13cbc364fbceefce654d9a4b0331113ff47efe90ce2523c2de23ecef63fefbd",
+      "localSha256": "c13cbc364fbceefce654d9a4b0331113ff47efe90ce2523c2de23ecef63fefbd"
+    },
+    {
+      "path": "assets/skills/git-guardrails-claude-code/agents/openai.yaml",
+      "upstreamPath": "skills/misc/git-guardrails-claude-code/agents/openai.yaml",
+      "upstreamSha256": "9151961c68ab52e07e2463df15e8ff7c9331c3b7afbf716c3461623f87c57c14",
+      "localSha256": "9151961c68ab52e07e2463df15e8ff7c9331c3b7afbf716c3461623f87c57c14"
+    },
+    {
+      "path": "assets/skills/git-guardrails-claude-code/scripts/block-dangerous-git.sh",
+      "upstreamPath": "skills/misc/git-guardrails-claude-code/scripts/block-dangerous-git.sh",
+      "upstreamSha256": "bb5dc3a96ae81924ff3b88b959979b4eb68b7810f6fa9bd395fb8f781e0d8c12",
+      "localSha256": "bb5dc3a96ae81924ff3b88b959979b4eb68b7810f6fa9bd395fb8f781e0d8c12"
+    },
+    {
+      "path": "assets/skills/git-guardrails-claude-code/SKILL.md",
+      "upstreamPath": "skills/misc/git-guardrails-claude-code/SKILL.md",
+      "upstreamSha256": "12d335b84bcf984b213b527014262233f27ffa1eb807db466832ff711b96f41f",
+      "localSha256": "12d335b84bcf984b213b527014262233f27ffa1eb807db466832ff711b96f41f"
+    },
+    {
+      "path": "assets/skills/migrate-to-shoehorn/agents/openai.yaml",
+      "upstreamPath": "skills/misc/migrate-to-shoehorn/agents/openai.yaml",
+      "upstreamSha256": "43d8fbb6347d771e82eb866bae6987acede6dc1d16d46b9c69e2b06930771180",
+      "localSha256": "43d8fbb6347d771e82eb866bae6987acede6dc1d16d46b9c69e2b06930771180"
+    },
+    {
+      "path": "assets/skills/migrate-to-shoehorn/SKILL.md",
+      "upstreamPath": "skills/misc/migrate-to-shoehorn/SKILL.md",
+      "upstreamSha256": "200c11163ecd56d908ec431154e4b452cd6afeb3de91e5b54434f543f0822201",
+      "localSha256": "200c11163ecd56d908ec431154e4b452cd6afeb3de91e5b54434f543f0822201"
+    },
+    {
+      "path": "assets/skills/scaffold-exercises/agents/openai.yaml",
+      "upstreamPath": "skills/misc/scaffold-exercises/agents/openai.yaml",
+      "upstreamSha256": "f3ab550f1077150f0fe728fe3ff187e8672f4df7eedc7f233cdd1a61f347f1db",
+      "localSha256": "f3ab550f1077150f0fe728fe3ff187e8672f4df7eedc7f233cdd1a61f347f1db"
+    },
+    {
+      "path": "assets/skills/scaffold-exercises/SKILL.md",
+      "upstreamPath": "skills/misc/scaffold-exercises/SKILL.md",
+      "upstreamSha256": "de28db7a0954db55c11ba1e3cc0fd4c037bf0f5cb8313cb292e319bcce47f424",
+      "localSha256": "de28db7a0954db55c11ba1e3cc0fd4c037bf0f5cb8313cb292e319bcce47f424"
+    },
+    {
+      "path": "assets/skills/setup-pre-commit/agents/openai.yaml",
+      "upstreamPath": "skills/misc/setup-pre-commit/agents/openai.yaml",
+      "upstreamSha256": "946bfa9a3cab905f4241d8dcc127a11fdcf2994027b87e198f26f7e65d88f727",
+      "localSha256": "946bfa9a3cab905f4241d8dcc127a11fdcf2994027b87e198f26f7e65d88f727"
+    },
+    {
+      "path": "assets/skills/setup-pre-commit/SKILL.md",
+      "upstreamPath": "skills/misc/setup-pre-commit/SKILL.md",
+      "upstreamSha256": "e069e6a23069ebdba946d4dea11e5d663c10640c6b14b55c4585c81b1a256ac9",
+      "localSha256": "e069e6a23069ebdba946d4dea11e5d663c10640c6b14b55c4585c81b1a256ac9"
+    },
+    {
+      "path": "assets/skills/grill-me/agents/openai.yaml",
+      "upstreamPath": "skills/productivity/grill-me/agents/openai.yaml",
+      "upstreamSha256": "c03a1eee1161bb70ca360b3d17705638b93bc8eec41319732725dc05a53196a5",
+      "localSha256": "c03a1eee1161bb70ca360b3d17705638b93bc8eec41319732725dc05a53196a5"
+    },
+    {
+      "path": "assets/skills/grill-me/SKILL.md",
+      "upstreamPath": "skills/productivity/grill-me/SKILL.md",
+      "upstreamSha256": "19e660207b447acf6ee0d600471c02e549c7aca8fb3ab38fdc2c7056aa442fc8",
+      "localSha256": "19e660207b447acf6ee0d600471c02e549c7aca8fb3ab38fdc2c7056aa442fc8"
+    },
+    {
+      "path": "assets/skills/grilling/agents/openai.yaml",
+      "upstreamPath": "skills/productivity/grilling/agents/openai.yaml",
+      "upstreamSha256": "ad75163922ff8263acdd25ebc37420e8fcf1fccb93483fd5742e9bd26f5c45f6",
+      "localSha256": "ad75163922ff8263acdd25ebc37420e8fcf1fccb93483fd5742e9bd26f5c45f6"
+    },
+    {
+      "path": "assets/skills/grilling/SKILL.md",
+      "upstreamPath": "skills/productivity/grilling/SKILL.md",
+      "upstreamSha256": "ec91c3f684a0a6323eaf30faa26d3aac5b95f28811eca6d4f108138934063c5c",
+      "localSha256": "ec91c3f684a0a6323eaf30faa26d3aac5b95f28811eca6d4f108138934063c5c"
+    },
+    {
+      "path": "assets/skills/handoff/agents/openai.yaml",
+      "upstreamPath": "skills/productivity/handoff/agents/openai.yaml",
+      "upstreamSha256": "deb645c801764579994bd23d1954aa991ef1d0d55bf30043d47ada631fcff5f4",
+      "localSha256": "deb645c801764579994bd23d1954aa991ef1d0d55bf30043d47ada631fcff5f4"
+    },
+    {
+      "path": "assets/skills/handoff/SKILL.md",
+      "upstreamPath": "skills/productivity/handoff/SKILL.md",
+      "upstreamSha256": "739d8fbe3e6ed688581eb62b35f04834822eae47e57bc35a79c8d8dc9ac703d3",
+      "localSha256": "739d8fbe3e6ed688581eb62b35f04834822eae47e57bc35a79c8d8dc9ac703d3"
+    },
+    {
+      "path": "assets/skills/teach/agents/openai.yaml",
+      "upstreamPath": "skills/productivity/teach/agents/openai.yaml",
+      "upstreamSha256": "80e96a4d492ad8538e609672361e8543b69e7b22ce83be0efc2e5532472ede69",
+      "localSha256": "80e96a4d492ad8538e609672361e8543b69e7b22ce83be0efc2e5532472ede69"
+    },
+    {
+      "path": "assets/skills/teach/GLOSSARY-FORMAT.md",
+      "upstreamPath": "skills/productivity/teach/GLOSSARY-FORMAT.md",
+      "upstreamSha256": "22f851b265a3bec5a333937cc7ff1250136c9b6512787ae2eb51a2a14e35c341",
+      "localSha256": "22f851b265a3bec5a333937cc7ff1250136c9b6512787ae2eb51a2a14e35c341"
+    },
+    {
+      "path": "assets/skills/teach/LEARNING-RECORD-FORMAT.md",
+      "upstreamPath": "skills/productivity/teach/LEARNING-RECORD-FORMAT.md",
+      "upstreamSha256": "d49c754ea416a075534d0ba1428a0beba1327ae527c2d1af0333908d08e25d05",
+      "localSha256": "d49c754ea416a075534d0ba1428a0beba1327ae527c2d1af0333908d08e25d05"
+    },
+    {
+      "path": "assets/skills/teach/MISSION-FORMAT.md",
+      "upstreamPath": "skills/productivity/teach/MISSION-FORMAT.md",
+      "upstreamSha256": "44ea82d5f57a626086bde99c70cd229cdef67998e8502c1cbcd50504f57f989a",
+      "localSha256": "44ea82d5f57a626086bde99c70cd229cdef67998e8502c1cbcd50504f57f989a"
+    },
+    {
+      "path": "assets/skills/teach/RESOURCES-FORMAT.md",
+      "upstreamPath": "skills/productivity/teach/RESOURCES-FORMAT.md",
+      "upstreamSha256": "377e70f83d41fdc2623037410600194655a2f7df41000925c24cc437da074ab5",
+      "localSha256": "377e70f83d41fdc2623037410600194655a2f7df41000925c24cc437da074ab5"
+    },
+    {
+      "path": "assets/skills/teach/SKILL.md",
+      "upstreamPath": "skills/productivity/teach/SKILL.md",
+      "upstreamSha256": "d9480a846c88bb1151947eb484bab1a8c9a84af4d9ddf1ea0f6fb7fe639cf9b3",
+      "localSha256": "d9480a846c88bb1151947eb484bab1a8c9a84af4d9ddf1ea0f6fb7fe639cf9b3"
+    },
+    {
+      "path": "assets/skills/to-questionnaire/agents/openai.yaml",
+      "upstreamPath": "skills/productivity/to-questionnaire/agents/openai.yaml",
+      "upstreamSha256": "0b5ed84d805809777a15371c946a70f98321e3c6400fce5fcd74df71d40e860b",
+      "localSha256": "0b5ed84d805809777a15371c946a70f98321e3c6400fce5fcd74df71d40e860b"
+    },
+    {
+      "path": "assets/skills/to-questionnaire/SKILL.md",
+      "upstreamPath": "skills/productivity/to-questionnaire/SKILL.md",
+      "upstreamSha256": "77825120815c21400f82e2794faf342d1d1a4ab1493be3fe061857885d26b768",
+      "localSha256": "77825120815c21400f82e2794faf342d1d1a4ab1493be3fe061857885d26b768"
+    },
+    {
+      "path": "assets/skills/wait-what/agents/openai.yaml",
+      "upstreamPath": "skills/productivity/wait-what/agents/openai.yaml",
+      "upstreamSha256": "e0d9beddf0093b3cf05de2722699affab5d240e5950469e208d59c1f0ed91bef",
+      "localSha256": "e0d9beddf0093b3cf05de2722699affab5d240e5950469e208d59c1f0ed91bef"
+    },
+    {
+      "path": "assets/skills/wait-what/SKILL.md",
+      "upstreamPath": "skills/productivity/wait-what/SKILL.md",
+      "upstreamSha256": "95393f96e730b20dabc6b425515cb6292d34bd9a91859a03c2c821e24d321112",
+      "localSha256": "95393f96e730b20dabc6b425515cb6292d34bd9a91859a03c2c821e24d321112"
+    },
+    {
+      "path": "assets/skills/writing-for-agents/agents/openai.yaml",
+      "upstreamPath": "skills/productivity/writing-for-agents/agents/openai.yaml",
+      "upstreamSha256": "486c388ed1babac6ea25001147b41d3ff6c8892b0128ae1b0bef8feea6363428",
+      "localSha256": "486c388ed1babac6ea25001147b41d3ff6c8892b0128ae1b0bef8feea6363428"
+    },
+    {
+      "path": "assets/skills/writing-for-agents/SKILL-MECHANICS.md",
+      "upstreamPath": "skills/productivity/writing-for-agents/SKILL-MECHANICS.md",
+      "upstreamSha256": "86f112c08d785cc224c13dcda75c0724b74bd62622cc61d4b7ab3dbbaf37f6fc",
+      "localSha256": "86f112c08d785cc224c13dcda75c0724b74bd62622cc61d4b7ab3dbbaf37f6fc"
+    },
+    {
+      "path": "assets/skills/writing-for-agents/SKILL.md",
+      "upstreamPath": "skills/productivity/writing-for-agents/SKILL.md",
+      "upstreamSha256": "1c0c4ebf2d221917591144f0ced4fe46dae13301cb3d6d93fc88ecf0dda6aed2",
+      "localSha256": "1c0c4ebf2d221917591144f0ced4fe46dae13301cb3d6d93fc88ecf0dda6aed2"
+    }
+  ],
+  "localChanges": "Existing DSH adaptations preserved; conflicting files retained locally. Compare SHA-256 values against the upstream snapshot; extra local resources are maintained separately."
+}

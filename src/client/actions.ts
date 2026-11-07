@@ -27,7 +27,7 @@ const DOC_SUPPLEMENT_PROMPT = `补充文档。
 数据库/接口结论必须对照实际 SQL、迁移或源码核实，无法核实的标“待确认”；不改代码、不运行构建测试、不提交或推送。
 完成后列出使用的来源与边界（本会话，或时间段/版本范围及提交数）、改动的文件与章节、依据（提交号或源码位置）、未建立的文档和待确认项。`
 
-/** Temporary instrumentation is scoped to one issue and must carry its own cleanup handoff. */
+/** Exact historical signature used only to migrate unmodified saved presets. */
 const ADD_LOGS_PROMPT = `请针对当前要复现排查的具体问题，增加最少量的临时诊断日志。
 先从本会话确认问题现象、预期与实际行为、触发条件/复现步骤、运行环境和需要验证的假设；信息不足时先询问，不猜测问题，不泛化为全项目日志改造。
 读取相关调用链和现有日志机制，说明每个日志点要验证什么，再仅在必要入口、关键分支、状态变化、异常出口或异步边界加日志；不修复业务逻辑、不做无关重构，不改变返回值、异常传播、时序或业务副作用。
@@ -36,6 +36,15 @@ const ADD_LOGS_PROMPT = `请针对当前要复现排查的具体问题，增加�
 完成后输出：日志点及对应假设、复现步骤、如何临时开启/关闭和采集哪些脱敏日志、已执行的针对性验证及未验证项；未实际复现时不得声称已定位根因。不执行完整编译，不提交或推送。
 维护可搜索的清理清单：列出标识、文件位置、本次新增的日志/临时开关/配置及其移除方式，保留原有日志和用户其他改动。明确说明关闭开关不等于移除临时代码。
 完成本次加日志后，必须提醒用户：“这些是临时诊断日志，复现取证或问题排查结束后请移除，并恢复临时配置。”在本会话后续获得复现结果、定位/修复问题或结束排查时再次提醒用户，清理前确认范围，清理后做针对性验证。未确认清理前明确标为待清理，不声称已经移除；不承诺跨会话或后台自动提醒，交接时携带清理清单。`
+
+/** Stable ID preserves saved group membership when replacing the logging shortcut. */
+export const DIAGNOSTIC_MODES = [
+  { skillId: 'diagnose-function-page', label: '功能排查-页面模式', english: 'Function diagnostics · Page' },
+  { skillId: 'diagnose-function-logs', label: '功能排查-日志模式', english: 'Function diagnostics · Logs' },
+  { skillId: 'diagnose-performance-page', label: '性能排查-页面模式', english: 'Performance diagnostics · Page' },
+  { skillId: 'diagnose-performance-logs', label: '性能排查-日志模式', english: 'Performance diagnostics · Logs' },
+] as const
+const DIAGNOSTIC_PROMPT = '请针对本对话刚完成编码的功能补充排查手段。先结合本会话和实际代码确认范围；功能尚未完成或目标不明确时先说明并询问，不扩展为全项目改造。按所选 Skill 实现，复用已有采集、页面和日志能力，不改变业务执行逻辑。区分真实验证与未验证结果，完成后说明改动、用法、已验证场景和限制。'
 
 const ANALYZE_LOGS_PROMPT = `请分析日志并定位问题。
 日志路径：<请填写日志文件或目录路径>
@@ -75,7 +84,7 @@ export const DEFAULT_ACTIONS: readonly CodingAction[] = [
   { id: 'plan', label: '拆分工单', kind: 'skill', skillId: 'to-tickets', prompt: '只按已确认规格拆分可独立验收的工单，标注依赖、阻塞关系和验证方法；不编码、不创建分支、不执行构建测试、不提交。', enabled: true, order: 30, description: '已有可验收规格、需要落地排期时使用；只拆分带依赖和验证方法的工单，不开始编码或提交。', example: '例如：把权限升级拆成迁移、接口和回滚三类工单。' },
   { id: 'execute', label: '编码', kind: 'skill', skillId: 'implement', prompt: '每个功能开发前，先确认是否配套排查能力；可通过后台日志或前端排查按钮展示排查路径及诊断信息，确认后纳入实现。只按已确认的规格或工单实现，并运行与改动直接相关的测试；不重新讨论需求，不做代码审查或代码走读，不执行完整项目编译，不提交（这些分别由对应按钮负责）。规格缺口或阻塞先停下说明。', enabled: true, pinned: true, order: 40, description: '规格或工单已确认、需要落地编码时使用；只改实现并跑相关测试，不做需求讨论、代码走读、完整编译或提交。', example: '例如：按工单完成接口改造并补充对应测试。' },
   { id: 'bug', label: 'Bug排查', kind: 'skill', skillId: 'diagnosing-bugs', prompt: '先建立稳定复现，定位根因并给出证据；只做最小修复和针对性验证，不做需求变更、代码审查或完整编译，不提交。根因未确认前不扩大改动范围。', enabled: true, pinned: true, order: 50, description: '功能异常、报错或测试失败但原因不明时使用；以复现和根因为主，只做最小修复与针对性验证，不做审查或提交。', example: '例如：定位会话状态偶发丢失的触发条件。' },
-  { id: 'add-logs', label: '增加日志', kind: 'prompt', prompt: ADD_LOGS_PROMPT, enabled: true, pinned: true, order: 55, description: '为复现排查某个具体问题临时增加最小诊断日志；要求脱敏、可控启停、记录清理清单，并在完成及本会话排查结束时提醒移除，不直接修复业务逻辑。', example: '例如：为偶发请求超时增加带关联 ID 的临时日志，取证后移除并恢复配置。' },
+  { id: 'add-logs', label: '补充排查', kind: 'skill', skillId: 'diagnose-function-page', prompt: DIAGNOSTIC_PROMPT, enabled: true, pinned: true, order: 55, description: '为本对话已完成的功能补充排查，选择功能/性能与页面/日志四种模式，各调用独立 Skill。', example: '例如：编码完成后，为当前业务补充执行步骤页面或耗时日志。' },
   { id: 'analyze-logs', label: '分析日志', kind: 'prompt', prompt: ANALYZE_LOGS_PROMPT, enabled: true, pinned: true, order: 56, description: '填写日志路径，结合问题和相关代码分析日志并给出证据与验证建议。', example: '例如：分析 /var/log/app/app.log 中的请求超时。' },
   { id: 'remote-debug', label: '远程调试', kind: 'prompt', prompt: REMOTE_DEBUG_PROMPT, enabled: true, pinned: true, order: 310, description: '填写 SSH 连接信息、远程运行路径和问题描述，进行远程诊断。', example: '例如：通过 SSH 排查远程服务启动失败。' },
   { id: 'review', label: '代码审查', kind: 'skill', skillId: 'code-review', prompt: '只审查正确性、数据安全、并发和可维护性，输出有证据的问题清单：编号、优先级、文件位置、影响和验证方法；不修改代码、不执行修复、不提交，修复交给「修复审核问题」。', enabled: true, pinned: true, order: 60, description: '实现完成、准备合并前使用；只输出可核验的问题清单，不改代码、不做修复，发现问题后由修复审核问题处理。', example: '例如：检查权限判断、并发写入和错误处理。' },
@@ -143,7 +152,7 @@ export const ENGLISH_DEFAULT_PRESENTATION: Readonly<Record<string, Pick<CodingAc
   'plan': { label: 'Split into Tickets', description: 'Use when an accepted specification needs implementation tickets; split independently verifiable work with dependencies, blockers and checks, without coding, branching or committing.', example: 'e.g. Split a permission upgrade into migration, API and rollback tickets.' },
   'execute': { label: 'Develop', description: 'Use when a specification or ticket is confirmed; implement and run only checks related to the change, without re-discussing requirements, reviewing or walking through code, running a full build or committing.', example: 'e.g. Implement the ticket interface change and its related tests.' },
   'bug': { label: 'Diagnose Bug', description: 'Use when a feature fails or errors without a known cause; establish a reproduction, locate the root cause and apply a minimal verified fix, without review, full builds or commits.', example: 'e.g. Find what makes session state disappear intermittently.' },
-  'add-logs': { label: 'Add Logs', description: 'Add minimal temporary diagnostic logs for one specific reproduction; require redaction, controlled activation, a cleanup checklist and removal reminders on completion and when this session ends diagnosis, without fixing business logic.', example: 'e.g. Trace intermittent request timeouts with a correlation ID, then remove the temporary logs and restore configuration.' },
+  'add-logs': { label: 'Supplement Diagnostics', description: 'Add function or performance diagnostics to the feature completed in this conversation, using a page or logs.', example: 'e.g. Add a step view or timing logs after coding.' },
   'analyze-logs': { label: 'Analyze Logs', description: 'Provide a log path to analyze evidence alongside the problem and relevant code.', example: 'e.g. Analyze request timeouts in /var/log/app/app.log.' },
   'remote-debug': { label: 'Remote Debug', description: 'Provide SSH connection details, the remote working path and a problem description for diagnosis.', example: 'e.g. Diagnose a remote service startup failure over SSH.' },
   'review': { label: 'Code Review', description: 'Use before merging completed work; report evidence-backed findings with IDs, priorities, locations, impact and checks, without editing code or committing. Repair belongs to Fix Review Findings.', example: 'e.g. Check permission checks, concurrent writes and error handling.' },
@@ -224,6 +233,16 @@ export function parseActions(text: string | undefined): CodingAction[] {
   })
   const loaded = doc.schemaVersion === 1 ? migrateActions(actions) : actions
   return loaded.map(action => {
+    // Only upgrade the recognizable old preset; retain customized actions and visibility.
+    if (action.id === 'add-logs' && action.kind === 'prompt' &&
+        ['增加日志', 'Add Logs'].includes(action.label) &&
+        action.prompt === ADD_LOGS_PROMPT) {
+      const preset = DEFAULT_ACTIONS.find(candidate => candidate.id === 'add-logs')!
+      const target = action.label === 'Add Logs' ? { ...preset, ...ENGLISH_DEFAULT_PRESENTATION['add-logs'] } : preset
+      return { ...action, kind: target.kind, skillId: target.skillId, prompt: target.prompt, label: target.label,
+        description: action.description === "为复现排查某个具体问题临时增加最小诊断日志；要求脱敏、可控启停、记录清理清单，并在完成及本会话排查结束时提醒移除，不直接修复业务逻辑。" ? target.description : action.description,
+        example: action.example === "例如：为偶发请求超时增加带关联 ID 的临时日志，取证后移除并恢复配置。" ? target.example : action.example }
+    }
     if (action.id === 'handover-log-guide' && action.kind === 'skill' &&
         action.skillId === 'project-handover-log-guide' && ['日志排查', '问题排查', '排查流程'].includes(action.label)) {
       return { ...action, label: '排查资料' }

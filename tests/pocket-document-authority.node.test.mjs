@@ -53,7 +53,9 @@ test('initialized layout is shared by every bundled Skill', () => {
   assert.match(contract, /docs\/agents\/document-layout\.md/);
   assert.match(setup, /work-readme\.md/);
   assert.match(layout, /dsh-document-layout:v1/);
-  assert.match(userPrompt, /统一文档及产物路由/);
+  assert.doesNotMatch(userPrompt, /统一文档及产物路由/);
+  assert.match(read('src/windows-powershell.ts'), /统一文档及产物路由/);
+  assert.match(read('src/index.ts'), /registerArtifactRoutingGuidance\(child\)/);
   assert.ok(existsSync(path.join(root, 'docs/_work/README.md')));
 });
 test('setup uses automatic recommendations while retaining mandatory high-risk decisions', () => {

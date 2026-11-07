@@ -3,13 +3,13 @@ import assert from 'node:assert/strict'
 import { readFileSync } from 'node:fs'
 import { runInNewContext } from 'node:vm'
 import { zh, en } from '../src/client/locales.ts'
-import { DEFAULT_ACTIONS, encodeActions } from '../src/client/actions.ts'
+import { DEFAULT_ACTIONS, DIAGNOSTIC_MODES, encodeActions } from '../src/client/actions.ts'
 import { conversationHistory } from '../src/client/contextual-actions.ts'
 
 /** Project each entry onto the attribution fields, so unrelated shape additions stay out of these cases. */
 const attributed = (view, actions) => conversationHistory(view, actions).map(({ id, command }) => ({ id, command }))
 
-function harness({ actions, layout, english = false, measured = false, rowWidth = 0, widths = [], moreWidth = 0, dom } = {}) {
+function harness({ actions, layout, english = false, measured = false, rowWidth = 0, widths = [], moreWidth = 0, dom, skillNames } = {}) {
   let registration, Launcher, cursor = 0
   const state = [], refs = [], events = [], layoutEffects = []
   const row = { clientWidth: rowWidth, getBoundingClientRect: () => ({ width: row.clientWidth }) }
@@ -65,7 +65,7 @@ function harness({ actions, layout, english = false, measured = false, rowWidth 
         insertText: text => { events.push(['insert', text]); return true },
         persistDraft: () => events.push(['persist']),
       },
-      fetchSkillNames: async () => DEFAULT_ACTIONS.filter(a => a.kind === 'skill').map(a => a.skillId),
+      fetchSkillNames: async () => skillNames ?? [...DEFAULT_ACTIONS.filter(a => a.kind === 'skill').map(a => a.skillId), ...DIAGNOSTIC_MODES.map(mode => mode.skillId)],
       checkProjectSetup: async () => ({ ready: true, missing: [] }),
       saveLayout: async (json, revision) => { events.push(['save', json, revision]); if (data.saveWait) await data.saveWait; if (data.saveOk) data.config.layoutJson = json; return data.saveOk },
       todoStaleMs: 90000, t: key => dictionary[key] ?? key,
@@ -319,7 +319,7 @@ test('groups show eight actions; the ninth is expanded and collapsed without cha
     h.actionButtons('common')[8].props.onClick()
     await new Promise(resolve => setImmediate(resolve))
     assert.equal(h.events[0][0], 'insert')
-    assert.match(h.events[0][1], /^Prompt 8\n\n统一文档及产物路由：/)
+    assert.equal(h.events[0][1], 'Prompt 8')
     assert.deepEqual(h.events.slice(1), [['persist']])
     h.overflow('common').props.onClick()
     assert.equal(h.actionButtons('common').length, 8)
@@ -330,34 +330,34 @@ test('default groups expand independently, preserve action order and retain over
   const h = harness()
   assert.equal(h.actionButtons('common').length, 8)
   assert.equal(h.actionButtons('development').length, 8)
-  assert.equal(h.overflow('development').props.children, '更多（13）')
+  assert.equal(h.overflow('development').props.children, '更多（8）')
   h.overflow('development').props.onClick()
-  assert.equal(h.actionButtons('development').length, 21)
+  assert.equal(h.actionButtons('development').length, 16)
   assert.equal(h.actionButtons('common').length, 8)
-  const developmentOrder = ['需求讨论', '固化需求', '编码', '代码审查', '修复', '编译', 'Bug排查', '提交代码', '增加日志', '分析日志', '咨询', '资料研究', '领域建模', '制作原型', '拆分工单', '架构优化', '测试驱动开发', '远程调试', '健康验收', '复盘', '上下文交接']
+  const developmentOrder = ['需求讨论', '固化需求', '编码', '代码审查', '修复', '编译', 'Bug排查', '提交代码', '补充排查', '分析日志', '咨询', '拆分工单', '架构优化', '测试驱动开发', '远程调试', '健康验收']
   assert.deepEqual(h.actionButtons('development').map(n => n.props.children), developmentOrder)
   h.overflow('development').props.onClick()
   h.data.messages = [{ role: 'user', text: '/to-spec 固化需求' }, { role: 'assistant', text: '规格已完成，验收标准已确认' }]
   assert.match(h.overflow('development').props.children, /•/, 'hidden recommended tickets remain discoverable')
   const english = harness({ english: true })
-  assert.equal(english.overflow('development').props.children, 'More (13)')
+  assert.equal(english.overflow('development').props.children, 'More (8)')
   assert.match(english.overflow('development').props['aria-label'], /Development/)
 })
 
 test('rows fill the available width and only collapse the buttons that do not fit', () => {
-  const widths = Array(21).fill(50)
+  const widths = Array(16).fill(50)
   const layout = { schemaVersion: 1, commonActionIds: [], visibleGroups: { common: false, 'requirements-analysis': false, development: true, documents: false, others: false } }
   const h = harness({ measured: true, rowWidth: 600, widths, moreWidth: 70, layout })
   h.render(); h.flush(); h.render()
   assert.equal(h.actionButtons('development').length, 9)
-  assert.equal(h.overflow('development').props.children, '更多（12）')
+  assert.equal(h.overflow('development').props.children, '更多（7）')
   h.row.clientWidth = 300
   h.render(); h.flush(); h.render()
   assert.equal(h.actionButtons('development').length, 4)
-  assert.equal(h.overflow('development').props.children, '更多（17）')
+  assert.equal(h.overflow('development').props.children, '更多（12）')
   h.row.clientWidth = 1200
   h.render(); h.flush(); h.render()
-  assert.equal(h.actionButtons('development').length, 21)
+  assert.equal(h.actionButtons('development').length, 16)
   assert.equal(h.overflow('development'), undefined, 'no More when the whole row fits')
 })
 
@@ -418,6 +418,10 @@ test('common editor groups all enabled actions and synchronizes repeated members
   assert.ok(labels('documents').includes('文档融合'))
   assert.ok(labels('development').includes('Bug排查'))
   assert.ok(!labels('others').includes('Bug排查'))
+  for (const label of ['资料研究', '领域建模', '制作原型', '复盘', '上下文交接']) {
+    assert.ok(labels('others').includes(label))
+    assert.ok(!labels('development').includes(label))
+  }
   assert.ok(labels('others').includes('Action 0'))
   assert.ok(!labels('others').includes('Action 1'))
   const repeated = () => nodes().filter(n => n.type === 'label' && n.props.children[1] === '文档融合')
@@ -477,4 +481,44 @@ test('edit common keeps changes on save rejection and blocks stale revisions', a
   await new Promise(resolve => setImmediate(resolve))
   assert.equal(h.events.length, 1)
   assert.ok(nodes().some(n => n.props?.role === 'alert' && n.props.children.includes('配置被其他窗口更新')))
+})
+
+for (const english of [false, true]) test('diagnostic chooser routes all four modes without sending, locale=' + english, async () => {
+  for (const mode of DIAGNOSTIC_MODES) {
+    const h = harness({ english })
+    const trigger = h.actionButtons('common').find(n => n.props.children === (english ? 'Supplement Diagnostics' : '补充排查'))
+    trigger.props.onClick()
+    assert.equal(h.events.length, 0)
+    const panel = h.nodes(h.render()).find(n => n.props?.['data-diagnostic-modes'] !== undefined)
+    const choice = h.nodes(panel).find(n => n.type === 'button' && n.props.children === (english ? mode.english : mode.label))
+    await choice.props.onClick()
+    await new Promise(resolve => setImmediate(resolve))
+    const insert = h.events.find(e => e[0] === 'insert')
+    assert.ok(insert?.[1].startsWith('/' + mode.skillId + ' '), mode.skillId)
+    assert.ok(insert[1].includes(mode.label))
+    assert.deepEqual(h.events.map(e => e[0]), ['insert', 'persist'])
+  }
+})
+
+test('diagnostic chooser cancels and unavailable skills never insert', async () => {
+  const h = harness({ skillNames: [] })
+  const trigger = () => h.actionButtons('common').find(n => n.props.children === '补充排查')
+  trigger().props.onClick()
+  let panel = h.nodes(h.render()).find(n => n.props?.['data-diagnostic-modes'] !== undefined)
+  h.nodes(panel).find(n => n.type === 'button' && n.props.children === '取消').props.onClick()
+  assert.equal(h.nodes(h.render()).some(n => n.props?.['data-diagnostic-modes'] !== undefined), false)
+  assert.equal(h.events.length, 0)
+  trigger().props.onClick()
+  panel = h.nodes(h.render()).find(n => n.props?.['data-diagnostic-modes'] !== undefined)
+  h.nodes(panel).find(n => n.type === 'button').props.onClick()
+  await new Promise(resolve => setImmediate(resolve))
+  assert.equal(h.events.length, 0)
+  assert.ok(h.nodes(h.render()).some(n => n.props?.role === 'alert' && n.props.children.includes('diagnose-function-page')))
+})
+
+test('all diagnostic mode commands belong to the supplement button in sent history', () => {
+  for (const mode of DIAGNOSTIC_MODES) {
+    const view = { messages: [{ role: 'user', text: '/' + mode.skillId + ' 用户编辑过的排查说明' }] }
+    assert.deepEqual(attributed(view, DEFAULT_ACTIONS), [{ id: 'add-logs', command: undefined }])
+  }
 })

@@ -6,7 +6,7 @@ describe('mattpocock-DSH CodingAction document', () => {
   it('ships skill and prompt rows without automatic execution metadata', () => {
     const actions = parseActions(undefined)
     expect(actions.filter(a => a.kind === 'skill').length).toBeGreaterThan(4)
-    expect(actions.filter(a => a.kind === 'prompt').map(a => a.id)).toEqual(['add-logs','doc-supplement','image','commit','review-fix','compile','continue'])
+    expect(actions.filter(a => a.kind === 'prompt').map(a => a.id)).toEqual(['doc-supplement','image','commit','review-fix','compile','continue'])
     expect(actions.every(a => a.enabled)).toBe(true)
     expect(new Set(actions.map(a => a.id)).size).toBe(actions.length)
   })

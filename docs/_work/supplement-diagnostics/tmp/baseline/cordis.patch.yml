@@ -1,0 +1,6 @@
+# DeepSeek Harness Coding Suite Bundle Patch
+- insert:
+    - id: coding-suite
+      name: dsh-coding-suite
+      config:
+        todoStaleMs: 90000
