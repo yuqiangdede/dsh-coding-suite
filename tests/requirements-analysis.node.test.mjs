@@ -62,7 +62,7 @@ test('old layout gains a hidden group; malformed existing and new fields still f
 })
 
 test('saved custom presets survive parsing; opt-in additions are unique and translated', () => {
-  const oldNames = [["product-development-pipeline","需求全流程","全流程"],["requirement-clarification","需求澄清","澄清"],["requirement-analysis","需求分析","分析"],["product-risk-gate","需求风险扫描","风险扫描"],["product-module-gate","模块边界审计","边界审计"],["product-state-gate","数据与状态校验","数据状态"],["product-exception-gate","异常流程检查","异常检查"],["product-prd-pages","PRD 与页面规格","PRD/页面"],["product-consistency-gate","页面一致性校验","一致性校验"]]
+  const oldNames = [["product-development-pipeline","需求全流程","全流程"],["requirement-clarification","需求澄清","澄清"],["requirement-analysis","需求分析","分析"],["product-risk-gate","需求风险扫描","风险扫描"],["product-module-gate","模块边界审计","边界审计"],["product-state-gate","数据与状态校验","数据状态"],["product-exception-gate","异常流程检查","异常检查"],["product-prd-pages","PRD 与页面规格","页面规格"],["product-consistency-gate","页面一致性校验","一致性校验"]]
   for (const [id, previous, compact] of oldNames) {
     const preset = DEFAULT_ACTIONS.find(action => action.id === id)
     assert.equal(preset.label, compact)
@@ -255,4 +255,97 @@ test('shipped Host provider discovers and loads the flat product skill catalog w
     assert.equal(loaded.invocation.userInvocable, true)
     assert(!loaded.content.startsWith('---'))
   }
+})
+
+
+test('requirements UI flow uses page specs directly without PRD or formal review prerequisites', () => {
+  const group = LAUNCHER_GROUPS.find(group => group.id === groupId)
+  assert(!group.actionIds.includes('prd-writing'))
+  assert(!group.actionIds.includes('requirement-review'))
+  const action = DEFAULT_ACTIONS.find(action => action.id === 'product-prd-pages')
+  assert.equal(action.label, '页面规格')
+  assert(!/prd-writing|requirement-review/.test(action.prompt))
+  for (const label of ['PRD/页面', 'PRD 与页面规格']) {
+    assert.equal(parseActions(encodeActions([{ ...action, label }]))[0].label, '页面规格')
+  }
+  const step = readFileSync(resolve(root, 'assets/skills/product-development-pipeline/steps/08 PRD与页面规格.md'), 'utf8')
+  assert(!/prd-writing|requirement-review|GO|PRD 文件/.test(step))
+  const consistency = readFileSync(resolve(root, 'assets/skills/product-development-pipeline/steps/09 页面-流程-权限一致性校验.md'), 'utf8')
+  assert(!/PRD/.test(consistency))
+  assert(client.includes('直接将已确认业务方案整理成页面规格'))
+})
+
+
+test('requirements next step is a prompt-only navigator with opt-in migration', () => {
+  const action = DEFAULT_ACTIONS.find(action => action.id === 'requirements-next-step')
+  assert.equal(action.label, '下一步')
+  assert.equal(action.kind, 'prompt')
+  assert.equal(action.skillId, undefined)
+  const group = LAUNCHER_GROUPS.find(group => group.id === groupId)
+  assert.equal(group.actionIds[0], action.id)
+  assert(!defaultLauncherLayout(DEFAULT_ACTIONS).commonActionIds.includes(action.id))
+  const old = DEFAULT_ACTIONS.filter(item => item.id !== action.id)
+  assert.deepEqual(parseActions(encodeActions(old)), old)
+  assert.deepEqual(missingDefaultActions(old).map(item => item.id), [action.id])
+  assert.equal(presentDefaultActions([action], true)[0].label, 'Next Step')
+  assert.match(action.prompt, /用户明确确认/)
+  assert.match(action.prompt, /等待用户决定/)
+  assert.match(action.prompt, /只推荐一个/)
+  assert.match(action.prompt, /流程完成/)
+  assert.doesNotMatch(action.prompt, /\{undefined\}/)
+  assert(client.includes(action.prompt.split('\n\n输入')[0]))
+  assert.equal(actionsForGroup(groupId, DEFAULT_ACTIONS, defaultLauncherLayout(DEFAULT_ACTIONS))[0].id, action.id)
+})
+
+
+test('next step recommendations describe stages using Chinese button names', () => {
+  const action = DEFAULT_ACTIONS.find(action => action.id === 'requirements-next-step')
+  assert.doesNotMatch(action.prompt, /product-[a-z-]+|requirement-[a-z-]+|solution-design|action ID/)
+  assert.match(action.prompt, /只使用中文按钮名称/)
+  assert.match(action.prompt, /澄清 → 分析 → 风险扫描/)
+  const text = withEvidence(action.prompt, null, action.id, [], false)
+  assert.match(text, /省略英文技能标识/)
+})
+
+
+test('requirements advice receives current button names including customized labels', () => {
+  const buttons = [{ stage: '页面规格', label: '我的页面设计' }, { stage: '异常检查', label: '异常检查' }]
+  for (const id of ['requirements-next-step', 'product-exception-gate']) {
+    const draft = withEvidence('旧提示词', null, id, [], false, buttons)
+    assert.match(draft, /"页面规格" → "我的页面设计"/)
+    assert.match(draft, /不沿用历史消息中的旧名称/)
+    assert.match(draft, /没有可用按钮时说明当前不可用/)
+  }
+  assert.doesNotMatch(withEvidence('普通提示词', null, 'continue', [], false, buttons), /当前可用的需求按钮/)
+  assert.match(withEvidence('旧提示词', null, 'requirements-next-step', [], false, []), /实际按钮名称）：无/)
+})
+
+
+test('image output renames the saved preset without changing custom labels or bindings', () => {
+  const current = DEFAULT_ACTIONS.find(action => action.id === 'product-image-prompt')
+  const old = { ...current, label: '生图提示词', prompt: '保留已有提示词' }
+  assert.deepEqual(parseActions(encodeActions([old])), [{ ...old, label: '生图' }])
+  const custom = { ...old, label: '自定义名称' }
+  assert.deepEqual(parseActions(encodeActions([custom])), [custom])
+  const rebound = { ...old, skillId: 'research' }
+  assert.deepEqual(parseActions(encodeActions([rebound])), [rebound])
+})
+
+
+test('other group hides retired requirement presets without losing customized saved actions', () => {
+  const base = DEFAULT_ACTIONS.find(action => action.id === 'product-prd-pages')
+  const old = [
+    { ...base, id: 'prd-writing', skillId: 'prd-writing', label: '编写 PRD', prompt: '旧内容' },
+    { ...base, id: 'requirement-review', skillId: 'requirement-review', label: '需求评审', prompt: '旧内容' },
+  ]
+  assert(!DEFAULT_ACTIONS.some(action => old.some(item => item.id === action.id)))
+  const saved = [...DEFAULT_ACTIONS, ...old]
+  assert.deepEqual(parseActions(encodeActions(saved)), saved)
+  assert(!missingDefaultActions(DEFAULT_ACTIONS).some(action => old.some(item => item.id === action.id)))
+  const layout = defaultLauncherLayout(saved)
+  assert(!actionsForGroup('others', saved, layout).some(action => old.some(item => item.id === action.id)))
+  const custom = { ...old[0], label: '我的需求文档' }
+  assert(actionsForGroup('others', [...DEFAULT_ACTIONS, custom], layout).some(action => action.label === custom.label))
+  const rebound = { ...old[1], skillId: 'research' }
+  assert(actionsForGroup('others', [...DEFAULT_ACTIONS, rebound], layout).some(action => action.skillId === 'research' && action.id === rebound.id))
 })

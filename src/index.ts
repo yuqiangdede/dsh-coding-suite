@@ -13,7 +13,7 @@ import type { Context, Volatile } from '@deepseek-ai/cordis'
 import z from '@deepseek-ai/schemastery'
 import { LAUNCHER_CONFIG_GLOBAL, LauncherDeploymentFields, type LauncherDeployment } from './config.ts'
 import { registerCodingSuiteSkills, type CodingSuiteSkillConfig } from './skill-provider.ts'
-import { registerArtifactRoutingGuidance, registerWindowsPowerShellGuidance } from './windows-powershell.ts'
+import { registerArtifactRoutingGuidance, registerSetupGuidance, registerWindowsPowerShellGuidance } from './windows-powershell.ts'
 
 export * from './skill-provider.ts'
 
@@ -58,6 +58,7 @@ export function apply(ctx: Context, config: CodingSuiteConfig): void {
   ctx.inject(['systemPrompt'], (child) => {
     registerWindowsPowerShellGuidance(child)
     registerArtifactRoutingGuidance(child)
+    registerSetupGuidance(child)
   })
 
   // 2. Mount Launcher Settings & Index Injections

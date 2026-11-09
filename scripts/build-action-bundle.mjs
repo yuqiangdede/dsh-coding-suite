@@ -9,10 +9,13 @@ import { receivingInstructions } from '../src/client/locales.ts'
 
 function replaceTable(source, name, value) {
   const pattern = new RegExp(`(\\t\\tconst ${name} = )[\\s\\S]*?\\n\\t\\t[\\]}];`)
-  const matches = source.match(new RegExp(pattern.source, 'g'))
+  const tablePattern = name === 'DEFAULT_ACTIONS'
+    ? new RegExp(`(\\t\\tconst ${name} = )[\\s\\S]*?;\\n(?=\\t\\t(?:function|const|class) )`)
+    : pattern
+  const matches = source.match(new RegExp(tablePattern.source, 'g'))
   if (matches?.length !== 1) throw new Error(`Expected exactly one bundled ${name} table`)
   const literal = JSON.stringify(value, null, '\t').replaceAll('\n', '\n\t\t')
-  return source.replace(pattern, (_match, prefix) => prefix + literal + ';')
+  return source.replace(tablePattern, (_match, prefix) => prefix + literal + ';' + (name === 'DEFAULT_ACTIONS' ? '\n' : ''))
 }
 
 export function buildActionTables(source) {

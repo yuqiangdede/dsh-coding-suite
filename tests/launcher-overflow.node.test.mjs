@@ -3,7 +3,7 @@ import assert from 'node:assert/strict'
 import { readFileSync } from 'node:fs'
 import { runInNewContext } from 'node:vm'
 import { zh, en } from '../src/client/locales.ts'
-import { DEFAULT_ACTIONS, DIAGNOSTIC_MODES, encodeActions } from '../src/client/actions.ts'
+import { DEFAULT_ACTIONS, DIAGNOSTIC_MODES, REQUIREMENTS_HTML_PROMPT, encodeActions } from '../src/client/actions.ts'
 import { conversationHistory } from '../src/client/contextual-actions.ts'
 
 /** Project each entry onto the attribution fields, so unrelated shape additions stay out of these cases. */
@@ -521,4 +521,36 @@ test('all diagnostic mode commands belong to the supplement button in sent histo
     const view = { messages: [{ role: 'user', text: '/' + mode.skillId + ' 用户编辑过的排查说明' }] }
     assert.deepEqual(attributed(view, DEFAULT_ACTIONS), [{ id: 'add-logs', command: undefined }])
   }
+})
+
+
+for (const english of [false, true]) test('image output chooser inserts the selected editable draft, locale=' + english, async () => {
+  for (const output of ['prompt', 'html']) {
+    const h = harness({ english })
+    h.overflow('requirements-analysis').props.onClick()
+    h.actionButtons('requirements-analysis').find(node => node.props.children === (english ? 'Generate' : '生图')).props.onClick()
+    assert.equal(h.events.length, 0)
+    const panel = h.nodes(h.render()).find(node => node.props?.['data-image-output-modes'] !== undefined)
+    assert(panel)
+    const label = output === 'prompt' ? (english ? 'Prompt' : '提示词') : (english ? 'HTML page' : 'HTML页面')
+    h.nodes(panel).find(node => node.type === 'button' && node.props.children === label).props.onClick()
+    await new Promise(resolve => setImmediate(resolve))
+    assert.deepEqual(h.events.map(event => event[0]), ['insert', 'persist'])
+    if (output === 'prompt') assert(h.events[0][1].startsWith('/product-image-prompt '))
+    else {
+      assert(h.events[0][1].startsWith(REQUIREMENTS_HTML_PROMPT))
+      assert.deepEqual(attributed({ messages: [{ role: 'user', text: h.events[0][1] }] }, DEFAULT_ACTIONS), [{ id: 'product-image-prompt', command: undefined }])
+    }
+  }
+})
+
+test('image output chooser cancellation does not insert a draft', () => {
+  const h = harness()
+  h.overflow('requirements-analysis').props.onClick()
+  h.actionButtons('requirements-analysis').find(node => node.props.children === '生图').props.onClick()
+  let panel = h.nodes(h.render()).find(node => node.props?.['data-image-output-modes'] !== undefined)
+  h.nodes(panel).find(node => node.type === 'button' && node.props.children === '取消').props.onClick()
+  panel = h.nodes(h.render()).find(node => node.props?.['data-image-output-modes'] !== undefined)
+  assert.equal(panel, undefined)
+  assert.deepEqual(h.events, [])
 })

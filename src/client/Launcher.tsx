@@ -1,6 +1,6 @@
 import { useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react'
 import type { InjectFace, PropsLocale, PropsRuntime } from '@deepseek-ai/dsh-client-ui-slots'
-import { DEFAULT_ACTIONS, DIAGNOSTIC_MODES, parseActions, actionErrorKey, presentDefaultActions, displayOrder, type CodingAction } from './actions.ts'
+import { DEFAULT_ACTIONS, DIAGNOSTIC_MODES, REQUIREMENTS_HTML_PROMPT, parseActions, actionErrorKey, presentDefaultActions, displayOrder, type CodingAction } from './actions.ts'
 import type { LauncherInjected } from './index.ts'
 import { chatEntries, conversationHistory, recommend, withEvidence } from './contextual-actions.ts'
 import { LAUNCHER_GROUPS, actionsForGroup, defaultLauncherLayout, fittedActionCount, parseLauncherLayout, type GroupId } from './launcher-layout.ts'
@@ -46,7 +46,7 @@ function revealChatRow(row: HTMLElement, boundary: Element): void {
 }
 export function Launcher({
   useInput, useConversation, useSession, useProjection, inputActions, useActionForm, fetchSkillNames,
-  saveLayout, todoStaleMs, checkProjectSetup, t,
+  saveLayout, todoStaleMs, t,
 }: Props) {
   const snapshot = useActionForm(x => x)
   const input = useInput(x => x)
@@ -83,6 +83,7 @@ export function Launcher({
   }, [optimisticLayout, snapshot.value?.layoutJson])
   const [commonEdit, setCommonEdit] = useState<{ ids: string[], revision: number } | null>(null)
   const [diagnosticAction, setDiagnosticAction] = useState<CodingAction | null>(null)
+  const [imageAction, setImageAction] = useState<CodingAction | null>(null)
   const [pending, setPending] = useState(false)
   const [notice, setNotice] = useState('')
   const rootRef = useRef<HTMLDivElement>(null)
@@ -226,38 +227,14 @@ export function Launcher({
   const insert = async (action: CodingAction) => {
     if (!available || commandLock.current) return
     setNotice('')
-    let setupContext = ''
-    if (action.id !== 'initialize') {
-      // Always re-evaluate: files may have changed since the last failed check.
-      commandLock.current = true
-      setPending(true)
-      try {
-        const report = await checkProjectSetup()
-        if (!alive.current) return
-        if (!report.ready) setupContext = report.missing.join('；') || '初始化状态未就绪，缺项待核实'
-      } catch (error) {
-        if (alive.current) {
-          setupContext = '自动检查失败：' + String(error)
-        }
-      } finally {
-        commandLock.current = false
-        if (alive.current) setPending(false)
-      }
-    }
     const span = inputActions.captureInsertion()
     if (span.start !== span.end) { setNotice(t('selection')); return }
     if (action.kind === 'skill' && (span.start !== 0 || input.draft.startsWith('/'))) {
       setNotice(t('start')); return
     }
-    let value = withEvidence(action.prompt, recommendation, action.id, entries, t('defaultLocale') === 'en')
-    if (action.id === 'handover-requirement-summary' && action.kind === 'skill' && action.skillId === 'project-handover-requirement-summary') {
-      value += '\n\n成果物约定：本次追溯结果统一写成布局登记的中间产物根目录下 requirement-trace/<任务ID>/requirements-from-svn.md 工作稿；任务 ID 按仓库、分支和范围稳定确定，同一任务复用，不同任务不覆盖。先核查现有文件并按项目及 Skill 写入规程展示内容或差异并取得确认；正式交接内容仍复用现有权威位置。旧提示中的仅在对话展示由此成果物约定替代。'
-    }
-    if (action.id !== 'initialize') {
-      if (setupContext) {
-        value += '\n\n执行上述任务前，先检查并补全当前项目缺失的初始化步骤与文档结构。检查线索（可能有误，请以项目文件为准）：' + setupContext + '。读取已安装的 setup-matt-pocock-skills Skill 及其 _shared/SETUP_AUTO_DECISIONS.md，复用现有文档权威；自动完成可验证、无冲突的工程初始化项，验证并报告实际变更。对冲突、覆盖或迁移已有资料等需要决定的事项，只暂停受影响部分并说明；其余可独立进行的任务继续。若 Skill 不可用，说明限制并依据项目现有规则尽力完成安全项，不要声称已执行该 Skill。完成可执行的初始化后继续上述任务。'
-      }
-    }
+    const requirementButtons = actionsForGroup('requirements-analysis', enabledActions, layout)
+      .map(button => ({ stage: DEFAULT_ACTIONS.find(preset => preset.id === button.id)?.label ?? button.label, label: button.label }))
+    let value = withEvidence(action.prompt, recommendation, action.id, entries, t('defaultLocale') === 'en', requirementButtons)
     if (action.kind === 'skill') {
       const skillId = action.skillId ?? ''
       commandLock.current = true
@@ -310,7 +287,11 @@ export function Launcher({
     return preview ? head + '\n' + (preview.length > 60 ? preview.slice(0, 59) + '…' : preview) : head
   }
   const render = (a: CodingAction) => <button type="button" key={a.id} disabled={!available} className={visibleRecommendation?.ids.includes(a.id) ? css.recommended : css.action}
-    title={a.description + '\n' + a.example + (visibleRecommendation?.ids.includes(a.id) ? '\n' + t('recommendationTooltip').replace('{reason}', t(visibleRecommendation.reason)) : '')} onClick={() => { if (a.id === 'add-logs' && a.kind === 'skill' && DIAGNOSTIC_MODES.some(mode => mode.skillId === a.skillId)) setDiagnosticAction(a); else void insert(a) }}>{displayLabel(a)}</button>
+    title={a.description + '\n' + a.example + (visibleRecommendation?.ids.includes(a.id) ? '\n' + t('recommendationTooltip').replace('{reason}', t(visibleRecommendation.reason)) : '')} onClick={() => {
+      if (a.id === 'add-logs' && a.kind === 'skill' && DIAGNOSTIC_MODES.some(mode => mode.skillId === a.skillId)) setDiagnosticAction(a)
+      else if (a.id === 'product-image-prompt' && a.kind === 'skill' && a.skillId === a.id) setImageAction(a)
+      else void insert(a)
+    }}>{displayLabel(a)}</button>
   // Expansion is local presentation state, independent of saved membership and action availability.
   const renderGroupActions = (id: string, label: string, members: CodingAction[]) => {
     const fallback = 8
@@ -337,6 +318,14 @@ export function Launcher({
       </div>}
     </div>
   }
+  const renderImageOptions = () => imageAction && <div className={css.actionGroup} role="group" aria-label={t('imageOutputChoose')} data-image-output-modes>
+    <div className={css.groupHeader}>{t('imageOutputChoose')}</div>
+    <div className={css.row}>
+      <button type="button" className={css.action} disabled={!available} onClick={() => { setImageAction(null); void insert(imageAction) }}>{t('imageOutputPrompt')}</button>
+      <button type="button" className={css.action} disabled={!available} onClick={() => { setImageAction(null); void insert({ ...imageAction, kind: 'prompt', prompt: REQUIREMENTS_HTML_PROMPT }) }}>{t('imageOutputHtml')}</button>
+      <button type="button" className={css.action} onClick={() => setImageAction(null)}>{t('cancelCommon')}</button>
+    </div>
+  </div>
   return <div ref={rootRef} className={css.root} data-matt-skill-launcher>
     {(hasActions || historyGroups.length > 0) && <div className={css.groupToggles}>
       {hasActions && <div className={css.groupControls} role="group" aria-label={t('groupVisibility')}>
@@ -407,6 +396,7 @@ export function Launcher({
           <button type="button" className={css.hideGroup} disabled={layoutSaving || !snapshot.writable}
             onClick={() => { void toggleGroup('common') }}>{t('hideGroup')}</button></div>
         {renderGroupActions('common', t('groupCommon'), commonActions)}
+        {!layout.visibleGroups['requirements-analysis'] && renderImageOptions()}
       </div>}
       {!commonEdit && groups.filter(group => layout.visibleGroups[group.id] && group.actions.length > 0).map(group =>
         <div className={css.actionGroup} key={group.id} data-launcher-group={group.id}>
@@ -416,6 +406,7 @@ export function Launcher({
               onClick={() => { void toggleGroup(group.id) }}>{t('hideGroup')}</button>
           </div>
           {renderGroupActions(group.id, t(group.label), group.actions)}
+          {group.id === 'requirements-analysis' && renderImageOptions()}
         </div>)}
     </>}
     {diagnosticAction && <div className={css.actionGroup} role="group" aria-label={t('diagnosticChoose')} data-diagnostic-modes>

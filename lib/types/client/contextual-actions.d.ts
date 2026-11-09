@@ -86,5 +86,8 @@ export declare function recommend(entries: readonly ChatEntry[], running?: boole
  * @param english - Whether the receiving instructions use English.
  * @returns A draft carrying the action's receiving task without conversation excerpts.
  */
-export declare function withEvidence(prompt: string, _recommendation: Recommendation | null, actionId: string, _entries?: readonly ChatEntry[], english?: boolean): string;
+export declare function withEvidence(prompt: string, _recommendation: Recommendation | null, actionId: string, _entries?: readonly ChatEntry[], english?: boolean, requirementButtons?: readonly {
+    stage: string;
+    label: string;
+}[]): string;
 //# sourceMappingURL=contextual-actions.d.ts.map

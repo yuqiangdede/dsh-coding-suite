@@ -2,7 +2,7 @@ import type { CodingAction } from './actions.ts'
 
 /** Visual-only groups. One action ID may be referenced by several groups. */
 export const LAUNCHER_GROUPS = [
-  { id: 'requirements-analysis', label: 'groupRequirementsAnalysis', actionIds: ['requirement-clarification', 'requirement-analysis', 'product-risk-gate', 'solution-design', 'product-module-gate', 'product-state-gate', 'product-exception-gate', 'prd-writing', 'requirement-review', 'product-prd-pages', 'product-consistency-gate', 'product-image-prompt'] },
+  { id: 'requirements-analysis', label: 'groupRequirementsAnalysis', actionIds: ['requirements-next-step', 'requirement-clarification', 'requirement-analysis', 'product-risk-gate', 'solution-design', 'product-module-gate', 'product-state-gate', 'product-exception-gate', 'product-prd-pages', 'product-consistency-gate', 'product-image-prompt'] },
   { id: 'development', label: 'groupDevelopment', actionIds: ['discussion', 'spec', 'execute', 'review', 'review-fix', 'compile', 'bug', 'commit', 'add-logs', 'analyze-logs', 'ask', 'plan', 'architecture', 'tdd', 'remote-debug', 'health-acceptance'] },
   { id: 'documents', label: 'groupDocuments', actionIds: ['requirements', 'overview', 'outline', 'database', 'api-docs', 'doc-supplement', 'doc-merge', 'docx', 'xlsx', 'handover-requirement-summary', 'handover-log-guide'] },
   { id: 'others', label: 'groupOthers', actionIds: ['research', 'domain', 'prototype', 'retro', 'handoff', 'visual', 'graphify-navigation', 'graphify-refresh', 'maintain-document-directory', 'mermaid-draw', 'image', 'continue'] },
@@ -23,6 +23,10 @@ const defaultVisibility: Record<GroupId, boolean> = {
   common: true, 'requirements-analysis': true, development: true, documents: false, others: false,
 }
 const retiredHandoverIds = new Set(['handover-overview', 'handover-features', 'handover-flows', 'handover-troubleshooting', 'handover-maintain', 'product-development-pipeline'])
+const retiredRequirementLabels: Readonly<Record<string, readonly string[]>> = {
+  'prd-writing': ['编写 PRD', 'Write PRD'],
+  'requirement-review': ['需求评审', 'Review Requirements'],
+}
 const actionIdPattern = /^[a-z0-9][a-z0-9-]{0,63}$/
 
 export function defaultLauncherLayout(actions: readonly CodingAction[], hasSavedActions = false): LauncherLayout {
@@ -115,7 +119,8 @@ export function actionsForGroup(
     ...DEFAULT_COMMON_IDS,
     ...LAUNCHER_GROUPS.flatMap(group => [...group.actionIds]),
   ])
-  return [...ordered, ...enabled.filter(a => a.enabled && a.id !== 'initialize' && !retiredHandoverIds.has(a.id) && !known.has(a.id))
+  return [...ordered, ...enabled.filter(a => a.enabled && a.id !== 'initialize' && !retiredHandoverIds.has(a.id) && !known.has(a.id) &&
+    !(a.kind === 'skill' && a.skillId === a.id && retiredRequirementLabels[a.id]?.includes(a.label)))
     .sort((a, b) => a.order - b.order)]
 }
 

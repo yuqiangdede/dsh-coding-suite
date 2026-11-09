@@ -1,6 +1,9 @@
 /** Launcher-owned UI dictionaries. */
 /** Simplified Chinese copy. */
 export declare const zh: {
+    readonly imageOutputChoose: "选择生图输出方式";
+    readonly imageOutputPrompt: "提示词";
+    readonly imageOutputHtml: "HTML页面";
     readonly diagnosticChoose: "选择补充排查模式（本对话已完成功能）";
     readonly historyTitle: "本对话记录（最新在前）";
     readonly historyHelp: "根据已发送消息中的按钮内容识别；修改提示词、旧配置或手动输入可能影响识别，不代表执行结果。";
@@ -23,7 +26,7 @@ export declare const zh: {
     readonly groupVisibility: "显示分组";
     readonly groupCommon: "常用";
     readonly groupCommonHelp: "常用入口可自行编辑；按当前任务选择，不要求逐个执行。";
-    readonly groupRequirementsHelp: "建议：澄清 → 分析 → 风险扫描 → 业务方案 → 边界、数据状态和异常检查 → PRD 与需求评审 → 页面一致性校验 → 生图提示词。PRD/页面已包含写作和评审，单独按钮可按需使用。";
+    readonly groupRequirementsHelp: "可点击「下一步」判断应进入的阶段或需确认的内容。建议：澄清 → 分析 → 风险扫描 → 业务方案 → 边界、数据状态和异常检查 → 页面规格 → 页面一致性校验 → 生图（提示词或 HTML 页面）。";
     readonly groupDevelopmentHelp: "建议：按需咨询、研究和需求讨论 → 固化需求 → 拆分工单 → 编码或测试驱动开发 → 代码审查 → 修复 → 编译 → 健康验收 → 提交代码。领域建模、原型、架构优化、排查和复盘按需使用。";
     readonly groupDocumentsHelp: "建议：需求文档 → 总体设计 → 概要设计 → 数据库设计和接口文档；按需补充、融合，最后转换 Word。";
     readonly groupHandoverHelp: "建议：先追溯需求，再整理排查资料；需要整合资料时使用文档融合。";

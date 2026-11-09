@@ -8,8 +8,8 @@ test('diagnostic shortcuts provide editable inputs and respect existing configur
   const analyze = DEFAULT_ACTIONS.find(a => a.id === 'analyze-logs')
   const remote = DEFAULT_ACTIONS.find(a => a.id === 'remote-debug')
   for (const action of [analyze, remote]) assert.equal(action.kind, 'prompt')
-  assert.match(analyze.prompt, /日志路径：<请填写/)
-  for (const field of ['SSH 连接信息：<请填写', '远程运行路径：<请填写', '问题描述：<请填写']) assert.ok(remote.prompt.includes(field))
+  assert.match(analyze.prompt, /日志路径：\{/)
+  for (const field of ['SSH 连接信息：{', '远程运行路径：{', '问题描述：{']) assert.ok(remote.prompt.includes(field))
   assert.match(remote.prompt, /缺少上述信息时先询问/)
   assert.deepEqual(presentDefaultActions([analyze, remote], true).map(a => a.label), ['Analyze Logs', 'Remote Debug'])
   const layout = defaultLauncherLayout(DEFAULT_ACTIONS)
@@ -27,4 +27,11 @@ test('diagnostic shortcuts provide editable inputs and respect existing configur
   assert.deepEqual(parseLauncherLayout(JSON.stringify(custom), DEFAULT_ACTIONS, true), custom)
   assert.equal(zh.groupDocuments, '文档')
   assert.equal(en.groupDocuments, 'Documents')
+})
+
+ test('all default action drafts describe their input with braces', () => {
+  for (const action of DEFAULT_ACTIONS) {
+    assert.match(action.prompt, /\{[^{}]+\}/, action.id)
+    assert.doesNotMatch(action.prompt, /\{undefined\}/, action.id)
+  }
 })

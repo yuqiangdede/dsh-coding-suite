@@ -3,7 +3,7 @@ import type { CodingAction } from './actions.ts';
 export declare const LAUNCHER_GROUPS: readonly [{
     readonly id: "requirements-analysis";
     readonly label: "groupRequirementsAnalysis";
-    readonly actionIds: readonly ["requirement-clarification", "requirement-analysis", "product-risk-gate", "solution-design", "product-module-gate", "product-state-gate", "product-exception-gate", "prd-writing", "requirement-review", "product-prd-pages", "product-consistency-gate", "product-image-prompt"];
+    readonly actionIds: readonly ["requirements-next-step", "requirement-clarification", "requirement-analysis", "product-risk-gate", "solution-design", "product-module-gate", "product-state-gate", "product-exception-gate", "product-prd-pages", "product-consistency-gate", "product-image-prompt"];
 }, {
     readonly id: "development";
     readonly label: "groupDevelopment";

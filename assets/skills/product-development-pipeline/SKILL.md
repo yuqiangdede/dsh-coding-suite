@@ -1,6 +1,6 @@
 ---
 name: product-development-pipeline
-description: 当用户希望把一个 B 端或行业系统需求端到端推进多个产品设计阶段，并需要通过 Gate 管理澄清、分析、方案、PRD、评审、页面规格和原型输出之间的顺序与回退时使用。该 Skill 只做总控编排；若用户只要求单独一个阶段，直接使用 product-development-skills 中对应专项 Skill。
+description: 当用户希望把一个 B 端或行业系统需求端到端推进多个产品设计阶段，并需要通过 Gate 管理澄清、分析、方案、页面规格和原型输出之间的顺序与回退时使用。该 Skill 只做总控编排；若用户只要求单独一个阶段，直接使用 product-development-skills 中对应专项 Skill。
 ---
 
 # Product Development Pipeline
@@ -18,8 +18,7 @@ description: 当用户希望把一个 B 端或行业系统需求端到端推进�
 - 需求澄清 → `requirement-clarification`
 - 需求分析 → `requirement-analysis`
 - 产品/业务方案 → `solution-design`
-- PRD → `prd-writing`
-- 独立需求评审 → `requirement-review`
+- 页面规格 → `product-prd-pages`
 - 从零可运行原型 → `prototype-greenfield`
 - 已有项目原型 → `prototype-existing-project`
 - 版本结束后的复盘/知识沉淀不属于本设计阶段主链路，分别使用 `version-retrospective`、`project-knowledge-capture`
@@ -36,7 +35,7 @@ DSH 分组以本流水线为主干：从需求澄清持续推进到 Step 10 路�
 4. `steps/04 决策与方案对比.md`：调用方案设计能力，形成推荐方案、模块、对象、主流程、状态和权限框架。
 5. `steps/05 模块边界审计.md`：Gate ②-A，模块结构未站稳不得冻结。
 6. `steps/06 数据模型与状态校验.md` + `steps/07 关键流程异常枚举.md`：Gate ②-B，先状态后异常；失败则回退 04/05/06。
-7. `steps/08 PRD与页面规格.md`：先调用 `prd-writing` 形成研发规格，再调用 `requirement-review` 做独立评审；通过后只把已确认业务设计投影成页面规格，不重新做 01–07。
+7. `steps/08 PRD与页面规格.md`：直接把已确认业务设计整理成页面规格，不重新做 01–07。
 8. `steps/09 页面-流程-权限一致性校验.md`：Gate ③，检查页面、流程、状态、角色和权限是否一致。
 9. `steps/10 输出路由.md`：根据用户目标选择 UI Prompt、从零可运行原型、已有项目原型或仅输出文档。
 
@@ -54,7 +53,6 @@ DSH 分组以本流水线为主干：从需求澄清持续推进到 Step 10 路�
 - 不得重复询问用户已经明确的信息。
 - Gate 失败不得靠“默认假设”强行通过。
 - 先稳定核心对象和状态，再枚举异常。
-- PRD 负责写，独立评审负责审；作者不能自行宣布 GO。
 - Step 08 禁止重新执行需求澄清、需求分析、模块设计和流程设计。
 - Gate ③ 未通过，禁止进入 UI/原型输出。
 - 最后一步默认输出 UI 生图提示词，不实际生图；用户明确指定文档或原型时采用指定路由。
@@ -87,7 +85,6 @@ DSH 分组以本流水线为主干：从需求澄清持续推进到 Step 10 路�
 
 - 需求分析与范围。
 - 方案决策与模块/对象/状态/流程设计。
-- PRD 与独立评审结论。
 - 页面规格与一致性 Gate 结果。
 - UI Prompt，或可运行的 HTML/React/Vue 原型，或仅文档交付。
 

@@ -461,3 +461,49 @@ ACTION:xlsx 与 SKILL:markdown-to-xlsx：根据用户要求参照仓库 MD转Wor
 ### 2026-11-05：排查入口改名
 
 按用户要求，将 ACTION:handover-log-guide 的默认显示名由「排查流程」改为「排查资料」，英文展示名改为 Troubleshooting Docs，文档分组提示中的对应表述同步改为「排查资料」；按钮 ID、默认提示词、接收指令、Skill 正文与绑定不变。旧默认名（日志排查、问题排查、排查流程）定向兼容，自定义名称保留。来源为本次用户需求，未引入外部资源。修改前基线为 Git 提交 `851eeaf`。
+
+### 2026-11-07：默认按钮输入标记
+
+按用户要求，为默认按钮提示词增加按用途设计的输入占位标记。来源为本次用户要求及仓库已有提示词，本地改写，未引入外部资源；已保存的自定义按钮配置不自动覆盖。
+
+### 2026-11-09：需求主干精简
+
+来源为本次用户确认和仓库既有资产，本地改写，无外部内容引入。基线为修改前 Git HEAD，已有工作树改动保留，原上游版本和许可记录延续，Git 保存本地差异。
+
+逐项涉及 `src/client/actions.ts` 的 product-prd-pages、product-exception-gate、product-image-prompt 及总控英文展示，`src/client/locales.ts` 的需求组说明，`assets/skills/_shared/PRODUCT_DEVELOPMENT.md`，`product-development-pipeline/SKILL.md` 和 steps/06、07、08、09、10，`product-prd-pages`、`product-risk-gate`、`product-module-gate`、`product-state-gate`、`product-exception-gate`、`product-consistency-gate`、`product-image-prompt` 的 SKILL.md。移除主干 PRD 与正式评审前置，直接整理页面规格，经一致性检查交付 UI 提示词。保留原 action/Skill ID 与路径以兼容已有配置。
+
+补充资产映射为 `src/client/launcher-layout.ts`（需求组移除两个独立按钮）及 `product-development-pipeline/README.md`（流程说明）。发布重建时修正 `scripts/build-action-bundle.mjs` 对带 map 的默认动作声明的匹配，并在 `scripts/rebuild-launcher-bundle.mjs` 统一转换换行，使既有输入占位符改动可正常打包。
+
+### 2026-11-09：需求下一步提示词按钮
+
+日期为 2026-11-09。来源类别为本地编写，依据本次用户需求及仓库既有需求阶段定义。未引入外部提示词，外部上游路径与版本不适用，许可沿用项目 MIT。具体个人作者身份未知。修改基线为本次编辑前工作树，既有未提交内容保留，Git 保存最终差异。
+
+逐项资产为 src/client/actions.ts 中 ACTION:requirements-next-step 的默认提示词、输入提示及英文展示，src/client/locales.ts 中同 ID 的接收指令和中英需求组说明，src/client/launcher-layout.ts 的需求组首位动作。同步 lib/client.js 及对应 portable 产物。本地新增，不修改原产品研发技能的上游来源和许可。
+
+验证记录。4 项需求针对性测试和 2 项诊断快捷入口测试通过。默认动作表同步检查、客户端 bundle 校验及 git diff --check 通过。尚未执行宿主界面点击或模型真实多轮对话验证。
+
+### 2026-11-09：需求阶段中文名称提示词调整
+
+来源登记为 2026-11-09 用户明确要求，本地改写，依据仓库已有需求按钮与本次用户指令，未引入外部提示词。外部上游路径及版本不适用，许可沿用项目 MIT，具体个人作者身份未知。修改前基线为本轮编辑前工作树，原有未提交内容保留，差异由 Git 保存。
+
+逐项资产为 src/client/actions.ts 中 requirements-next-step 的默认提示词，以及 src/client/locales.ts 中 requirements-next-step、requirement-clarification、requirement-analysis、product-risk-gate、solution-design、product-module-gate、product-state-gate、product-exception-gate、product-prd-pages、product-consistency-gate、product-image-prompt 的中文接收指令。发布包及对应 portable 产物同步重建。
+
+3 项针对性回归通过。尚未执行真实宿主中的多轮模型输出验证。
+
+
+### 2026-11-09：需求按钮名称对齐
+
+来源为用户要求和本仓库现有按钮定义，本地改写，未引入外部提示词，原上游路径、版本及许可信息保持既有记录。修改前基线为本轮编辑前工作树，既有改动予以保留，Git 保存最终差异。项目许可见根目录 LICENSE，具体个人作者身份未知。
+
+涉及 `src/client/actions.ts` 中风险扫描、边界审计、数据状态、异常检查、页面规格和一致性校验的默认按钮提示词；`assets/skills/product-exception-gate/SKILL.md` 的阶段名称表述；`src/client/contextual-actions.ts` 与 `src/client/Launcher.tsx` 根据当前可用按钮构造推荐名称提示。同步更新发布包与 portable 产物。历史按钮名仅保留在旧配置兼容映射及历史记录中。
+
+
+### 2026-11-09：生图输出选择
+
+来源为用户明确要求及仓库现有 `product-image-prompt` 与 `image` 动作提示词，本地改写，未引入外部内容。原产品研发技能来源、版本和许可见既有来源清单；新增 HTML 生成提示词依本项目 MIT 许可，具体个人作者身份未知。修改前基线为本次编辑前工作树，已有改动保留，Git 保存最终差异。
+
+逐项资产包括 `src/client/actions.ts` 的 `product-image-prompt` 名称、`requirements-next-step` 提示词及 `REQUIREMENTS_HTML_PROMPT`，`src/client/Launcher.tsx` 的输出选择和草稿插入，`src/client/locales.ts` 的中英文选项与说明，`src/client/contextual-actions.ts` 的历史归属。发布包及 portable 产物同步重建。
+
+### 2026-11-09：移除需求文档默认按钮
+
+按用户要求，从 `src/client/actions.ts` 移除 `prd-writing` 与 `requirement-review` 默认按钮及输入提示，并在 `src/client/launcher-layout.ts` 对旧配置中的原预设名称做其他组显示兼容。已有提示词、英文展示映射及技能资源的历史来源维持原记录；此次未引入外部内容。修改前基线为本轮编辑前工作树，已有改动保留。

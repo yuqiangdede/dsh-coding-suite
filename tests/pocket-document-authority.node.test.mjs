@@ -90,3 +90,14 @@ test('setup, maintenance and project policy preserve existing authoritative docu
   assert.match(index, /缺失主题补位/);
   assert.match(policy, /现有文档路径/);
 });
+
+test('setup guidance is registered in background and respects read-only requests', async () => {
+  const { registerSetupGuidance } = await import('../lib/windows-powershell.js');
+  const sections = [];
+  registerSetupGuidance({ systemPrompt: { section: section => sections.push(section) } });
+  assert.equal(sections[0].name, 'coding-suite:setup-guidance');
+  assert.match(sections[0].text, /只读、不写文件/);
+  assert.match(sections[0].text, /setup-matt-pocock-skills/);
+  assert.match(read('lib/index.js'), /registerSetupGuidance\(child\)/);
+  assert.doesNotMatch(read('src/client/Launcher.tsx'), /执行上述任务前/);
+});

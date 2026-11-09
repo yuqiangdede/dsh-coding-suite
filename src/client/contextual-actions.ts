@@ -1,4 +1,4 @@
-import { DIAGNOSTIC_MODES } from './actions.ts'
+import { DIAGNOSTIC_MODES, REQUIREMENTS_HTML_PROMPT } from './actions.ts'
 import { receivingInstructions, documentReceiving, codingDocPolicy } from './locales.ts'
 
 /** Read-only recommendations derived from finalized, visible chat messages. */
@@ -194,6 +194,7 @@ function attributeHistoryText(text: string, actions: readonly ActionSignature[])
   // extra hand-typed context keeps the command while changing the rest.
   const matches = actions.filter(action => {
     if (!action.prompt) return false
+    if (action.id === 'product-image-prompt' && action.kind === 'skill' && action.skillId === action.id && text.includes(REQUIREMENTS_HTML_PROMPT)) return true
     if (action.kind === 'skill') {
       return Boolean(action.skillId) && text.trimStart().startsWith('/' + action.skillId + ' ' + action.prompt)
     }
@@ -435,12 +436,26 @@ export function withEvidence(
   actionId: string,
   _entries: readonly ChatEntry[] = [],
   english = false,
+  requirementButtons?: readonly { stage: string; label: string }[],
 ): string {
   const instruction = receivingInstructions[actionId] ?? (documentActions.has(actionId) ? documentReceiving : undefined)
   if (!instruction) return prompt
   const policy = codeActions.has(actionId) ? codingDocPolicy[english ? 1 : 0] : ''
-  return prompt + '\n\n' + instruction[english ? 1 : 0] + (policy ? '\n' + policy : '')
+  let buttons = ''
+  if (requirementButtons && requirementActionIds.has(actionId)) {
+    const list = requirementButtons.map(button => `${JSON.stringify(button.stage)} → ${JSON.stringify(button.label)}`).join('、')
+    buttons = english
+      ? `\nCurrent available requirements buttons (standard stage → displayed label): ${list || 'none'}. Recommend only displayed labels from this list, rather than names from earlier messages. If the needed stage has no button, explain that it is unavailable.`
+      : `\n当前可用的需求按钮（标准阶段 → 实际按钮名称）：${list || '无'}。推荐时以此清单中的实际按钮名称为准，不沿用历史消息中的旧名称；所需阶段没有可用按钮时说明当前不可用。`
+  }
+  return prompt + '\n\n' + instruction[english ? 1 : 0] + (policy ? '\n' + policy : '') + buttons
 }
+
+const requirementActionIds = new Set([
+  'requirements-next-step', 'requirement-clarification', 'requirement-analysis', 'product-risk-gate',
+  'solution-design', 'product-module-gate', 'product-state-gate', 'product-exception-gate',
+  'product-prd-pages', 'product-consistency-gate', 'product-image-prompt',
+])
 
 const documentActions = new Set(['api-docs', 'requirements', 'overview', 'outline', 'database', 'doc-merge', 'docx', 'xlsx'])
 const codeActions = new Set(['execute', 'bug', 'tdd', 'review-fix'])

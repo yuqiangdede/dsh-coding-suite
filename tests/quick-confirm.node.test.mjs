@@ -101,7 +101,7 @@ function renderConfirm(options = {}) {
   return { confirm: nodes[confirmAt], nodes, calls }
 }
 
-test('actions include automatic setup when missing or checking fails, and proceed normally when ready', async () => {
+test('actions keep setup guidance out of drafts in all setup states', async () => {
   injected.fetchSkillNames = async () => ({ includes: () => true })
   for (const result of [
     { ready: false, missing: ['文档布局缺少类别：外部工单'] },
@@ -115,9 +115,7 @@ test('actions include automatic setup when missing or checking fails, and procee
     action.props.onClick()
     await new Promise(resolve => setTimeout(resolve, 0))
     assert.equal(calls.inserted.length, 1)
-    assert.equal(calls.inserted[0].text.includes('先检查并补全当前项目'), result instanceof Error || !result.ready)
-    if (result instanceof Error) assert.match(calls.inserted[0].text, /offline/)
-    else if (!result.ready) assert.match(calls.inserted[0].text, /外部工单/)
+    assert.doesNotMatch(calls.inserted[0].text, /执行上述任务前|先检查并补全当前项目|外部工单|offline/)
     assert.equal(calls.submitted, 0)
   }
 })

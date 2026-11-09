@@ -58,6 +58,7 @@ function compile(path, alias) {
       source.diagnostics.map(item => ts.flattenDiagnosticMessageText(item.messageText, '\n')).join('\n'))
   }
   return source.outputText
+    .replace(/\r\n/g, '\n')
     .replace(/^import[\s\S]*?;\r?\n/gm, '')
     .replace(/\bexport (?=(?:async function|const|function|class) )/g, '')
     .replace(/\b_jsx\b/g, 'react_jsx_runtime.jsx')

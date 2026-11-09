@@ -27,3 +27,8 @@ export function registerWindowsPowerShellGuidance(ctx: Context, platform: NodeJS
 export function registerArtifactRoutingGuidance(ctx: Context): void {
   ctx.systemPrompt.section({ name: 'coding-suite:artifact-routing', order: 1060, interpolate: false, text: '统一文档及产物路由：在读取、写入或依赖正式文档、阶段中间稿、评审/Gate、转换缓存前，先读当前项目 docs/agents/document-layout.md 和其知识索引。沿用登记的正式权威文件，所有文件型中间产物进入登记的任务专属工作区，不因 Skill 默认输出路径创建第二套文档。改写正式文件先显示差异并取得确认，结束时列出实际文件路径。' })
 }
+
+/** Background setup guidance; never overrides the user's task scope. */
+export function registerSetupGuidance(ctx: Context): void {
+  ctx.systemPrompt.section({ name: 'coding-suite:setup-guidance', order: 1061, interpolate: false, text: '当用户通过本插件按钮或内置 Skill 发起任务且项目初始化不完整时，在用户授权范围内先检查相关项目规则和初始化状态。读取可用的 setup-matt-pocock-skills 及其 _shared/SETUP_AUTO_DECISIONS.md，复用现有文档权威；仅自动完成与当前任务兼容、可验证且无冲突的工程初始化项，并报告实际变更。对冲突、覆盖或迁移既有资料等需要决定的事项，只暂停受影响部分并说明；其余可独立进行的任务继续。若 Skill 不可用，说明限制并依据项目现有规则尽力完成获授权的安全项，不要声称已执行该 Skill。用户要求只读、不写文件或限制任务范围时遵循用户要求，不擅自初始化写入。检查结果以当前项目实际文件为准。' })
+}
