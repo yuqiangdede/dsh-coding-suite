@@ -507,3 +507,7 @@ ACTION:xlsx 与 SKILL:markdown-to-xlsx：根据用户要求参照仓库 MD转Wor
 ### 2026-11-09：移除需求文档默认按钮
 
 按用户要求，从 `src/client/actions.ts` 移除 `prd-writing` 与 `requirement-review` 默认按钮及输入提示，并在 `src/client/launcher-layout.ts` 对旧配置中的原预设名称做其他组显示兼容。已有提示词、英文展示映射及技能资源的历史来源维持原记录；此次未引入外部内容。修改前基线为本轮编辑前工作树，已有改动保留。
+
+### 2026-11-10 升级 Spring7 按钮与内置 Skill
+
+来源为用户提供的 `spring7-boot4-upgrade-skill.zip`，经用户确认本地适配。作者、原包版本与许可均未知，未将项目 MIT 推断为附件许可。三个附件资源、按钮提示词及中英接收指令的来源、固定指纹、原始基线和修改说明见 [逐项来源清单](../../../assets/skills/spring7-boot4-upgrade/source-manifest.json)。保留分阶段迁移流程，新增方案人工确认、恢复范围校验、项目产物路由与执行授权约束。功能约定见 [升级 Spring7](../requirements/spring7-upgrade.md)。

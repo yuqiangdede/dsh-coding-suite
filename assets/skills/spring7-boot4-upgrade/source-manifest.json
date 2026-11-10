@@ -1,0 +1,61 @@
+{
+  "date": "2026-11-10",
+  "provider": "用户附件",
+  "package": "spring7-boot4-upgrade-skill.zip",
+  "packageSha256": "4791193f9039624a70a16444bf9726761df705e0d5cd53f440eb570a5e228e71",
+  "author": "未知",
+  "upstreamVersion": "未知",
+  "license": "未知；用户授权参考实现，附件对外发布许可未核实",
+  "references": [
+    "用户确认的按钮方案",
+    "assets/skills/_shared/DOCUMENT_AUTHORITY.md",
+    "docs/agents/document-layout.md"
+  ],
+  "assets": [
+    {
+      "localPath": "assets/skills/spring7-boot4-upgrade/references/compatibility-matrix.md",
+      "category": "用户提供附件，原样引入",
+      "upstreamPath": "spring7-boot4-upgrade-skill/references/compatibility-matrix.md",
+      "upstreamSha256": "ca51dcb6a633082629eaf8a0d63c7bc59aa60fc8e40e374e46348dc53ff48863",
+      "baseline": "docs/_work/spring7-boot4-upgrade/upstream/references/compatibility-matrix.md",
+      "changes": "无内容修改"
+    },
+    {
+      "localPath": "assets/skills/spring7-boot4-upgrade/references/acceptance-checklist.md",
+      "category": "用户提供附件，原样引入",
+      "upstreamPath": "spring7-boot4-upgrade-skill/references/acceptance-checklist.md",
+      "upstreamSha256": "569251b593ccda0b10e33bbdf43ae5bb991ab787f4a5369f74e5953100ac4551",
+      "baseline": "docs/_work/spring7-boot4-upgrade/upstream/references/acceptance-checklist.md",
+      "changes": "无内容修改"
+    },
+    {
+      "localPath": "assets/skills/spring7-boot4-upgrade/SKILL.md",
+      "category": "用户提供附件，本地适配",
+      "upstreamPath": "spring7-boot4-upgrade-skill/SKILL.md",
+      "upstreamSha256": "40726adeaaad1e11dddd307b7a6d1f0771f9b035f8bb6a6bc091c0b92bafb4c8",
+      "baseline": "docs/_work/spring7-boot4-upgrade/upstream/SKILL.md",
+      "changes": "增加方案人工确认与恢复范围校验，适配文档布局和执行授权"
+    },
+    {
+      "localPath": "src/client/actions.ts#spring7-upgrade",
+      "category": "本地编写，参考用户附件",
+      "upstreamPath": "spring7-boot4-upgrade-skill/SKILL.md",
+      "baseline": "Git parent of the feature commit",
+      "changes": "默认提示词、输入提示和英文展示，先方案后确认"
+    },
+    {
+      "localPath": "src/client/locales.ts#spring7-upgrade",
+      "category": "本地编写，参考用户附件",
+      "upstreamPath": "spring7-boot4-upgrade-skill/SKILL.md",
+      "baseline": "Git parent of the feature commit",
+      "changes": "中英接收指令与确认门禁"
+    },
+    {
+      "localPath": "src/client/launcher-layout.ts#development",
+      "category": "本地编写",
+      "upstreamPath": null,
+      "baseline": "Git parent of the feature commit",
+      "changes": "开发组入口"
+    }
+  ]
+}

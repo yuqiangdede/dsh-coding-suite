@@ -33,6 +33,8 @@ Only link to files that actually exist. The table's directory names without link
 
 ## Current state
 
+- [升级 Spring7 按钮](requirements/spring7-upgrade.md) — accepted；开发组入口，先展示改动位置与方案，人工确认后分阶段升级。
+
 - [可选代码图谱导航](requirements/graphify-navigation.md) — accepted；初始化只诊断，按钮发送后建图或刷新，默认本地代码提取，无后台监听。
 
 - [对话中的按钮使用顺序](requirements/conversation-action-history.md) — accepted；输入区按当前对话已发送消息展示识别出的按钮和自由对话，保留顺序并说明识别限制；可点击定位到对应消息（折叠组先展开，无法定位时提示）。

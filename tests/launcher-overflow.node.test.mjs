@@ -330,34 +330,34 @@ test('default groups expand independently, preserve action order and retain over
   const h = harness()
   assert.equal(h.actionButtons('common').length, 8)
   assert.equal(h.actionButtons('development').length, 8)
-  assert.equal(h.overflow('development').props.children, '更多（8）')
+  assert.equal(h.overflow('development').props.children, '更多（9）')
   h.overflow('development').props.onClick()
-  assert.equal(h.actionButtons('development').length, 16)
+  assert.equal(h.actionButtons('development').length, 17)
   assert.equal(h.actionButtons('common').length, 8)
-  const developmentOrder = ['需求讨论', '固化需求', '编码', '代码审查', '修复', '编译', 'Bug排查', '提交代码', '补充排查', '分析日志', '咨询', '拆分工单', '架构优化', '测试驱动开发', '远程调试', '健康验收']
+  const developmentOrder = ['需求讨论', '固化需求', '编码', '代码审查', '修复', '编译', 'Bug排查', '提交代码', '补充排查', '分析日志', '咨询', '拆分工单', '架构优化', '升级 Spring7', '测试驱动开发', '远程调试', '健康验收']
   assert.deepEqual(h.actionButtons('development').map(n => n.props.children), developmentOrder)
   h.overflow('development').props.onClick()
   h.data.messages = [{ role: 'user', text: '/to-spec 固化需求' }, { role: 'assistant', text: '规格已完成，验收标准已确认' }]
   assert.match(h.overflow('development').props.children, /•/, 'hidden recommended tickets remain discoverable')
   const english = harness({ english: true })
-  assert.equal(english.overflow('development').props.children, 'More (8)')
+  assert.equal(english.overflow('development').props.children, 'More (9)')
   assert.match(english.overflow('development').props['aria-label'], /Development/)
 })
 
 test('rows fill the available width and only collapse the buttons that do not fit', () => {
-  const widths = Array(16).fill(50)
+  const widths = Array(17).fill(50)
   const layout = { schemaVersion: 1, commonActionIds: [], visibleGroups: { common: false, 'requirements-analysis': false, development: true, documents: false, others: false } }
   const h = harness({ measured: true, rowWidth: 600, widths, moreWidth: 70, layout })
   h.render(); h.flush(); h.render()
   assert.equal(h.actionButtons('development').length, 9)
-  assert.equal(h.overflow('development').props.children, '更多（7）')
+  assert.equal(h.overflow('development').props.children, '更多（8）')
   h.row.clientWidth = 300
   h.render(); h.flush(); h.render()
   assert.equal(h.actionButtons('development').length, 4)
-  assert.equal(h.overflow('development').props.children, '更多（12）')
+  assert.equal(h.overflow('development').props.children, '更多（13）')
   h.row.clientWidth = 1200
   h.render(); h.flush(); h.render()
-  assert.equal(h.actionButtons('development').length, 16)
+  assert.equal(h.actionButtons('development').length, 17)
   assert.equal(h.overflow('development'), undefined, 'no More when the whole row fits')
 })
 
@@ -553,4 +553,20 @@ test('image output chooser cancellation does not insert a draft', () => {
   panel = h.nodes(h.render()).find(node => node.props?.['data-image-output-modes'] !== undefined)
   assert.equal(panel, undefined)
   assert.deepEqual(h.events, [])
+})
+
+test('Spring7 upgrade inserts an editable audit prompt without sending a migration request', async () => {
+  const h = harness()
+  h.overflow('development').props.onClick()
+  h.actionButtons('development').find(n => n.props.children === '升级 Spring7').props.onClick()
+  await new Promise(resolve => setImmediate(resolve))
+  const action = DEFAULT_ACTIONS.find(a => a.id === 'spring7-upgrade')
+  assert.ok(h.events.some(event => event[0] === 'insert' && event[1].startsWith('/spring7-boot4-upgrade ' + action.prompt)))
+  assert.deepEqual(h.events.map(event => event[0]), ['insert', 'persist'])
+  assert.equal(h.nodes(h.render()).some(n => n.props?.['data-conversation-history']), false)
+  const missing = harness({ skillNames: [] })
+  missing.overflow('development').props.onClick()
+  missing.actionButtons('development').find(n => n.props.children === '升级 Spring7').props.onClick()
+  await new Promise(resolve => setImmediate(resolve))
+  assert.deepEqual(missing.events, [])
 })

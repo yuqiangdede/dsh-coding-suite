@@ -10,7 +10,7 @@ test('six group IDs, defaults, and ordered button references', () => {
   assert.deepEqual(Object.entries(layout.visibleGroups), [
     ['common', true], ['requirements-analysis', true], ['development', true], ['documents', false], ['handover-docs', false], ['others', false],
   ])
-  assert.deepEqual(LAUNCHER_GROUPS.map(g => g.actionIds.length), [11, 15, 7, 2, 16])
+  assert.deepEqual(LAUNCHER_GROUPS.map(g => g.actionIds.length), [11, 17, 7, 2, 16])
   assert.deepEqual(actionsForGroup('common', DEFAULT_ACTIONS, layout).map(a => a.id), [...DEFAULT_COMMON_IDS])
   assert.equal(actionsForGroup('documents', DEFAULT_ACTIONS, layout).length, 7)
   const others = actionsForGroup('others', DEFAULT_ACTIONS, layout).map(a => a.id)
