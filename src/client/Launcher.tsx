@@ -95,22 +95,33 @@ export function Launcher({
     const key = actionErrorKey(error)
     return key ? t(key) : String(error)
   }
-  let actions: CodingAction[] = []
-  let invalid = ''
-  try { actions = parseActions(snapshot.value?.actionsJson) } catch (error) { invalid = explain(error) }
-  actions = snapshot.value?.actionsJson ? actions : presentDefaultActions(actions, t('defaultLocale') === 'en')
-  let layout = defaultLauncherLayout(actions)
-  try { layout = parseLauncherLayout(snapshot.value?.layoutJson, actions, Boolean(snapshot.value?.actionsJson)) }
-  catch (error) { invalid = explain(error) }
+  const actionsJson = snapshot.value?.actionsJson
+  const layoutJson = snapshot.value?.layoutJson
+  const english = t('defaultLocale') === 'en'
+  // Draft edits and layout measurements do not change the persisted configuration.
+  const configuration = useMemo(() => {
+    let actions: CodingAction[] = []
+    let failure: unknown
+    try { actions = parseActions(actionsJson) } catch (error) { failure = error }
+    if (!actionsJson) actions = presentDefaultActions(actions, english)
+    let layout = defaultLauncherLayout(actions)
+    try { layout = parseLauncherLayout(layoutJson, actions, Boolean(actionsJson)) }
+    catch (error) { failure = error }
+    return { actions, layout, failure }
+  }, [actionsJson, layoutJson, english])
+  const { actions } = configuration
+  const invalid = configuration.failure === undefined ? '' : explain(configuration.failure)
+  let layout = configuration.layout
   if (optimisticLayout && snapshot.value?.layoutJson === optimisticLayout.base) layout = optimisticLayout.value
-  const enabledActions = actions.filter(a => a.enabled && a.id !== 'product-development-pipeline').sort((a, b) => displayOrder(a) - displayOrder(b))
+  const enabledActions = useMemo(() => actions.filter(a => a.enabled && a.id !== 'product-development-pipeline')
+    .sort((a, b) => displayOrder(a) - displayOrder(b)), [actions])
   // Buttons travel with their own prompt, so the request can be attributed by id
   // instead of guessing the stage from keywords inside that prompt.
-  const entries = sessionRunning ? [] : chatEntries(chat)
-  const history = conversationHistory(chat, actions)
+  const entries = useMemo(() => sessionRunning ? [] : chatEntries(chat), [chat, sessionRunning])
+  const history = useMemo(() => conversationHistory(chat, actions), [chat, actions])
   const latestReply = !sessionRunning && entries.at(-1)?.role === 'assistant' ? entries.at(-1)?.text : ''
   const initializeAction = DEFAULT_ACTIONS.find(action => action.id === 'initialize')!
-  const recommendation = recommend(entries, sessionRunning, enabledActions)
+  const recommendation = useMemo(() => recommend(entries, sessionRunning, enabledActions), [entries, sessionRunning, enabledActions])
   const recommendedActions = recommendation
     ? enabledActions.filter(action => recommendation.ids.includes(action.id))
     : []
@@ -171,11 +182,19 @@ export function Launcher({
     }
     measure()
     if (typeof ResizeObserver === 'undefined') return
-    const observer = new ResizeObserver(measure)
+    let frame: number | undefined
+    const observer = new ResizeObserver(() => {
+      if (typeof requestAnimationFrame !== 'function') { measure(); return }
+      if (frame !== undefined) return
+      frame = requestAnimationFrame(() => { frame = undefined; measure() })
+    })
     for (const row of Object.values(groupRows.current)) if (row) observer.observe(row)
     // Font or label changes resize the probe before the row itself changes.
     for (const probe of Object.values(groupProbes.current)) if (probe) observer.observe(probe)
-    return () => { observer.disconnect() }
+    return () => {
+      observer.disconnect()
+      if (frame !== undefined) cancelAnimationFrame(frame)
+    }
   }, [measurable, measurementKey])
   const hasActions = enabledActions.length > 0
   const groupHasRecommendation = (id: GroupId) =>
@@ -289,7 +308,7 @@ export function Launcher({
   const render = (a: CodingAction) => <button type="button" key={a.id} disabled={!available} className={visibleRecommendation?.ids.includes(a.id) ? css.recommended : css.action}
     title={a.description + '\n' + a.example + (visibleRecommendation?.ids.includes(a.id) ? '\n' + t('recommendationTooltip').replace('{reason}', t(visibleRecommendation.reason)) : '')} onClick={() => {
       if (a.id === 'add-logs' && a.kind === 'skill' && DIAGNOSTIC_MODES.some(mode => mode.skillId === a.skillId)) setDiagnosticAction(a)
-      else if (a.id === 'product-image-prompt' && a.kind === 'skill' && a.skillId === a.id) setImageAction(a)
+      else if (a.id === 'product-image-prompt' && a.kind === 'skill' && a.skillId === a.id) setImageAction(current => current?.id === a.id ? null : a)
       else void insert(a)
     }}>{displayLabel(a)}</button>
   // Expansion is local presentation state, independent of saved membership and action availability.

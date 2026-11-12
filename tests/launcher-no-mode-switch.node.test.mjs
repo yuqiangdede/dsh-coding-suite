@@ -42,7 +42,7 @@ function harness() {
   let dock
   const ctx = {
     effect: fn => fn(), locale: { register() {}, bind: () => key => zh[key] ?? key },
-    configForms: { get: () => ({}) }, sessions: {}, remote: {},
+    configForms: { get: () => ({}) }, sessions: { list: { getSnapshot: () => ({ byId: {} }) }, binding: () => ({ session: { getSnapshot: () => null, projections: { faceOf: () => ({ getSnapshot: () => null }) } } }) }, remote: {},
     slots: { inject: (_, fn) => fn(), register: (options, component) => {
       if (options.name === 'conversation.input.dock') dock = { options, component }
       return { dispose() {} }
@@ -84,7 +84,7 @@ test('the launcher has no retired S0–S9 workflow or execution-mode controls', 
   assert.equal(rendered.some(node => node.props?.['aria-label'] === '编码模式'), false)
   assert.ok(rendered.some(node => node.props?.['aria-label'] === '显示分组'), 'group visibility row remains')
   // Ordinary insertion still works; a mode switch can never be the only path.
-  const action = rendered.find(node => node.type === 'button' && typeof node.props.title === 'string')
+  const action = rendered.find(node => node.type === 'button' && node.props.children === '分析日志')
   assert.ok(action, 'at least one action button renders')
   action.props.onClick()
   await h.settle()

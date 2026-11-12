@@ -1,0 +1,122 @@
+{
+  "introduced": "2026-11-10",
+  "source": {
+    "kind": "用户提供设计稿，参考改写并本地编写",
+    "description": "创建 Skill：Legacy Refactor Coach（历史工程重构指导专家）",
+    "provider": "本次用户附件",
+    "author": "未知",
+    "upstreamPath": "附件 已粘贴的文本.txt",
+    "upstreamVersion": "未知，按附件原始字节 SHA-256 固定",
+    "sha256": "0fe5276e28bdc54f56accd6f68740c0f8fd205cc0403cdc5b2e7514d1887514e",
+    "externalLicense": "未知，用户明确请求按该设计实现，未声明外部发布许可",
+    "localLicense": "本仓库 LICENSE；不据此推断附件原文许可"
+  },
+  "references": [
+    {
+      "path": "C:/Users/yuqiang2/.codex/skills/.system/skill-creator/SKILL.md",
+      "usage": "遵循结构及渐进加载规范，未复制正文",
+      "version": "未知"
+    },
+    {
+      "path": "assets/skills/_shared/DOCUMENT_AUTHORITY.md",
+      "usage": "沿用仓库路由，未复制正文",
+      "version": "本次编辑前工作树，Git 留存历史"
+    }
+  ],
+  "baseline": "新增资产此前不存在；按钮及发布资源以本次编辑前工作树为基线，保留已有改动，Git 保存差异",
+  "assets": [
+    {
+      "path": "assets/skills/legacy-refactor-coach/SKILL.md",
+      "adaptation": "入口与工作流按用户设计拆分、补齐状态/证据模板，目标项目路径优先；按钮接入既有发现与配置机制"
+    },
+    {
+      "path": "assets/skills/legacy-refactor-coach/references/architecture.md",
+      "adaptation": "入口与工作流按用户设计拆分、补齐状态/证据模板，目标项目路径优先；按钮接入既有发现与配置机制"
+    },
+    {
+      "path": "assets/skills/legacy-refactor-coach/references/backend-java.md",
+      "adaptation": "入口与工作流按用户设计拆分、补齐状态/证据模板，目标项目路径优先；按钮接入既有发现与配置机制"
+    },
+    {
+      "path": "assets/skills/legacy-refactor-coach/references/discovery.md",
+      "adaptation": "入口与工作流按用户设计拆分、补齐状态/证据模板，目标项目路径优先；按钮接入既有发现与配置机制"
+    },
+    {
+      "path": "assets/skills/legacy-refactor-coach/references/frontend-vue.md",
+      "adaptation": "入口与工作流按用户设计拆分、补齐状态/证据模板，目标项目路径优先；按钮接入既有发现与配置机制"
+    },
+    {
+      "path": "assets/skills/legacy-refactor-coach/references/migration.md",
+      "adaptation": "入口与工作流按用户设计拆分、补齐状态/证据模板，目标项目路径优先；按钮接入既有发现与配置机制"
+    },
+    {
+      "path": "assets/skills/legacy-refactor-coach/references/templates.md",
+      "adaptation": "入口与工作流按用户设计拆分、补齐状态/证据模板，目标项目路径优先；按钮接入既有发现与配置机制"
+    },
+    {
+      "path": "assets/skills/legacy-refactor-coach/references/verification.md",
+      "adaptation": "入口与工作流按用户设计拆分、补齐状态/证据模板，目标项目路径优先；按钮接入既有发现与配置机制"
+    },
+    {
+      "path": "assets/skills/legacy-refactor-coach/references/workflow.md",
+      "adaptation": "入口与工作流按用户设计拆分、补齐状态/证据模板，目标项目路径优先；按钮接入既有发现与配置机制"
+    },
+    {
+      "path": "src/client/actions.ts#refactor",
+      "adaptation": "入口与工作流按用户设计拆分、补齐状态/证据模板，目标项目路径优先；按钮接入既有发现与配置机制"
+    },
+    {
+      "path": "src/client/locales.ts#receivingInstructions.refactor",
+      "adaptation": "入口与工作流按用户设计拆分、补齐状态/证据模板，目标项目路径优先；按钮接入既有发现与配置机制"
+    },
+    {
+      "path": "src/client/launcher-layout.ts#development",
+      "adaptation": "入口与工作流按用户设计拆分、补齐状态/证据模板，目标项目路径优先；按钮接入既有发现与配置机制"
+    },
+    {
+      "path": "lib/client.js#refactor",
+      "adaptation": "入口与工作流按用户设计拆分、补齐状态/证据模板，目标项目路径优先；按钮接入既有发现与配置机制"
+    },
+    {
+      "path": "lib/types/client/actions.js#refactor",
+      "adaptation": "入口与工作流按用户设计拆分、补齐状态/证据模板，目标项目路径优先；按钮接入既有发现与配置机制"
+    },
+    {
+      "path": "lib/types/client/locales.js#refactor",
+      "adaptation": "入口与工作流按用户设计拆分、补齐状态/证据模板，目标项目路径优先；按钮接入既有发现与配置机制"
+    },
+    {
+      "path": "lib/types/client/launcher-layout.js#development",
+      "adaptation": "入口与工作流按用户设计拆分、补齐状态/证据模板，目标项目路径优先；按钮接入既有发现与配置机制"
+    },
+    {
+      "path": "assets/skills/legacy-refactor-coach/references/reimplementation.md",
+      "adaptation": "依据用户提出的功能盘点、功能确认、技术选型与新模块实施流程本地编写；参考现有状态机与 requirements-spec 的可选调用条件。"
+    }
+  ],
+  "localChanges": [
+    {
+      "date": "2026-11-10",
+      "source": "用户本次要求：新增重新实现目标，先列功能、选择保留项，再从零实现且不保留旧逻辑",
+      "assets": [
+        "assets/skills/legacy-refactor-coach/SKILL.md",
+        "assets/skills/legacy-refactor-coach/references/workflow.md",
+        "assets/skills/legacy-refactor-coach/references/migration.md",
+        "src/client/actions.ts#refactor",
+        "lib/client.js#refactor"
+      ],
+      "adaptation": "增加重新实现分支，按已确认范围逐单元验证；旧代码仅作功能和契约取证。"
+    },
+    {
+      "date": "2026-11-10",
+      "source": "用户要求细化重新实现后续引导：先找功能清单，缺失时调用其他 Skill 分析，确认功能及技术选型后新建模块实现。",
+      "assets": [
+        "assets/skills/legacy-refactor-coach/SKILL.md",
+        "assets/skills/legacy-refactor-coach/references/reimplementation.md",
+        "assets/skills/legacy-refactor-coach/references/workflow.md",
+        "assets/skills/legacy-refactor-coach/references/templates.md"
+      ],
+      "adaptation": "增加 R0–R4 阶段、可用 Skill 调用及回退、决策与验收和恢复机制。"
+    }
+  ]
+}

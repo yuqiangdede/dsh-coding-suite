@@ -7,7 +7,7 @@ export declare const LAUNCHER_GROUPS: readonly [{
 }, {
     readonly id: "development";
     readonly label: "groupDevelopment";
-    readonly actionIds: readonly ["discussion", "spec", "execute", "review", "review-fix", "compile", "bug", "commit", "add-logs", "analyze-logs", "ask", "plan", "architecture", "spring7-upgrade", "tdd", "remote-debug", "health-acceptance"];
+    readonly actionIds: readonly ["discussion", "spec", "execute", "review", "review-fix", "compile", "bug", "commit", "add-logs", "analyze-logs", "ask", "plan", "architecture", "refactor", "spring7-upgrade", "tdd", "remote-debug", "health-acceptance"];
 }, {
     readonly id: "documents";
     readonly label: "groupDocuments";

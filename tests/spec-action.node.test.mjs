@@ -53,7 +53,7 @@ test('every launcher action stays clickable without a prior discussion conclusio
   let insertions = 0
   const render = ({ messages = [], running = false, phase = 'plain' } = {}) => Launcher({
     useActionForm: fn => fn({ status: 'ready', value: {} }),
-    useInput: fn => fn({ phase, draft: '' }),
+    useInput: fn => fn({ phase, draft: '', attachmentIds: [] }),
     useConversation: fn => fn({ views: new Map([['chat', { messages }]]) }),
     useSession: fn => fn({ running }),
     useProjection: () => [],
@@ -65,7 +65,7 @@ test('every launcher action stays clickable without a prior discussion conclusio
     fetchSkillNames: async () => ['to-spec'], todoStaleMs: 90000,
     t: key => zh[key] ?? key,
   })
-  const actionButtons = messages => buttons(render({ messages })).filter(node => typeof node.props.title === 'string')
+  const actionButtons = messages => buttons(render({ messages })).filter(node => /_(?:action|recommended)$/.test(node.props.className ?? ''))
   const spec = messages => actionButtons(messages).find(node => node.props.children === '固化需求')
   const click = async button => {
     const before = insertions
@@ -105,7 +105,7 @@ test('generic unavailability still disables actions', async () => {
   let insertions = 0
   const render = phase => Launcher({
     useActionForm: fn => fn({ status: 'ready', value: {} }),
-    useInput: fn => fn({ phase, draft: '' }),
+    useInput: fn => fn({ phase, draft: '', attachmentIds: [] }),
     useConversation: fn => fn({ views: new Map([['chat', { messages: [] }]]) }),
     useSession: fn => fn({ running: false }),
     useProjection: () => [],

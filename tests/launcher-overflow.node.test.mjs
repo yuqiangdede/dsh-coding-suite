@@ -284,17 +284,22 @@ test('development group is renamed in both the launcher and settings dictionary'
 
 test('pipeline group renders eight then expands all configured stages and inserts correct drafts without sending', async () => {
   const h = harness()
-  const expected = ['requirement-clarification', 'requirement-analysis', 'product-risk-gate', 'solution-design', 'product-module-gate', 'product-state-gate', 'product-exception-gate', 'prd-writing', 'requirement-review', 'product-prd-pages', 'product-consistency-gate', 'product-image-prompt']
+  const expected = ['requirements-next-step', 'requirement-clarification', 'requirement-analysis', 'product-risk-gate', 'solution-design', 'product-module-gate', 'product-state-gate', 'product-exception-gate', 'product-prd-pages', 'product-consistency-gate', 'product-image-prompt']
   assert.equal(h.actionButtons('requirements-analysis').length, 8)
-  assert.equal(h.overflow('requirements-analysis').props.children, '更多（4）')
+  assert.equal(h.overflow('requirements-analysis').props.children, '更多（3）')
   h.overflow('requirements-analysis').props.onClick()
   assert.deepEqual(h.actionButtons('requirements-analysis').map(n => n.props.children), expected.map(id => DEFAULT_ACTIONS.find(a => a.id === id).label))
   for (const [index, id] of expected.entries()) {
     h.actionButtons('requirements-analysis')[index].props.onClick()
+    if (id === 'product-image-prompt') {
+      const panel = h.nodes(h.render()).find(node => node.props?.['data-image-output-modes'] !== undefined)
+      h.nodes(panel).find(node => node.type === 'button' && node.props.children === '提示词').props.onClick()
+    }
     await new Promise(resolve => setImmediate(resolve))
     assert.equal(h.events.length, (index + 1) * 2)
     assert.equal(h.events.at(-1)[0], 'persist')
-    assert.ok(h.events.at(-2)[1].startsWith('/' + DEFAULT_ACTIONS.find(a => a.id === id).skillId + ' '))
+    const action = DEFAULT_ACTIONS.find(a => a.id === id)
+    assert.ok(h.events.at(-2)[1].startsWith(action.kind === 'skill' ? '/' + action.skillId + ' ' : action.prompt))
   }
   const old = harness({ layout: commonLayout(['bug']) })
   assert.equal(old.actionButtons('requirements-analysis').length, 0)
@@ -330,34 +335,34 @@ test('default groups expand independently, preserve action order and retain over
   const h = harness()
   assert.equal(h.actionButtons('common').length, 8)
   assert.equal(h.actionButtons('development').length, 8)
-  assert.equal(h.overflow('development').props.children, '更多（9）')
+  assert.equal(h.overflow('development').props.children, '更多（10）')
   h.overflow('development').props.onClick()
-  assert.equal(h.actionButtons('development').length, 17)
+  assert.equal(h.actionButtons('development').length, 18)
   assert.equal(h.actionButtons('common').length, 8)
-  const developmentOrder = ['需求讨论', '固化需求', '编码', '代码审查', '修复', '编译', 'Bug排查', '提交代码', '补充排查', '分析日志', '咨询', '拆分工单', '架构优化', '升级 Spring7', '测试驱动开发', '远程调试', '健康验收']
+  const developmentOrder = ['需求讨论', '固化需求', '编码', '代码审查', '修复', '编译', 'Bug排查', '提交代码', '补充排查', '分析日志', '咨询', '拆分工单', '架构优化', '项目重构', '升级 Spring7', '测试驱动开发', '远程调试', '健康验收']
   assert.deepEqual(h.actionButtons('development').map(n => n.props.children), developmentOrder)
   h.overflow('development').props.onClick()
   h.data.messages = [{ role: 'user', text: '/to-spec 固化需求' }, { role: 'assistant', text: '规格已完成，验收标准已确认' }]
   assert.match(h.overflow('development').props.children, /•/, 'hidden recommended tickets remain discoverable')
   const english = harness({ english: true })
-  assert.equal(english.overflow('development').props.children, 'More (9)')
+  assert.equal(english.overflow('development').props.children, 'More (10)')
   assert.match(english.overflow('development').props['aria-label'], /Development/)
 })
 
 test('rows fill the available width and only collapse the buttons that do not fit', () => {
-  const widths = Array(17).fill(50)
+  const widths = Array(18).fill(50)
   const layout = { schemaVersion: 1, commonActionIds: [], visibleGroups: { common: false, 'requirements-analysis': false, development: true, documents: false, others: false } }
   const h = harness({ measured: true, rowWidth: 600, widths, moreWidth: 70, layout })
   h.render(); h.flush(); h.render()
   assert.equal(h.actionButtons('development').length, 9)
-  assert.equal(h.overflow('development').props.children, '更多（8）')
+  assert.equal(h.overflow('development').props.children, '更多（9）')
   h.row.clientWidth = 300
   h.render(); h.flush(); h.render()
   assert.equal(h.actionButtons('development').length, 4)
-  assert.equal(h.overflow('development').props.children, '更多（13）')
+  assert.equal(h.overflow('development').props.children, '更多（14）')
   h.row.clientWidth = 1200
   h.render(); h.flush(); h.render()
-  assert.equal(h.actionButtons('development').length, 17)
+  assert.equal(h.actionButtons('development').length, 18)
   assert.equal(h.overflow('development'), undefined, 'no More when the whole row fits')
 })
 
@@ -372,13 +377,13 @@ test('diagnostic buttons insert editable prompts into the draft', async () => {
   const h = harness()
   h.actionButtons('common').find(n => n.props.children === '分析日志').props.onClick()
   await new Promise(resolve => setImmediate(resolve))
-  assert.match(h.events[0][1], /日志路径：<请填写/)
+  assert.match(h.events[0][1], /日志路径：\{日志文件或目录路径\}/)
   h.overflow('common').props.onClick()
   h.actionButtons('common').find(n => n.props.children === '远程调试').props.onClick()
   await new Promise(resolve => setImmediate(resolve))
-  assert.match(h.events[2][1], /SSH 连接信息：<请填写/)
-  assert.match(h.events[2][1], /远程运行路径：<请填写/)
-  assert.match(h.events[2][1], /问题描述：<请填写/)
+  assert.match(h.events[2][1], /SSH 连接信息：\{/)
+  assert.match(h.events[2][1], /远程运行路径：\{/)
+  assert.match(h.events[2][1], /问题描述：\{/)
 })
 
 test('common visibility saves, restores, and respects read-only or rejected changes', async () => {
@@ -534,6 +539,7 @@ for (const english of [false, true]) test('image output chooser inserts the sele
     assert(panel)
     const label = output === 'prompt' ? (english ? 'Prompt' : '提示词') : (english ? 'HTML page' : 'HTML页面')
     h.nodes(panel).find(node => node.type === 'button' && node.props.children === label).props.onClick()
+    assert.equal(h.nodes(h.render()).find(node => node.props?.['data-image-output-modes'] !== undefined), undefined)
     await new Promise(resolve => setImmediate(resolve))
     assert.deepEqual(h.events.map(event => event[0]), ['insert', 'persist'])
     if (output === 'prompt') assert(h.events[0][1].startsWith('/product-image-prompt '))
@@ -542,6 +548,20 @@ for (const english of [false, true]) test('image output chooser inserts the sele
       assert.deepEqual(attributed({ messages: [{ role: 'user', text: h.events[0][1] }] }, DEFAULT_ACTIONS), [{ id: 'product-image-prompt', command: undefined }])
     }
   }
+})
+
+for (const english of [false, true]) test('image output chooser toggles closed and reopens without inserting a draft, locale=' + english, () => {
+  const h = harness({ english })
+  h.overflow('requirements-analysis').props.onClick()
+  const clickGenerate = () => h.actionButtons('requirements-analysis').find(node => node.props.children === (english ? 'Generate' : '生图')).props.onClick()
+  const panel = () => h.nodes(h.render()).find(node => node.props?.['data-image-output-modes'] !== undefined)
+  clickGenerate()
+  assert(panel())
+  clickGenerate()
+  assert.equal(panel(), undefined)
+  clickGenerate()
+  assert(panel())
+  assert.deepEqual(h.events, [])
 })
 
 test('image output chooser cancellation does not insert a draft', () => {
@@ -553,6 +573,24 @@ test('image output chooser cancellation does not insert a draft', () => {
   panel = h.nodes(h.render()).find(node => node.props?.['data-image-output-modes'] !== undefined)
   assert.equal(panel, undefined)
   assert.deepEqual(h.events, [])
+})
+
+test('project refactor button inserts its bundled skill prompt and remains out of sent history', async () => {
+  const h = harness()
+  h.overflow('development').props.onClick()
+  const button = h.actionButtons('development').find(n => n.props.children === '项目重构')
+  assert.ok(button)
+  button.props.onClick()
+  await new Promise(resolve => setImmediate(resolve))
+  const action = DEFAULT_ACTIONS.find(a => a.id === 'refactor')
+  assert.ok(h.events.some(event => event[0] === 'insert' && event[1].startsWith('/legacy-refactor-coach ' + action.prompt)))
+  assert.deepEqual(h.events.map(event => event[0]), ['insert', 'persist'])
+  assert.equal(h.nodes(h.render()).some(n => n.props?.['data-conversation-history']), false)
+  const missing = harness({ skillNames: [] })
+  missing.overflow('development').props.onClick()
+  missing.actionButtons('development').find(n => n.props.children === '项目重构').props.onClick()
+  await new Promise(resolve => setImmediate(resolve))
+  assert.deepEqual(missing.events, [])
 })
 
 test('Spring7 upgrade inserts an editable audit prompt without sending a migration request', async () => {

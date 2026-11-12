@@ -498,6 +498,10 @@ ACTION:xlsx 与 SKILL:markdown-to-xlsx：根据用户要求参照仓库 MD转Wor
 涉及 `src/client/actions.ts` 中风险扫描、边界审计、数据状态、异常检查、页面规格和一致性校验的默认按钮提示词；`assets/skills/product-exception-gate/SKILL.md` 的阶段名称表述；`src/client/contextual-actions.ts` 与 `src/client/Launcher.tsx` 根据当前可用按钮构造推荐名称提示。同步更新发布包与 portable 产物。历史按钮名仅保留在旧配置兼容映射及历史记录中。
 
 
+### 2026-11-10：一致性校验说明与按钮清单
+
+根据用户确认的文案，调整「一致性校验」接收说明及需求按钮清单的中文表达。来源为用户提供的文案和本地适配，无外部上游。按钮清单继续使用当前可用配置。涉及 `src/client/locales.ts`、`src/client/contextual-actions.ts` 及发布文件 `lib/client.js`。
+
 ### 2026-11-09：生图输出选择
 
 来源为用户明确要求及仓库现有 `product-image-prompt` 与 `image` 动作提示词，本地改写，未引入外部内容。原产品研发技能来源、版本和许可见既有来源清单；新增 HTML 生成提示词依本项目 MIT 许可，具体个人作者身份未知。修改前基线为本次编辑前工作树，已有改动保留，Git 保存最终差异。
@@ -507,6 +511,12 @@ ACTION:xlsx 与 SKILL:markdown-to-xlsx：根据用户要求参照仓库 MD转Wor
 ### 2026-11-09：移除需求文档默认按钮
 
 按用户要求，从 `src/client/actions.ts` 移除 `prd-writing` 与 `requirement-review` 默认按钮及输入提示，并在 `src/client/launcher-layout.ts` 对旧配置中的原预设名称做其他组显示兼容。已有提示词、英文展示映射及技能资源的历史来源维持原记录；此次未引入外部内容。修改前基线为本轮编辑前工作树，已有改动保留。
+
+### 2026-11-10 项目重构 Skill 与开发组按钮
+
+来源为用户提供的《创建 Skill：Legacy Refactor Coach（历史工程重构指导专家）》附件，按设计参考改写并本地编写。逐项路径、来源指纹、未知版本/作者/外部许可、参考依据与本地适配见 [来源清单](../../../assets/skills/legacy-refactor-coach/source-manifest.json)。用户明确要求依据该设计创建 Skill，附件外部发布许可未知；不将项目许可推断为附件原文许可。
+
+新增 `assets/skills/legacy-refactor-coach/SKILL.md` 与八份 `references/`；`src/client/actions.ts` 的 `refactor` 默认提示词与输入提示、`src/client/locales.ts` 的中英接收指令、`src/client/launcher-layout.ts` 的开发组入口及对应发布产物均逐项登记于清单。新资产无既有版本；修改基线为本轮编辑前工作树，已有改动保留，Git 保存最终差异。Skill 遵循目标项目文档布局，阶段工作稿进入登记任务目录；已有 `docs/refactor/` 只在布局允许时复用。
 
 ### 2026-11-10 升级 Spring7 按钮与内置 Skill
 

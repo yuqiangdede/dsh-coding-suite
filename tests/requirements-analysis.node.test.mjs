@@ -4,6 +4,7 @@ import { readFileSync, existsSync, readdirSync } from 'node:fs'
 import { readFile } from 'node:fs/promises'
 import { resolve, dirname, join, isAbsolute, sep } from 'node:path'
 import { runInNewContext } from 'node:vm'
+import { fileURLToPath } from 'node:url'
 import { parse as parseYaml } from 'yaml'
 import { DEFAULT_ACTIONS, encodeActions, parseActions, missingDefaultActions, presentDefaultActions } from '../src/client/actions.ts'
 import { LAUNCHER_GROUPS, defaultLauncherLayout, parseLauncherLayout, actionsForGroup, exportLauncherConfiguration, importedLauncherLayout } from '../src/client/launcher-layout.ts'
@@ -12,7 +13,7 @@ import { zh, en } from '../src/client/locales.ts'
 
 const groupId = 'requirements-analysis'
 const stageIds = ['product-risk-gate', 'product-module-gate', 'product-state-gate', 'product-exception-gate', 'product-prd-pages', 'product-consistency-gate', 'product-image-prompt']
-const newIds = [...stageIds, 'requirement-clarification', 'requirement-analysis', 'solution-design', 'prd-writing', 'requirement-review', 'product-development-pipeline']
+const newIds = ['requirements-next-step', ...stageIds, 'requirement-clarification', 'requirement-analysis', 'solution-design']
 const root = resolve(import.meta.dirname, '..')
 const client = readFileSync(resolve(root, 'lib/client.js'), 'utf8')
 const start = client.indexOf('//#region lib/types/client/contextual-actions.js')
@@ -33,8 +34,9 @@ test('new group follows the full pipeline to image prompts while preserving exis
   assert.equal(LAUNCHER_GROUPS[0].id, groupId)
   const layout = defaultLauncherLayout(DEFAULT_ACTIONS)
   const grouped = actionsForGroup(groupId, DEFAULT_ACTIONS, layout)
-  assert.deepEqual(grouped.map(a => a.id), ['product-development-pipeline', 'requirement-clarification', 'requirement-analysis', stageIds[0], 'solution-design', ...stageIds.slice(1)])
-  for (const id of ['spec', 'visual']) assert(actionsForGroup('development', DEFAULT_ACTIONS, layout).includes(DEFAULT_ACTIONS.find(a => a.id === id)))
+  assert.deepEqual(grouped.map(a => a.id), ['requirements-next-step', 'requirement-clarification', 'requirement-analysis', stageIds[0], 'solution-design', ...stageIds.slice(1)])
+  assert(actionsForGroup('development', DEFAULT_ACTIONS, layout).includes(DEFAULT_ACTIONS.find(a => a.id === 'spec')))
+  assert(actionsForGroup('others', DEFAULT_ACTIONS, layout).includes(DEFAULT_ACTIONS.find(a => a.id === 'visual')))
   assert.equal(layout.visibleGroups[groupId], true)
   assert(!newIds.some(id => layout.commonActionIds.includes(id)))
   assert.equal(zh.groupRequirementsAnalysis, '需求')
@@ -62,7 +64,7 @@ test('old layout gains a hidden group; malformed existing and new fields still f
 })
 
 test('saved custom presets survive parsing; opt-in additions are unique and translated', () => {
-  const oldNames = [["product-development-pipeline","需求全流程","全流程"],["requirement-clarification","需求澄清","澄清"],["requirement-analysis","需求分析","分析"],["product-risk-gate","需求风险扫描","风险扫描"],["product-module-gate","模块边界审计","边界审计"],["product-state-gate","数据与状态校验","数据状态"],["product-exception-gate","异常流程检查","异常检查"],["product-prd-pages","PRD 与页面规格","页面规格"],["product-consistency-gate","页面一致性校验","一致性校验"]]
+  const oldNames = [["requirement-clarification","需求澄清","澄清"],["requirement-analysis","需求分析","分析"],["product-risk-gate","需求风险扫描","风险扫描"],["product-module-gate","模块边界审计","边界审计"],["product-state-gate","数据与状态校验","数据状态"],["product-exception-gate","异常流程检查","异常检查"],["product-prd-pages","PRD 与页面规格","页面规格"],["product-consistency-gate","页面一致性校验","一致性校验"]]
   for (const [id, previous, compact] of oldNames) {
     const preset = DEFAULT_ACTIONS.find(action => action.id === id)
     assert.equal(preset.label, compact)
@@ -80,7 +82,7 @@ test('saved custom presets survive parsing; opt-in additions are unique and tran
   const filled = [...custom, ...presentDefaultActions(missing, true)]
   assert.deepEqual(missingDefaultActions(filled), [])
   assert.deepEqual(filled.find(a => a.id === 'spec'), custom.find(a => a.id === 'spec'))
-  assert.equal(filled.find(a => a.id === 'prd-writing').label, 'Write PRD')
+  assert.equal(filled.find(a => a.id === 'requirements-next-step').label, 'Next Step')
 })
 
 test('explicit stage outcomes advance or return only to the relevant requirements stage', () => {
@@ -139,9 +141,9 @@ test('main pipeline recommendations retain all gates and finish at the image pro
   }
   assert.equal(reply('product-prd-pages', '阶段 Gate：FAIL\n阶段结论：READY_FOR_CONSISTENCY'), null)
   assert.equal(reply('product-image-prompt', '阶段结论：UI_PROMPT_READY'), null)
-  const action = DEFAULT_ACTIONS.find(a => a.id === 'product-development-pipeline')
-  assert(action.prompt.includes('一直推进到最终 UI 生图提示词'))
+  const action = DEFAULT_ACTIONS.find(a => a.id === 'product-image-prompt')
   assert(action.prompt.includes('不实际生图'))
+  assert(DEFAULT_ACTIONS.find(a => a.id === 'requirements-next-step').prompt.includes('界面提示词或 HTML 页面'))
 })
 
 function settingsHarness(actions, english = false) {
@@ -175,7 +177,7 @@ test('published settings opt-in preserves custom content, translates additions a
   const h = settingsHarness(old, true)
   h.button('fillMissing').props.onClick()
   assert.equal(h.events.length, 0)
-  assert(h.nodes(h.render()).some(node => node.type === 'input' && node.props.value === 'Requirements Pipeline'))
+  assert(h.nodes(h.render()).some(node => node.type === 'input' && node.props.value === 'Next Step'))
   await h.button('save').props.onClick()
   assert.equal(h.events.length, 1)
   const saved = parseActions(h.events[0].actionsJson)
@@ -199,9 +201,9 @@ test('new action drafts receive artifact handoffs without copying conversation c
   for (const id of newIds) {
     const action = DEFAULT_ACTIONS.find(a => a.id === id)
     for (const english of [true, false]) {
-      const input = '/' + action.skillId + '\n' + action.prompt
+      const input = action.kind === 'skill' ? '/' + action.skillId + '\n' + action.prompt : action.prompt
       const draft = withEvidence(input, null, id, [], english)
-      assert(draft.startsWith('/' + id + '\n'))
+      assert(draft.startsWith(input))
       assert(draft.length > input.length)
     }
   }
@@ -239,7 +241,7 @@ test('shipped Host provider discovers and loads the flat product skill catalog w
   const end = bundle.indexOf('//#endregion', start)
   assert(start >= 0 && end > start)
   const register = runInNewContext(bundle.slice(start, end).replaceAll('import.meta.url', JSON.stringify(new URL('../lib/index.js', import.meta.url).href)) + '\nregisterCodingSuiteSkills', {
-    existsSync, readdirSync, readFileSync, readFile, resolve, join, isAbsolute, sep, parse: parseYaml,
+    existsSync, readdirSync, readFileSync, readFile, resolve, join, isAbsolute, sep, fileURLToPath, URL, parse: parseYaml,
   })
   let provider
   const dispose = () => {}
@@ -312,12 +314,12 @@ test('requirements advice receives current button names including customized lab
   const buttons = [{ stage: '页面规格', label: '我的页面设计' }, { stage: '异常检查', label: '异常检查' }]
   for (const id of ['requirements-next-step', 'product-exception-gate']) {
     const draft = withEvidence('旧提示词', null, id, [], false, buttons)
-    assert.match(draft, /"页面规格" → "我的页面设计"/)
-    assert.match(draft, /不沿用历史消息中的旧名称/)
+    assert.match(draft, /「我的页面设计」（页面规格）/)
+    assert.match(draft, /推荐时使用当前按钮名称/)
     assert.match(draft, /没有可用按钮时说明当前不可用/)
   }
-  assert.doesNotMatch(withEvidence('普通提示词', null, 'continue', [], false, buttons), /当前可用的需求按钮/)
-  assert.match(withEvidence('旧提示词', null, 'requirements-next-step', [], false, []), /实际按钮名称）：无/)
+  assert.doesNotMatch(withEvidence('普通提示词', null, 'continue', [], false, buttons), /可用按钮包括/)
+  assert.match(withEvidence('旧提示词', null, 'requirements-next-step', [], false, []), /可用按钮包括无/)
 })
 
 
