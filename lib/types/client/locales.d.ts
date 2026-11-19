@@ -1,6 +1,23 @@
 /** Launcher-owned UI dictionaries. */
 /** Simplified Chinese copy. */
 export declare const zh: {
+    readonly folderManage: "管理文件夹";
+    readonly folderDragHint: "拖动工作区或子文件夹到目标文件夹即可移动。";
+    readonly folderChooseWorkspaceView: "切换到「按工作区」查看分类。";
+    readonly folderTarget: "操作对象";
+    readonly folderCreate: "新建文件夹";
+    readonly folderName: "文件夹名称";
+    readonly folderParent: "目标文件夹";
+    readonly folderRoot: "顶层";
+    readonly folderDropToRoot: "拖到这里移至顶层";
+    readonly folderRename: "重命名";
+    readonly folderMove: "移动";
+    readonly folderDelete: "删除文件夹";
+    readonly folderDeleteHelp: "子文件夹和工作区将移到上一级。";
+    readonly folderCancel: "取消";
+    readonly folderConfirmDelete: "确认删除";
+    readonly folderSaveError: "保存分类失败，请检查本地存储后重试。";
+    readonly folderEdit: "编辑";
     readonly imageOutputChoose: "选择生图输出方式";
     readonly imageOutputPrompt: "提示词";
     readonly imageOutputHtml: "HTML页面";

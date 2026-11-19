@@ -72,7 +72,8 @@ const ctx = {
 
 exports.apply(ctx)
 
-assert.deepEqual(registrations.map(options => options.name), ['conversation.input.dock', 'settings.section'])
+assert.deepEqual(registrations.map(options => options.name), ['sidebar.footer.action', 'conversation.input.dock', 'settings.section'])
+assert.equal(registrations[0].id, 'coding-suite.workspace-folders')
 const injected = dockOptions.inject('session-1')
 assert.ok(injected.hooks.actionForm, 'launcher configuration must remain available')
 assert.equal(injected.projectRoot, 'C:/repo')

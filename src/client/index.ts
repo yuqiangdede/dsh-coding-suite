@@ -10,6 +10,9 @@ import type {} from '@deepseek-ai/dsh-api-remotes/client'
 import type {} from '@deepseek-ai/dsh-api-workspace-files/remote'
 import type {} from '@deepseek-ai/dsh-api-session-controller/client'
 import { LAUNCHER_CONFIG_GLOBAL, LauncherDeploymentSchema } from '../config.ts'
+import type {} from '@deepseek-ai/dsh-client-ui-sidebar/client'
+import type {} from '@deepseek-ai/dsh-client-ui-workspace/client'
+import { WorkspaceFoldersSidebar } from './WorkspaceFolders.tsx'
 import { Launcher } from './Launcher.tsx'
 import { LauncherSettings } from './Settings.tsx'
 import { evaluateProjectSetup, type ProjectSetupReport } from './setup-readiness.ts'
@@ -44,6 +47,9 @@ export const inject = ['locale', 'slots','sessions','remote','remote.skills','re
 export function apply(ctx: ClientContext): void {
   ctx.effect(() => ctx.locale.register('mattSkillLauncher', { zh, en }), 'launcher dictionaries')
   const t = ctx.locale.bind('mattSkillLauncher')
+  ctx.slots.inject('sidebar.footer.action', () => ctx.slots.register({
+    name: 'sidebar.footer.action', id: 'coding-suite.workspace-folders', locale: 'mattSkillLauncher',
+  }, WorkspaceFoldersSidebar))
   const form = ctx.configForms.get<ActionSettings>('coding-suite')
   // The page-global carries the Host-resolved policy; this read validates it
   // against the same field schema the Host Config uses.

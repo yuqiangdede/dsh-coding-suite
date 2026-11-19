@@ -76,7 +76,8 @@ test('the shipped client installs no disappearance probe or console hijack', () 
       register: (options) => { registrations.push(options.name); return { dispose() {} } },
     },
   })
-  assert.deepEqual(registrations, ['conversation.input.dock', 'settings.section'],
+  assert.deepEqual(registrations.filter(name => name === 'conversation.input.dock' || name === 'settings.section'),
+    ['conversation.input.dock', 'settings.section'],
     'apply must still wire both launcher surfaces')
   const banners = appended.filter(node => PROBE_BANNER in node.attributes)
   assert.equal(banners.length, 0,

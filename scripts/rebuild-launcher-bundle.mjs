@@ -13,7 +13,7 @@ import { buildActionTables } from './build-action-bundle.mjs'
 
 const root = resolve(import.meta.dirname, '..')
 const require = createRequire(import.meta.url)
-const ts = require(resolve(root, '.build-tools/node_modules/typescript'))
+const ts = require(process.env.DSH_SUITE_TYPESCRIPT ?? resolve(root, '.build-tools/node_modules/typescript'))
 const read = path => readFileSync(resolve(root, path), 'utf8')
 const write = (path, content) => writeFileSync(resolve(root, path), content)
 // Windows checkout may rewrite LF to CRLF; normalize before matching bundled regions.
@@ -102,6 +102,11 @@ function appendCss(prefix, sourceFile, variable, mapName, classes) {
   bundle = bundle.replace(section[0], section[1] + originalMap + ',' + additions + section[3])
 }
 
+if (!bundle.includes('let react_dom = require("react-dom");')) {
+  bundle = expectReplace(bundle, 'let react = require("react");',
+    'let react = require("react");\n\t\tlet react_dom = require("react-dom");', 'React portals')
+}
+
 // Recompile dictionaries too: retaining old copy would diverge from source.
 replaceRegion('locales', compile('src/client/locales.ts', ''))
 replaceRegion('actions', compile('src/client/actions.ts', ''))
@@ -130,6 +135,11 @@ bundle = expectReplace(bundle, settingsMarker,
   setupHelpers.trimEnd().split('\n').map(line => '\t\t' + line).join('\n') +
   '\n\t\t//#endregion\n' + settingsMarker, 'launcher module anchor')
 bundle = cutIfPresent(bundle, '\t\t//#region lib/types/client/WorkflowPanel.js\n', '\t\t//#region lib/types/client/Launcher.js\n', 'retired workflow panel')
+for (const [name, file] of [['workspace-folders', 'workspace-folders.ts'], ['WorkspaceFolders', 'WorkspaceFolders.tsx']]) {
+  const marker = '\t\t//#region lib/types/client/' + name + '.js\n'
+  if (!bundle.includes(marker)) bundle = expectReplace(bundle, settingsMarker, marker + '\t\t//#endregion\n' + settingsMarker, name)
+  replaceRegion(name, compile('src/client/' + file, '').replace(/\bcreatePortal\(/g, 'react_dom.createPortal('))
+}
 replaceRegion('Launcher', compile('src/client/Launcher.tsx', 'Launcher_module_css_default'))
 replaceRegion('Settings', compile('src/client/Settings.tsx', 'Settings_module_css_default'))
 appendCss('xbJU_q', 'src/client/Launcher.module.css', 'css$1', 'Launcher_module_css_default', [
@@ -211,7 +221,7 @@ if (/WorkflowMode|GoalRef|pauseWorkflow|resumeWorkflow|setMode/.test(declaration
 write('lib/types/client/index.d.ts', declarations)
 // Keep portable generated modules and public layout types aligned with the shipped UI.
 const portable = ts.createProgram([
-  'actions', 'launcher-layout', 'locales', 'contextual-actions', 'setup-readiness',
+  'actions', 'launcher-layout', 'locales', 'contextual-actions', 'setup-readiness', 'workspace-folders',
 ].map(name => resolve(root, 'src/client/' + name + '.ts')), {
   target: ts.ScriptTarget.ES2022,
   module: ts.ModuleKind.ESNext,
