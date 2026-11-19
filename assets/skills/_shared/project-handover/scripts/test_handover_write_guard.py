@@ -1,4 +1,5 @@
 import importlib.util
+import subprocess
 import tempfile
 import unittest
 from pathlib import Path
@@ -49,11 +50,19 @@ class HandoverGuardTests(unittest.TestCase):
                         self.proposal, p["originalSha256"], p["approvalDigest"])
         self.assertEqual(dest.read_text(encoding="utf-8"), "human edit")
 
-    def test_rejects_escaping_and_symlinks(self):
+    def test_rejects_escaping_paths(self):
         for path in ("../outside.md", "/absolute.md", ".git/config.json"):
             with self.assertRaises(guard.GuardError):
                 self.assertIsNone(guard.inspect(self.root, "docs/pocket/handover", path, self.proposal))
-        (self.root / "docs").symlink_to(self.root, target_is_directory=True)
+    def test_rejects_symlinks_or_windows_junctions(self):
+        link = self.root / "docs"
+        try:
+            link.symlink_to(self.root, target_is_directory=True)
+        except OSError as error:
+            if getattr(error, "winerror", None) != 1314:
+                raise
+            subprocess.run(["cmd", "/c", "mklink", "/J", str(link), str(self.root)],
+                           check=True, capture_output=True)
         with self.assertRaises(guard.GuardError):
             self.preview()
 

@@ -27,10 +27,10 @@ export declare const zh: {
     readonly groupCommon: "常用";
     readonly groupCommonHelp: "常用入口可自行编辑；按当前任务选择，不要求逐个执行。";
     readonly groupRequirementsHelp: "可点击「下一步」判断应进入的阶段或需确认的内容。建议：澄清 → 分析 → 风险扫描 → 业务方案 → 边界、数据状态和异常检查 → 页面规格 → 页面一致性校验 → 生图（提示词或 HTML 页面）。";
-    readonly groupDevelopmentHelp: "建议：按需咨询、研究和需求讨论 → 固化需求 → 拆分工单 → 编码或测试驱动开发 → 代码审查 → 修复 → 编译 → 健康验收 → 提交代码。领域建模、原型、架构优化、排查和复盘按需使用。";
+    readonly groupDevelopmentHelp: "建议：需求讨论 → 固化需求 → 拆分工单 → 编码 → 代码审查 → 修复 → 编译 → 提交代码。性能优化和排查按需使用。";
     readonly groupDocumentsHelp: "建议：需求文档 → 总体设计 → 概要设计 → 数据库设计和接口文档；按需补充、融合，最后转换 Word。";
     readonly groupHandoverHelp: "建议：先追溯需求，再整理排查资料；需要整合资料时使用文档融合。";
-    readonly groupOthersHelp: "按需使用：可视化讨论用于澄清界面决策；代码图谱先创建再更新；绘图和交互生成按任务选择。";
+    readonly groupOthersHelp: "按需使用：咨询、研究、架构优化、项目重构、技术升级、测试驱动开发、远程调试和健康验收；可视化讨论用于澄清界面决策，代码图谱先创建再更新，绘图和交互生成按任务选择。";
     readonly setupLabel: "初始化";
     readonly confirmLabel: "确认";
     readonly confirmTooltip: "一键确认上一条模型回复中明确推荐的方案并发送；高风险操作仍需单独批准。";

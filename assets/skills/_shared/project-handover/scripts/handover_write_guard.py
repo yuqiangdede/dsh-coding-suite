@@ -48,8 +48,12 @@ def safe_targets(workspace: Path, docs_root: str, target: str) -> tuple[Path, Pa
     current = workspace
     for piece in (*doc_parts, *target_parts):
         current = current / piece
-        if current.is_symlink():
-            raise GuardError("symlink target is prohibited")
+        try:
+            attributes = getattr(current.lstat(), "st_file_attributes", 0)
+        except FileNotFoundError:
+            attributes = 0
+        if current.is_symlink() or attributes & 0x400:
+            raise GuardError("symlink or junction target is prohibited")
     docs = workspace.joinpath(*doc_parts)
     destination = docs.joinpath(*target_parts)
     if not destination.is_relative_to(docs):

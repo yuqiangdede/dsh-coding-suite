@@ -4,23 +4,36 @@ from pathlib import Path
 import subprocess
 import sys
 import tempfile
+import time
 import unittest
 
 SCRIPT = Path(__file__).with_name("auto_reconcile.py")
 
 
 def command(*args, cwd=None):
+    if args and args[0] == "git":
+        args = ("git", "-c", "gc.auto=0", "-c", "maintenance.auto=false", *args[1:])
     return subprocess.run(args, cwd=cwd, text=True, capture_output=True, check=True)
 
 
 class SetupReconcileTests(unittest.TestCase):
     def setUp(self):
         self.temp = tempfile.TemporaryDirectory()
-        self.addCleanup(self.temp.cleanup)
+        self.addCleanup(self.cleanup_temp)
         self.root = Path(self.temp.name)
         command("git", "init", "-q", str(self.root))
         command("git", "config", "user.email", "test@example.invalid", cwd=self.root)
         command("git", "config", "user.name", "Test", cwd=self.root)
+
+    def cleanup_temp(self):
+        for attempt in range(20):
+            try:
+                self.temp.cleanup()
+                return
+            except PermissionError as error:
+                if getattr(error, "winerror", None) != 32 or attempt == 19:
+                    raise
+                time.sleep(0.1)
 
     def seed(self):
         folder = self.root / "docs" / "Integration"

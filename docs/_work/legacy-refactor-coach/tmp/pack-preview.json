@@ -1,0 +1,2386 @@
+[
+  {
+    "id": "dsh-coding-suite@0.2.5",
+    "name": "dsh-coding-suite",
+    "version": "0.2.5",
+    "size": 805295,
+    "unpackedSize": 2511317,
+    "shasum": "b512b23e370765ffa71cbf6187f7095e2473a644",
+    "integrity": "sha512-OLiYB85ZoekYmbv19PAS00EllsjevBKuzAhppBx3Ut3MYbvAHlaWDzcdOgMF0wYSREC4bvZ+itdMm0n24yyyUA==",
+    "filename": "dsh-coding-suite-0.2.5.tgz",
+    "files": [
+      {
+        "path": "LICENSE",
+        "size": 1068,
+        "mode": 420
+      },
+      {
+        "path": "README.md",
+        "size": 21400,
+        "mode": 420
+      },
+      {
+        "path": "assets/skills/_shared/ARTIFACT_LAYOUT.md",
+        "size": 1926,
+        "mode": 420
+      },
+      {
+        "path": "assets/skills/_shared/business-diagnostics/protocol.md",
+        "size": 3705,
+        "mode": 420
+      },
+      {
+        "path": "assets/skills/_shared/DOCUMENT_AUTHORITY.md",
+        "size": 6953,
+        "mode": 420
+      },
+      {
+        "path": "assets/skills/_shared/EVIDENCE.md",
+        "size": 2748,
+        "mode": 420
+      },
+      {
+        "path": "assets/skills/_shared/POCKET_SETUP.md",
+        "size": 9168,
+        "mode": 420
+      },
+      {
+        "path": "assets/skills/_shared/PRODUCT_DEVELOPMENT.md",
+        "size": 5251,
+        "mode": 420
+      },
+      {
+        "path": "assets/skills/_shared/project-handover/evidence.md",
+        "size": 1612,
+        "mode": 420
+      },
+      {
+        "path": "assets/skills/_shared/project-handover/protocol.md",
+        "size": 2902,
+        "mode": 420
+      },
+      {
+        "path": "assets/skills/_shared/project-handover/scripts/handover_write_guard.py",
+        "size": 7236,
+        "mode": 420
+      },
+      {
+        "path": "assets/skills/_shared/project-handover/scripts/test_handover_write_guard.py",
+        "size": 3465,
+        "mode": 420
+      },
+      {
+        "path": "assets/skills/_shared/project-handover/templates.md",
+        "size": 2004,
+        "mode": 420
+      },
+      {
+        "path": "assets/skills/_shared/project-handover/updates.md",
+        "size": 1506,
+        "mode": 420
+      },
+      {
+        "path": "assets/skills/_shared/README.md",
+        "size": 11382,
+        "mode": 420
+      },
+      {
+        "path": "assets/skills/_shared/scripts/document_qa.py",
+        "size": 6344,
+        "mode": 420
+      },
+      {
+        "path": "assets/skills/_shared/scripts/document_workspace.py",
+        "size": 5121,
+        "mode": 420
+      },
+      {
+        "path": "assets/skills/_shared/scripts/docx_text_check.py",
+        "size": 2893,
+        "mode": 420
+      },
+      {
+        "path": "assets/skills/_shared/scripts/evidence_registry.py",
+        "size": 6713,
+        "mode": 420
+      },
+      {
+        "path": "assets/skills/_shared/scripts/job_checkpoint.py",
+        "size": 7217,
+        "mode": 420
+      },
+      {
+        "path": "assets/skills/_shared/scripts/source_inventory.py",
+        "size": 3788,
+        "mode": 420
+      },
+      {
+        "path": "assets/skills/_shared/scripts/test_checkpoint.py",
+        "size": 2986,
+        "mode": 420
+      },
+      {
+        "path": "assets/skills/_shared/scripts/test_document_tools.py",
+        "size": 5602,
+        "mode": 420
+      },
+      {
+        "path": "assets/skills/_shared/scripts/test_evidence_registry.py",
+        "size": 3527,
+        "mode": 420
+      },
+      {
+        "path": "assets/skills/_shared/SETUP_AUTO_DECISIONS.md",
+        "size": 3058,
+        "mode": 420
+      },
+      {
+        "path": "assets/skills/_shared/TOOLING_POLICY.md",
+        "size": 5285,
+        "mode": 420
+      },
+      {
+        "path": "assets/skills/_upstream/matt/LICENSE",
+        "size": 1089,
+        "mode": 420
+      },
+      {
+        "path": "assets/skills/_upstream/matt/skills/deprecated/README.md",
+        "size": 163,
+        "mode": 420
+      },
+      {
+        "path": "assets/skills/_upstream/matt/skills/engineering/ask-matt/agents/openai.yaml",
+        "size": 142,
+        "mode": 420
+      },
+      {
+        "path": "assets/skills/_upstream/matt/skills/engineering/ask-matt/PHASE-BOUNDARIES.md",
+        "size": 4304,
+        "mode": 420
+      },
+      {
+        "path": "assets/skills/_upstream/matt/skills/engineering/ask-matt/SKILL.md",
+        "size": 12691,
+        "mode": 420
+      },
+      {
+        "path": "assets/skills/_upstream/matt/skills/engineering/code-review/agents/openai.yaml",
+        "size": 103,
+        "mode": 420
+      },
+      {
+        "path": "assets/skills/_upstream/matt/skills/engineering/code-review/SKILL.md",
+        "size": 6810,
+        "mode": 420
+      },
+      {
+        "path": "assets/skills/_upstream/matt/skills/engineering/codebase-design/agents/openai.yaml",
+        "size": 105,
+        "mode": 420
+      },
+      {
+        "path": "assets/skills/_upstream/matt/skills/engineering/codebase-design/DEEPENING.md",
+        "size": 2590,
+        "mode": 420
+      },
+      {
+        "path": "assets/skills/_upstream/matt/skills/engineering/codebase-design/DESIGN-IT-TWICE.md",
+        "size": 2743,
+        "mode": 420
+      },
+      {
+        "path": "assets/skills/_upstream/matt/skills/engineering/codebase-design/SKILL.md",
+        "size": 6560,
+        "mode": 420
+      },
+      {
+        "path": "assets/skills/_upstream/matt/skills/engineering/diagnosing-bugs/agents/openai.yaml",
+        "size": 106,
+        "mode": 420
+      },
+      {
+        "path": "assets/skills/_upstream/matt/skills/engineering/diagnosing-bugs/scripts/hitl-loop.template.sh",
+        "size": 1360,
+        "mode": 420
+      },
+      {
+        "path": "assets/skills/_upstream/matt/skills/engineering/diagnosing-bugs/SKILL.md",
+        "size": 8802,
+        "mode": 420
+      },
+      {
+        "path": "assets/skills/_upstream/matt/skills/engineering/domain-modeling/ADR-FORMAT.md",
+        "size": 2780,
+        "mode": 420
+      },
+      {
+        "path": "assets/skills/_upstream/matt/skills/engineering/domain-modeling/agents/openai.yaml",
+        "size": 104,
+        "mode": 420
+      },
+      {
+        "path": "assets/skills/_upstream/matt/skills/engineering/domain-modeling/GLOSSARY-FORMAT.md",
+        "size": 2360,
+        "mode": 420
+      },
+      {
+        "path": "assets/skills/_upstream/matt/skills/engineering/domain-modeling/SKILL.md",
+        "size": 3420,
+        "mode": 420
+      },
+      {
+        "path": "assets/skills/_upstream/matt/skills/engineering/grill-with-docs/agents/openai.yaml",
+        "size": 150,
+        "mode": 420
+      },
+      {
+        "path": "assets/skills/_upstream/matt/skills/engineering/grill-with-docs/SKILL.md",
+        "size": 254,
+        "mode": 420
+      },
+      {
+        "path": "assets/skills/_upstream/matt/skills/engineering/implement-spec/agents/openai.yaml",
+        "size": 173,
+        "mode": 420
+      },
+      {
+        "path": "assets/skills/_upstream/matt/skills/engineering/implement-spec/SKILL.md",
+        "size": 2877,
+        "mode": 420
+      },
+      {
+        "path": "assets/skills/_upstream/matt/skills/engineering/implement/agents/openai.yaml",
+        "size": 144,
+        "mode": 420
+      },
+      {
+        "path": "assets/skills/_upstream/matt/skills/engineering/implement/SKILL.md",
+        "size": 639,
+        "mode": 420
+      },
+      {
+        "path": "assets/skills/_upstream/matt/skills/engineering/improve-codebase-architecture/agents/openai.yaml",
+        "size": 171,
+        "mode": 420
+      },
+      {
+        "path": "assets/skills/_upstream/matt/skills/engineering/improve-codebase-architecture/HTML-REPORT.md",
+        "size": 6764,
+        "mode": 420
+      },
+      {
+        "path": "assets/skills/_upstream/matt/skills/engineering/improve-codebase-architecture/SKILL.md",
+        "size": 6099,
+        "mode": 420
+      },
+      {
+        "path": "assets/skills/_upstream/matt/skills/engineering/pr/agents/openai.yaml",
+        "size": 96,
+        "mode": 420
+      },
+      {
+        "path": "assets/skills/_upstream/matt/skills/engineering/pr/CREDITS.md",
+        "size": 607,
+        "mode": 420
+      },
+      {
+        "path": "assets/skills/_upstream/matt/skills/engineering/pr/SKILL.md",
+        "size": 4339,
+        "mode": 420
+      },
+      {
+        "path": "assets/skills/_upstream/matt/skills/engineering/prototype/agents/openai.yaml",
+        "size": 103,
+        "mode": 420
+      },
+      {
+        "path": "assets/skills/_upstream/matt/skills/engineering/prototype/LOGIC.md",
+        "size": 6103,
+        "mode": 420
+      },
+      {
+        "path": "assets/skills/_upstream/matt/skills/engineering/prototype/SKILL.md",
+        "size": 2957,
+        "mode": 420
+      },
+      {
+        "path": "assets/skills/_upstream/matt/skills/engineering/prototype/UI.md",
+        "size": 7025,
+        "mode": 420
+      },
+      {
+        "path": "assets/skills/_upstream/matt/skills/engineering/README.md",
+        "size": 4321,
+        "mode": 420
+      },
+      {
+        "path": "assets/skills/_upstream/matt/skills/engineering/research/agents/openai.yaml",
+        "size": 97,
+        "mode": 420
+      },
+      {
+        "path": "assets/skills/_upstream/matt/skills/engineering/research/SKILL.md",
+        "size": 844,
+        "mode": 420
+      },
+      {
+        "path": "assets/skills/_upstream/matt/skills/engineering/retro/agents/openai.yaml",
+        "size": 151,
+        "mode": 420
+      },
+      {
+        "path": "assets/skills/_upstream/matt/skills/engineering/retro/SKILL.md",
+        "size": 4413,
+        "mode": 420
+      },
+      {
+        "path": "assets/skills/_upstream/matt/skills/engineering/setup-matt-pocock-skills/agents/openai.yaml",
+        "size": 157,
+        "mode": 420
+      },
+      {
+        "path": "assets/skills/_upstream/matt/skills/engineering/setup-matt-pocock-skills/domain.md",
+        "size": 2093,
+        "mode": 420
+      },
+      {
+        "path": "assets/skills/_upstream/matt/skills/engineering/setup-matt-pocock-skills/issue-tracker-github.md",
+        "size": 5132,
+        "mode": 420
+      },
+      {
+        "path": "assets/skills/_upstream/matt/skills/engineering/setup-matt-pocock-skills/issue-tracker-gitlab.md",
+        "size": 4025,
+        "mode": 420
+      },
+      {
+        "path": "assets/skills/_upstream/matt/skills/engineering/setup-matt-pocock-skills/issue-tracker-local.md",
+        "size": 1840,
+        "mode": 420
+      },
+      {
+        "path": "assets/skills/_upstream/matt/skills/engineering/setup-matt-pocock-skills/SKILL.md",
+        "size": 7646,
+        "mode": 420
+      },
+      {
+        "path": "assets/skills/_upstream/matt/skills/engineering/setup-matt-pocock-skills/triage-labels.md",
+        "size": 1072,
+        "mode": 420
+      },
+      {
+        "path": "assets/skills/_upstream/matt/skills/engineering/tdd/agents/openai.yaml",
+        "size": 90,
+        "mode": 420
+      },
+      {
+        "path": "assets/skills/_upstream/matt/skills/engineering/tdd/mocking.md",
+        "size": 1540,
+        "mode": 420
+      },
+      {
+        "path": "assets/skills/_upstream/matt/skills/engineering/tdd/SKILL.md",
+        "size": 3667,
+        "mode": 420
+      },
+      {
+        "path": "assets/skills/_upstream/matt/skills/engineering/tdd/tests.md",
+        "size": 2291,
+        "mode": 420
+      },
+      {
+        "path": "assets/skills/_upstream/matt/skills/engineering/to-spec/agents/openai.yaml",
+        "size": 140,
+        "mode": 420
+      },
+      {
+        "path": "assets/skills/_upstream/matt/skills/engineering/to-spec/SKILL.md",
+        "size": 3118,
+        "mode": 420
+      },
+      {
+        "path": "assets/skills/_upstream/matt/skills/engineering/to-tickets/agents/openai.yaml",
+        "size": 151,
+        "mode": 420
+      },
+      {
+        "path": "assets/skills/_upstream/matt/skills/engineering/to-tickets/SKILL.md",
+        "size": 5917,
+        "mode": 420
+      },
+      {
+        "path": "assets/skills/_upstream/matt/skills/engineering/triage/AGENT-BRIEF.md",
+        "size": 8149,
+        "mode": 420
+      },
+      {
+        "path": "assets/skills/_upstream/matt/skills/engineering/triage/agents/openai.yaml",
+        "size": 140,
+        "mode": 420
+      },
+      {
+        "path": "assets/skills/_upstream/matt/skills/engineering/triage/OUT-OF-SCOPE.md",
+        "size": 4772,
+        "mode": 420
+      },
+      {
+        "path": "assets/skills/_upstream/matt/skills/engineering/triage/SKILL.md",
+        "size": 6670,
+        "mode": 420
+      },
+      {
+        "path": "assets/skills/_upstream/matt/skills/engineering/wayfinder/agents/openai.yaml",
+        "size": 149,
+        "mode": 420
+      },
+      {
+        "path": "assets/skills/_upstream/matt/skills/engineering/wayfinder/SKILL.md",
+        "size": 12536,
+        "mode": 420
+      },
+      {
+        "path": "assets/skills/_upstream/matt/skills/engineering/wizard/agents/openai.yaml",
+        "size": 99,
+        "mode": 420
+      },
+      {
+        "path": "assets/skills/_upstream/matt/skills/engineering/wizard/SKILL.md",
+        "size": 4167,
+        "mode": 420
+      },
+      {
+        "path": "assets/skills/_upstream/matt/skills/engineering/wizard/template.sh",
+        "size": 9721,
+        "mode": 420
+      },
+      {
+        "path": "assets/skills/_upstream/matt/skills/in-progress/chief-of-staff/agents/openai.yaml",
+        "size": 189,
+        "mode": 420
+      },
+      {
+        "path": "assets/skills/_upstream/matt/skills/in-progress/chief-of-staff/SKILL.md",
+        "size": 4804,
+        "mode": 420
+      },
+      {
+        "path": "assets/skills/_upstream/matt/skills/in-progress/claude-handoff/agents/openai.yaml",
+        "size": 146,
+        "mode": 420
+      },
+      {
+        "path": "assets/skills/_upstream/matt/skills/in-progress/claude-handoff/SKILL.md",
+        "size": 1442,
+        "mode": 420
+      },
+      {
+        "path": "assets/skills/_upstream/matt/skills/in-progress/loop-me/agents/openai.yaml",
+        "size": 145,
+        "mode": 420
+      },
+      {
+        "path": "assets/skills/_upstream/matt/skills/in-progress/loop-me/SKILL.md",
+        "size": 2554,
+        "mode": 420
+      },
+      {
+        "path": "assets/skills/_upstream/matt/skills/in-progress/README.md",
+        "size": 1900,
+        "mode": 420
+      },
+      {
+        "path": "assets/skills/_upstream/matt/skills/in-progress/setup-ts-deep-modules/agents/openai.yaml",
+        "size": 154,
+        "mode": 420
+      },
+      {
+        "path": "assets/skills/_upstream/matt/skills/in-progress/setup-ts-deep-modules/dependency-cruiser.config.cjs",
+        "size": 3807,
+        "mode": 420
+      },
+      {
+        "path": "assets/skills/_upstream/matt/skills/in-progress/setup-ts-deep-modules/SKILL.md",
+        "size": 7648,
+        "mode": 420
+      },
+      {
+        "path": "assets/skills/_upstream/matt/skills/in-progress/software-factory/EXAMPLE-TASKS.md",
+        "size": 3811,
+        "mode": 420
+      },
+      {
+        "path": "assets/skills/_upstream/matt/skills/in-progress/software-factory/GIT-HOSTS.md",
+        "size": 7790,
+        "mode": 420
+      },
+      {
+        "path": "assets/skills/_upstream/matt/skills/in-progress/software-factory/OBSERVABILITY-PLATFORMS.md",
+        "size": 7924,
+        "mode": 420
+      },
+      {
+        "path": "assets/skills/_upstream/matt/skills/in-progress/software-factory/RUNNERS.md",
+        "size": 8832,
+        "mode": 420
+      },
+      {
+        "path": "assets/skills/_upstream/matt/skills/in-progress/software-factory/SKILL.md",
+        "size": 6097,
+        "mode": 420
+      },
+      {
+        "path": "assets/skills/_upstream/matt/skills/in-progress/software-factory/TICKET-TRACKERS.md",
+        "size": 8550,
+        "mode": 420
+      },
+      {
+        "path": "assets/skills/_upstream/matt/skills/in-progress/writing-beats/agents/openai.yaml",
+        "size": 147,
+        "mode": 420
+      },
+      {
+        "path": "assets/skills/_upstream/matt/skills/in-progress/writing-beats/SKILL.md",
+        "size": 4922,
+        "mode": 420
+      },
+      {
+        "path": "assets/skills/_upstream/matt/skills/in-progress/writing-fragments/agents/openai.yaml",
+        "size": 145,
+        "mode": 420
+      },
+      {
+        "path": "assets/skills/_upstream/matt/skills/in-progress/writing-fragments/SKILL.md",
+        "size": 3637,
+        "mode": 420
+      },
+      {
+        "path": "assets/skills/_upstream/matt/skills/in-progress/writing-shape/agents/openai.yaml",
+        "size": 149,
+        "mode": 420
+      },
+      {
+        "path": "assets/skills/_upstream/matt/skills/in-progress/writing-shape/SKILL.md",
+        "size": 6001,
+        "mode": 420
+      },
+      {
+        "path": "assets/skills/_upstream/matt/skills/misc/git-guardrails-claude-code/agents/openai.yaml",
+        "size": 115,
+        "mode": 420
+      },
+      {
+        "path": "assets/skills/_upstream/matt/skills/misc/git-guardrails-claude-code/scripts/block-dangerous-git.sh",
+        "size": 532,
+        "mode": 420
+      },
+      {
+        "path": "assets/skills/_upstream/matt/skills/misc/git-guardrails-claude-code/SKILL.md",
+        "size": 2408,
+        "mode": 420
+      },
+      {
+        "path": "assets/skills/_upstream/matt/skills/misc/migrate-to-shoehorn/agents/openai.yaml",
+        "size": 113,
+        "mode": 420
+      },
+      {
+        "path": "assets/skills/_upstream/matt/skills/misc/migrate-to-shoehorn/SKILL.md",
+        "size": 2913,
+        "mode": 420
+      },
+      {
+        "path": "assets/skills/_upstream/matt/skills/misc/README.md",
+        "size": 692,
+        "mode": 420
+      },
+      {
+        "path": "assets/skills/_upstream/matt/skills/misc/scaffold-exercises/agents/openai.yaml",
+        "size": 111,
+        "mode": 420
+      },
+      {
+        "path": "assets/skills/_upstream/matt/skills/misc/scaffold-exercises/SKILL.md",
+        "size": 3695,
+        "mode": 420
+      },
+      {
+        "path": "assets/skills/_upstream/matt/skills/misc/setup-pre-commit/agents/openai.yaml",
+        "size": 102,
+        "mode": 420
+      },
+      {
+        "path": "assets/skills/_upstream/matt/skills/misc/setup-pre-commit/SKILL.md",
+        "size": 2349,
+        "mode": 420
+      },
+      {
+        "path": "assets/skills/_upstream/matt/skills/productivity/grill-me/agents/openai.yaml",
+        "size": 142,
+        "mode": 420
+      },
+      {
+        "path": "assets/skills/_upstream/matt/skills/productivity/grill-me/SKILL.md",
+        "size": 164,
+        "mode": 420
+      },
+      {
+        "path": "assets/skills/_upstream/matt/skills/productivity/grilling/agents/openai.yaml",
+        "size": 116,
+        "mode": 420
+      },
+      {
+        "path": "assets/skills/_upstream/matt/skills/productivity/grilling/SKILL.md",
+        "size": 2107,
+        "mode": 420
+      },
+      {
+        "path": "assets/skills/_upstream/matt/skills/productivity/handoff/agents/openai.yaml",
+        "size": 146,
+        "mode": 420
+      },
+      {
+        "path": "assets/skills/_upstream/matt/skills/productivity/handoff/SKILL.md",
+        "size": 956,
+        "mode": 420
+      },
+      {
+        "path": "assets/skills/_upstream/matt/skills/productivity/README.md",
+        "size": 1501,
+        "mode": 420
+      },
+      {
+        "path": "assets/skills/_upstream/matt/skills/productivity/teach/agents/openai.yaml",
+        "size": 144,
+        "mode": 420
+      },
+      {
+        "path": "assets/skills/_upstream/matt/skills/productivity/teach/GLOSSARY-FORMAT.md",
+        "size": 2157,
+        "mode": 420
+      },
+      {
+        "path": "assets/skills/_upstream/matt/skills/productivity/teach/LEARNING-RECORD-FORMAT.md",
+        "size": 2793,
+        "mode": 420
+      },
+      {
+        "path": "assets/skills/_upstream/matt/skills/productivity/teach/MISSION-FORMAT.md",
+        "size": 1571,
+        "mode": 420
+      },
+      {
+        "path": "assets/skills/_upstream/matt/skills/productivity/teach/RESOURCES-FORMAT.md",
+        "size": 1956,
+        "mode": 420
+      },
+      {
+        "path": "assets/skills/_upstream/matt/skills/productivity/teach/SKILL.md",
+        "size": 9873,
+        "mode": 420
+      },
+      {
+        "path": "assets/skills/_upstream/matt/skills/productivity/to-questionnaire/agents/openai.yaml",
+        "size": 171,
+        "mode": 420
+      },
+      {
+        "path": "assets/skills/_upstream/matt/skills/productivity/to-questionnaire/SKILL.md",
+        "size": 2958,
+        "mode": 420
+      },
+      {
+        "path": "assets/skills/_upstream/matt/skills/productivity/wait-what/agents/openai.yaml",
+        "size": 163,
+        "mode": 420
+      },
+      {
+        "path": "assets/skills/_upstream/matt/skills/productivity/wait-what/SKILL.md",
+        "size": 403,
+        "mode": 420
+      },
+      {
+        "path": "assets/skills/_upstream/matt/skills/productivity/writing-for-agents/agents/openai.yaml",
+        "size": 105,
+        "mode": 420
+      },
+      {
+        "path": "assets/skills/_upstream/matt/skills/productivity/writing-for-agents/SKILL-MECHANICS.md",
+        "size": 2651,
+        "mode": 420
+      },
+      {
+        "path": "assets/skills/_upstream/matt/skills/productivity/writing-for-agents/SKILL.md",
+        "size": 10967,
+        "mode": 420
+      },
+      {
+        "path": "assets/skills/api-integration-docs/references/markdown-templates.md",
+        "size": 7995,
+        "mode": 420
+      },
+      {
+        "path": "assets/skills/api-integration-docs/references/quality-check.md",
+        "size": 2849,
+        "mode": 420
+      },
+      {
+        "path": "assets/skills/api-integration-docs/references/source-analysis.md",
+        "size": 3840,
+        "mode": 420
+      },
+      {
+        "path": "assets/skills/api-integration-docs/references/source-reconciliation.md",
+        "size": 2755,
+        "mode": 420
+      },
+      {
+        "path": "assets/skills/api-integration-docs/SKILL.md",
+        "size": 11090,
+        "mode": 420
+      },
+      {
+        "path": "assets/skills/ask-matt/agents/openai.yaml",
+        "size": 142,
+        "mode": 420
+      },
+      {
+        "path": "assets/skills/ask-matt/LICENSE",
+        "size": 1068,
+        "mode": 420
+      },
+      {
+        "path": "assets/skills/ask-matt/PHASE-BOUNDARIES.md",
+        "size": 4304,
+        "mode": 420
+      },
+      {
+        "path": "assets/skills/ask-matt/SKILL.md",
+        "size": 2323,
+        "mode": 420
+      },
+      {
+        "path": "assets/skills/chief-of-staff/agents/openai.yaml",
+        "size": 189,
+        "mode": 420
+      },
+      {
+        "path": "assets/skills/chief-of-staff/SKILL.md",
+        "size": 4804,
+        "mode": 420
+      },
+      {
+        "path": "assets/skills/claude-handoff/agents/openai.yaml",
+        "size": 146,
+        "mode": 420
+      },
+      {
+        "path": "assets/skills/claude-handoff/SKILL.md",
+        "size": 1442,
+        "mode": 420
+      },
+      {
+        "path": "assets/skills/code-review/agents/openai.yaml",
+        "size": 103,
+        "mode": 420
+      },
+      {
+        "path": "assets/skills/code-review/LICENSE",
+        "size": 1068,
+        "mode": 420
+      },
+      {
+        "path": "assets/skills/code-review/SKILL.md",
+        "size": 2742,
+        "mode": 420
+      },
+      {
+        "path": "assets/skills/codebase-design/agents/openai.yaml",
+        "size": 105,
+        "mode": 420
+      },
+      {
+        "path": "assets/skills/codebase-design/DEEPENING.md",
+        "size": 2590,
+        "mode": 420
+      },
+      {
+        "path": "assets/skills/codebase-design/DESIGN-IT-TWICE.md",
+        "size": 2743,
+        "mode": 420
+      },
+      {
+        "path": "assets/skills/codebase-design/LICENSE",
+        "size": 1068,
+        "mode": 420
+      },
+      {
+        "path": "assets/skills/codebase-design/SKILL.md",
+        "size": 6560,
+        "mode": 420
+      },
+      {
+        "path": "assets/skills/component-doc-merge/references/intake-and-format.md",
+        "size": 4638,
+        "mode": 420
+      },
+      {
+        "path": "assets/skills/component-doc-merge/references/merge-rules.md",
+        "size": 6222,
+        "mode": 420
+      },
+      {
+        "path": "assets/skills/component-doc-merge/SKILL.md",
+        "size": 8439,
+        "mode": 420
+      },
+      {
+        "path": "assets/skills/database-design-doc/references/analysis-rules.md",
+        "size": 3723,
+        "mode": 420
+      },
+      {
+        "path": "assets/skills/database-design-doc/references/document-template.md",
+        "size": 5367,
+        "mode": 420
+      },
+      {
+        "path": "assets/skills/database-design-doc/SKILL.md",
+        "size": 11966,
+        "mode": 420
+      },
+      {
+        "path": "assets/skills/diagnose-function-logs/SKILL.md",
+        "size": 1162,
+        "mode": 420
+      },
+      {
+        "path": "assets/skills/diagnose-function-page/SKILL.md",
+        "size": 1182,
+        "mode": 420
+      },
+      {
+        "path": "assets/skills/diagnose-performance-logs/SKILL.md",
+        "size": 2349,
+        "mode": 420
+      },
+      {
+        "path": "assets/skills/diagnose-performance-page/SKILL.md",
+        "size": 2324,
+        "mode": 420
+      },
+      {
+        "path": "assets/skills/diagnosing-bugs/agents/openai.yaml",
+        "size": 106,
+        "mode": 420
+      },
+      {
+        "path": "assets/skills/diagnosing-bugs/LICENSE",
+        "size": 1068,
+        "mode": 420
+      },
+      {
+        "path": "assets/skills/diagnosing-bugs/scripts/hitl-loop.template.sh",
+        "size": 1360,
+        "mode": 420
+      },
+      {
+        "path": "assets/skills/diagnosing-bugs/SKILL.md",
+        "size": 8680,
+        "mode": 420
+      },
+      {
+        "path": "assets/skills/domain-modeling/ADR-FORMAT.md",
+        "size": 2780,
+        "mode": 420
+      },
+      {
+        "path": "assets/skills/domain-modeling/agents/openai.yaml",
+        "size": 104,
+        "mode": 420
+      },
+      {
+        "path": "assets/skills/domain-modeling/CONTEXT-FORMAT.md",
+        "size": 2291,
+        "mode": 420
+      },
+      {
+        "path": "assets/skills/domain-modeling/GLOSSARY-FORMAT.md",
+        "size": 2360,
+        "mode": 420
+      },
+      {
+        "path": "assets/skills/domain-modeling/LICENSE",
+        "size": 1068,
+        "mode": 420
+      },
+      {
+        "path": "assets/skills/domain-modeling/SKILL.md",
+        "size": 3208,
+        "mode": 420
+      },
+      {
+        "path": "assets/skills/git-guardrails-claude-code/agents/openai.yaml",
+        "size": 115,
+        "mode": 420
+      },
+      {
+        "path": "assets/skills/git-guardrails-claude-code/scripts/block-dangerous-git.sh",
+        "size": 532,
+        "mode": 420
+      },
+      {
+        "path": "assets/skills/git-guardrails-claude-code/SKILL.md",
+        "size": 2408,
+        "mode": 420
+      },
+      {
+        "path": "assets/skills/graphify-navigation/SKILL.md",
+        "size": 3981,
+        "mode": 420
+      },
+      {
+        "path": "assets/skills/grill-me/agents/openai.yaml",
+        "size": 142,
+        "mode": 420
+      },
+      {
+        "path": "assets/skills/grill-me/SKILL.md",
+        "size": 164,
+        "mode": 420
+      },
+      {
+        "path": "assets/skills/grill-with-docs/agents/openai.yaml",
+        "size": 150,
+        "mode": 420
+      },
+      {
+        "path": "assets/skills/grill-with-docs/LICENSE",
+        "size": 1068,
+        "mode": 420
+      },
+      {
+        "path": "assets/skills/grill-with-docs/SKILL.md",
+        "size": 254,
+        "mode": 420
+      },
+      {
+        "path": "assets/skills/grill-with-ui/LICENSE",
+        "size": 1065,
+        "mode": 420
+      },
+      {
+        "path": "assets/skills/grill-with-ui/page.html",
+        "size": 56542,
+        "mode": 420
+      },
+      {
+        "path": "assets/skills/grill-with-ui/server.mjs",
+        "size": 29229,
+        "mode": 420
+      },
+      {
+        "path": "assets/skills/grill-with-ui/SKILL.md",
+        "size": 31630,
+        "mode": 420
+      },
+      {
+        "path": "assets/skills/grill-with-ui/visual-brief.md",
+        "size": 1951,
+        "mode": 420
+      },
+      {
+        "path": "assets/skills/grilling/agents/openai.yaml",
+        "size": 116,
+        "mode": 420
+      },
+      {
+        "path": "assets/skills/grilling/LICENSE",
+        "size": 1068,
+        "mode": 420
+      },
+      {
+        "path": "assets/skills/grilling/SKILL.md",
+        "size": 2107,
+        "mode": 420
+      },
+      {
+        "path": "assets/skills/handoff/agents/openai.yaml",
+        "size": 146,
+        "mode": 420
+      },
+      {
+        "path": "assets/skills/handoff/LICENSE",
+        "size": 1068,
+        "mode": 420
+      },
+      {
+        "path": "assets/skills/handoff/SKILL.md",
+        "size": 956,
+        "mode": 420
+      },
+      {
+        "path": "assets/skills/implement-spec/agents/openai.yaml",
+        "size": 173,
+        "mode": 420
+      },
+      {
+        "path": "assets/skills/implement-spec/SKILL.md",
+        "size": 2877,
+        "mode": 420
+      },
+      {
+        "path": "assets/skills/implement/agents/openai.yaml",
+        "size": 144,
+        "mode": 420
+      },
+      {
+        "path": "assets/skills/implement/LICENSE",
+        "size": 1068,
+        "mode": 420
+      },
+      {
+        "path": "assets/skills/implement/SKILL.md",
+        "size": 1393,
+        "mode": 420
+      },
+      {
+        "path": "assets/skills/improve-codebase-architecture/agents/openai.yaml",
+        "size": 171,
+        "mode": 420
+      },
+      {
+        "path": "assets/skills/improve-codebase-architecture/HTML-REPORT.md",
+        "size": 6764,
+        "mode": 420
+      },
+      {
+        "path": "assets/skills/improve-codebase-architecture/LICENSE",
+        "size": 1068,
+        "mode": 420
+      },
+      {
+        "path": "assets/skills/improve-codebase-architecture/SKILL.md",
+        "size": 6069,
+        "mode": 420
+      },
+      {
+        "path": "assets/skills/legacy-refactor-coach/references/architecture.md",
+        "size": 5150,
+        "mode": 420
+      },
+      {
+        "path": "assets/skills/legacy-refactor-coach/references/backend-java.md",
+        "size": 2257,
+        "mode": 420
+      },
+      {
+        "path": "assets/skills/legacy-refactor-coach/references/discovery.md",
+        "size": 3847,
+        "mode": 420
+      },
+      {
+        "path": "assets/skills/legacy-refactor-coach/references/frontend-vue.md",
+        "size": 2309,
+        "mode": 420
+      },
+      {
+        "path": "assets/skills/legacy-refactor-coach/references/migration.md",
+        "size": 4055,
+        "mode": 420
+      },
+      {
+        "path": "assets/skills/legacy-refactor-coach/references/templates.md",
+        "size": 5692,
+        "mode": 420
+      },
+      {
+        "path": "assets/skills/legacy-refactor-coach/references/verification.md",
+        "size": 6057,
+        "mode": 420
+      },
+      {
+        "path": "assets/skills/legacy-refactor-coach/references/workflow.md",
+        "size": 9145,
+        "mode": 420
+      },
+      {
+        "path": "assets/skills/legacy-refactor-coach/SKILL.md",
+        "size": 5361,
+        "mode": 420
+      },
+      {
+        "path": "assets/skills/legacy-refactor-coach/source-manifest.json",
+        "size": 5151,
+        "mode": 420
+      },
+      {
+        "path": "assets/skills/loop-me/agents/openai.yaml",
+        "size": 145,
+        "mode": 420
+      },
+      {
+        "path": "assets/skills/loop-me/SKILL.md",
+        "size": 2554,
+        "mode": 420
+      },
+      {
+        "path": "assets/skills/markdown-to-docx/references/formats.md",
+        "size": 6164,
+        "mode": 420
+      },
+      {
+        "path": "assets/skills/markdown-to-docx/references/merge-and-convert.md",
+        "size": 3202,
+        "mode": 420
+      },
+      {
+        "path": "assets/skills/markdown-to-docx/references/verification.md",
+        "size": 6152,
+        "mode": 420
+      },
+      {
+        "path": "assets/skills/markdown-to-docx/scripts/convert.py",
+        "size": 23963,
+        "mode": 420
+      },
+      {
+        "path": "assets/skills/markdown-to-docx/scripts/document_content_check.py",
+        "size": 7071,
+        "mode": 420
+      },
+      {
+        "path": "assets/skills/markdown-to-docx/scripts/test_convert.py",
+        "size": 11472,
+        "mode": 420
+      },
+      {
+        "path": "assets/skills/markdown-to-docx/scripts/test_document_content_check.py",
+        "size": 4871,
+        "mode": 420
+      },
+      {
+        "path": "assets/skills/markdown-to-docx/SKILL.md",
+        "size": 8997,
+        "mode": 420
+      },
+      {
+        "path": "assets/skills/markdown-to-xlsx/SKILL.md",
+        "size": 1398,
+        "mode": 420
+      },
+      {
+        "path": "assets/skills/MATT-LICENSE",
+        "size": 1068,
+        "mode": 420
+      },
+      {
+        "path": "assets/skills/matt-source.json",
+        "size": 37543,
+        "mode": 420
+      },
+      {
+        "path": "assets/skills/migrate-to-shoehorn/agents/openai.yaml",
+        "size": 113,
+        "mode": 420
+      },
+      {
+        "path": "assets/skills/migrate-to-shoehorn/SKILL.md",
+        "size": 2913,
+        "mode": 420
+      },
+      {
+        "path": "assets/skills/outline-design/references/analysis.md",
+        "size": 6341,
+        "mode": 420
+      },
+      {
+        "path": "assets/skills/outline-design/references/delivery.md",
+        "size": 2233,
+        "mode": 420
+      },
+      {
+        "path": "assets/skills/outline-design/references/design-template.md",
+        "size": 6870,
+        "mode": 420
+      },
+      {
+        "path": "assets/skills/outline-design/references/diagrams.md",
+        "size": 4745,
+        "mode": 420
+      },
+      {
+        "path": "assets/skills/outline-design/references/source-and-merge.md",
+        "size": 6832,
+        "mode": 420
+      },
+      {
+        "path": "assets/skills/outline-design/SKILL.md",
+        "size": 14280,
+        "mode": 420
+      },
+      {
+        "path": "assets/skills/overall-design/references/analysis.md",
+        "size": 6341,
+        "mode": 420
+      },
+      {
+        "path": "assets/skills/overall-design/references/delivery.md",
+        "size": 2482,
+        "mode": 420
+      },
+      {
+        "path": "assets/skills/overall-design/references/design-template.md",
+        "size": 6230,
+        "mode": 420
+      },
+      {
+        "path": "assets/skills/overall-design/references/diagrams.md",
+        "size": 4772,
+        "mode": 420
+      },
+      {
+        "path": "assets/skills/overall-design/references/source-and-merge.md",
+        "size": 6832,
+        "mode": 420
+      },
+      {
+        "path": "assets/skills/overall-design/SKILL.md",
+        "size": 15085,
+        "mode": 420
+      },
+      {
+        "path": "assets/skills/pocket-maintenance/SKILL.md",
+        "size": 5200,
+        "mode": 420
+      },
+      {
+        "path": "assets/skills/pr/agents/openai.yaml",
+        "size": 96,
+        "mode": 420
+      },
+      {
+        "path": "assets/skills/pr/CREDITS.md",
+        "size": 607,
+        "mode": 420
+      },
+      {
+        "path": "assets/skills/pr/LICENSE",
+        "size": 1068,
+        "mode": 420
+      },
+      {
+        "path": "assets/skills/pr/SKILL.md",
+        "size": 4234,
+        "mode": 420
+      },
+      {
+        "path": "assets/skills/prd-writing/SKILL.md",
+        "size": 3138,
+        "mode": 420
+      },
+      {
+        "path": "assets/skills/product-consistency-gate/SKILL.md",
+        "size": 1500,
+        "mode": 420
+      },
+      {
+        "path": "assets/skills/PRODUCT-DEVELOPMENT-LICENSE",
+        "size": 11357,
+        "mode": 420
+      },
+      {
+        "path": "assets/skills/PRODUCT-DEVELOPMENT-NOTICE",
+        "size": 361,
+        "mode": 420
+      },
+      {
+        "path": "assets/skills/product-development-pipeline/README.md",
+        "size": 2605,
+        "mode": 420
+      },
+      {
+        "path": "assets/skills/product-development-pipeline/references/data-dashboard/数据大屏 页面规格.md",
+        "size": 6108,
+        "mode": 420
+      },
+      {
+        "path": "assets/skills/product-development-pipeline/references/feature-implementation/四步需求到实现协议 算法版本.md",
+        "size": 4851,
+        "mode": 420
+      },
+      {
+        "path": "assets/skills/product-development-pipeline/references/feature-implementation/四步需求到实现协议 通用版本.md",
+        "size": 4649,
+        "mode": 420
+      },
+      {
+        "path": "assets/skills/product-development-pipeline/references/interaction-rendering/草图转换为正式图.md",
+        "size": 1824,
+        "mode": 420
+      },
+      {
+        "path": "assets/skills/product-development-pipeline/references/interaction-rendering/页面规格渲染.md",
+        "size": 4627,
+        "mode": 420
+      },
+      {
+        "path": "assets/skills/product-development-pipeline/references/interaction-rendering/页面规格渲染html.md",
+        "size": 3970,
+        "mode": 420
+      },
+      {
+        "path": "assets/skills/product-development-pipeline/references/monolithic-version/99 单体版本提示词.md",
+        "size": 3762,
+        "mode": 420
+      },
+      {
+        "path": "assets/skills/product-development-pipeline/references/performance-optimization/01 流程梳理与性能优化.md",
+        "size": 2872,
+        "mode": 420
+      },
+      {
+        "path": "assets/skills/product-development-pipeline/references/requirement-analysis/完整的需求分析，输出UI页面规格V1.md",
+        "size": 10196,
+        "mode": 420
+      },
+      {
+        "path": "assets/skills/product-development-pipeline/references/requirement-analysis/完整的需求分析，输出UI页面规格V2.md",
+        "size": 5546,
+        "mode": 420
+      },
+      {
+        "path": "assets/skills/product-development-pipeline/references/requirement-analysis/精简的需求分析，输出UI页面规格.md",
+        "size": 3320,
+        "mode": 420
+      },
+      {
+        "path": "assets/skills/product-development-pipeline/references/requirement-analysis/输入模糊的功能性描述，输出UI页面规格.md",
+        "size": 5251,
+        "mode": 420
+      },
+      {
+        "path": "assets/skills/product-development-pipeline/references/requirement-analysis/需求发散分析.md",
+        "size": 2977,
+        "mode": 420
+      },
+      {
+        "path": "assets/skills/product-development-pipeline/references/流水线说明.md",
+        "size": 2261,
+        "mode": 420
+      },
+      {
+        "path": "assets/skills/product-development-pipeline/SKILL.md",
+        "size": 4592,
+        "mode": 420
+      },
+      {
+        "path": "assets/skills/product-development-pipeline/steps/01 问题澄清与反问.md",
+        "size": 1322,
+        "mode": 420
+      },
+      {
+        "path": "assets/skills/product-development-pipeline/steps/02 问题拆解.md",
+        "size": 1248,
+        "mode": 420
+      },
+      {
+        "path": "assets/skills/product-development-pipeline/steps/03 需求风险扫描.md",
+        "size": 1731,
+        "mode": 420
+      },
+      {
+        "path": "assets/skills/product-development-pipeline/steps/04 决策与方案对比.md",
+        "size": 1887,
+        "mode": 420
+      },
+      {
+        "path": "assets/skills/product-development-pipeline/steps/05 模块边界审计.md",
+        "size": 1608,
+        "mode": 420
+      },
+      {
+        "path": "assets/skills/product-development-pipeline/steps/06 数据模型与状态校验.md",
+        "size": 1882,
+        "mode": 420
+      },
+      {
+        "path": "assets/skills/product-development-pipeline/steps/07 关键流程异常枚举.md",
+        "size": 2038,
+        "mode": 420
+      },
+      {
+        "path": "assets/skills/product-development-pipeline/steps/08 PRD与页面规格.md",
+        "size": 1161,
+        "mode": 420
+      },
+      {
+        "path": "assets/skills/product-development-pipeline/steps/09 页面-流程-权限一致性校验.md",
+        "size": 2314,
+        "mode": 420
+      },
+      {
+        "path": "assets/skills/product-development-pipeline/steps/10 输出路由.md",
+        "size": 2701,
+        "mode": 420
+      },
+      {
+        "path": "assets/skills/product-development-source.json",
+        "size": 12135,
+        "mode": 420
+      },
+      {
+        "path": "assets/skills/product-exception-gate/SKILL.md",
+        "size": 1441,
+        "mode": 420
+      },
+      {
+        "path": "assets/skills/product-image-prompt/SKILL.md",
+        "size": 1972,
+        "mode": 420
+      },
+      {
+        "path": "assets/skills/product-module-gate/SKILL.md",
+        "size": 1418,
+        "mode": 420
+      },
+      {
+        "path": "assets/skills/product-prd-pages/SKILL.md",
+        "size": 1463,
+        "mode": 420
+      },
+      {
+        "path": "assets/skills/product-risk-gate/SKILL.md",
+        "size": 1442,
+        "mode": 420
+      },
+      {
+        "path": "assets/skills/product-state-gate/SKILL.md",
+        "size": 1453,
+        "mode": 420
+      },
+      {
+        "path": "assets/skills/project-handover-log-guide/SKILL.md",
+        "size": 12080,
+        "mode": 420
+      },
+      {
+        "path": "assets/skills/project-handover-requirement-summary/SKILL.md",
+        "size": 8665,
+        "mode": 420
+      },
+      {
+        "path": "assets/skills/project-knowledge-capture/references/storage-contract.md",
+        "size": 2613,
+        "mode": 420
+      },
+      {
+        "path": "assets/skills/project-knowledge-capture/SKILL.md",
+        "size": 3847,
+        "mode": 420
+      },
+      {
+        "path": "assets/skills/project-runtime-acceptance/assets/acceptance-report.md",
+        "size": 3869,
+        "mode": 420
+      },
+      {
+        "path": "assets/skills/project-runtime-acceptance/assets/project-policy.example.md",
+        "size": 1362,
+        "mode": 420
+      },
+      {
+        "path": "assets/skills/project-runtime-acceptance/assets/remediation-plan.md",
+        "size": 1046,
+        "mode": 420
+      },
+      {
+        "path": "assets/skills/project-runtime-acceptance/install.ps1",
+        "size": 507,
+        "mode": 420
+      },
+      {
+        "path": "assets/skills/project-runtime-acceptance/README.md",
+        "size": 5138,
+        "mode": 420
+      },
+      {
+        "path": "assets/skills/project-runtime-acceptance/references/api-calls.md",
+        "size": 2288,
+        "mode": 420
+      },
+      {
+        "path": "assets/skills/project-runtime-acceptance/references/async-tasks.md",
+        "size": 1456,
+        "mode": 420
+      },
+      {
+        "path": "assets/skills/project-runtime-acceptance/references/cache.md",
+        "size": 2277,
+        "mode": 420
+      },
+      {
+        "path": "assets/skills/project-runtime-acceptance/references/concurrency.md",
+        "size": 1514,
+        "mode": 420
+      },
+      {
+        "path": "assets/skills/project-runtime-acceptance/references/database.md",
+        "size": 3206,
+        "mode": 420
+      },
+      {
+        "path": "assets/skills/project-runtime-acceptance/references/deployment.md",
+        "size": 1300,
+        "mode": 420
+      },
+      {
+        "path": "assets/skills/project-runtime-acceptance/references/performance.md",
+        "size": 1354,
+        "mode": 420
+      },
+      {
+        "path": "assets/skills/project-runtime-acceptance/references/recovery.md",
+        "size": 1277,
+        "mode": 420
+      },
+      {
+        "path": "assets/skills/project-runtime-acceptance/references/resources.md",
+        "size": 1451,
+        "mode": 420
+      },
+      {
+        "path": "assets/skills/project-runtime-acceptance/references/scheduler.md",
+        "size": 2743,
+        "mode": 420
+      },
+      {
+        "path": "assets/skills/project-runtime-acceptance/references/security-observability.md",
+        "size": 1662,
+        "mode": 420
+      },
+      {
+        "path": "assets/skills/project-runtime-acceptance/references/storage.md",
+        "size": 1827,
+        "mode": 420
+      },
+      {
+        "path": "assets/skills/project-runtime-acceptance/scripts/inventory.py",
+        "size": 16623,
+        "mode": 420
+      },
+      {
+        "path": "assets/skills/project-runtime-acceptance/scripts/test_inventory.py",
+        "size": 10507,
+        "mode": 420
+      },
+      {
+        "path": "assets/skills/project-runtime-acceptance/SKILL.md",
+        "size": 12192,
+        "mode": 420
+      },
+      {
+        "path": "assets/skills/prototype-existing-project/SKILL.md",
+        "size": 2560,
+        "mode": 420
+      },
+      {
+        "path": "assets/skills/prototype-greenfield/SKILL.md",
+        "size": 2500,
+        "mode": 420
+      },
+      {
+        "path": "assets/skills/prototype/agents/openai.yaml",
+        "size": 103,
+        "mode": 420
+      },
+      {
+        "path": "assets/skills/prototype/LICENSE",
+        "size": 1068,
+        "mode": 420
+      },
+      {
+        "path": "assets/skills/prototype/LOGIC.md",
+        "size": 6103,
+        "mode": 420
+      },
+      {
+        "path": "assets/skills/prototype/SKILL.md",
+        "size": 2957,
+        "mode": 420
+      },
+      {
+        "path": "assets/skills/prototype/UI.md",
+        "size": 7025,
+        "mode": 420
+      },
+      {
+        "path": "assets/skills/requirement-analysis/SKILL.md",
+        "size": 2486,
+        "mode": 420
+      },
+      {
+        "path": "assets/skills/requirement-clarification/SKILL.md",
+        "size": 2688,
+        "mode": 420
+      },
+      {
+        "path": "assets/skills/requirement-review/SKILL.md",
+        "size": 2723,
+        "mode": 420
+      },
+      {
+        "path": "assets/skills/requirements-spec/references/content-review.md",
+        "size": 5375,
+        "mode": 420
+      },
+      {
+        "path": "assets/skills/requirements-spec/references/document-flow.md",
+        "size": 5003,
+        "mode": 420
+      },
+      {
+        "path": "assets/skills/requirements-spec/references/output-formats.md",
+        "size": 2038,
+        "mode": 420
+      },
+      {
+        "path": "assets/skills/requirements-spec/references/reverse-execution.md",
+        "size": 5061,
+        "mode": 420
+      },
+      {
+        "path": "assets/skills/requirements-spec/references/reverse-requirements.md",
+        "size": 14207,
+        "mode": 420
+      },
+      {
+        "path": "assets/skills/requirements-spec/references/source-extraction.md",
+        "size": 4943,
+        "mode": 420
+      },
+      {
+        "path": "assets/skills/requirements-spec/references/spec-template.md",
+        "size": 6766,
+        "mode": 420
+      },
+      {
+        "path": "assets/skills/requirements-spec/SKILL.md",
+        "size": 20225,
+        "mode": 420
+      },
+      {
+        "path": "assets/skills/research/agents/openai.yaml",
+        "size": 97,
+        "mode": 420
+      },
+      {
+        "path": "assets/skills/research/LICENSE",
+        "size": 1068,
+        "mode": 420
+      },
+      {
+        "path": "assets/skills/research/SKILL.md",
+        "size": 844,
+        "mode": 420
+      },
+      {
+        "path": "assets/skills/retro/agents/openai.yaml",
+        "size": 151,
+        "mode": 420
+      },
+      {
+        "path": "assets/skills/retro/LICENSE",
+        "size": 1068,
+        "mode": 420
+      },
+      {
+        "path": "assets/skills/retro/SKILL.md",
+        "size": 4413,
+        "mode": 420
+      },
+      {
+        "path": "assets/skills/scaffold-exercises/agents/openai.yaml",
+        "size": 111,
+        "mode": 420
+      },
+      {
+        "path": "assets/skills/scaffold-exercises/SKILL.md",
+        "size": 3695,
+        "mode": 420
+      },
+      {
+        "path": "assets/skills/setup-matt-pocock-skills/agents/openai.yaml",
+        "size": 157,
+        "mode": 420
+      },
+      {
+        "path": "assets/skills/setup-matt-pocock-skills/document-layout.md",
+        "size": 1512,
+        "mode": 420
+      },
+      {
+        "path": "assets/skills/setup-matt-pocock-skills/domain.md",
+        "size": 2093,
+        "mode": 420
+      },
+      {
+        "path": "assets/skills/setup-matt-pocock-skills/issue-tracker-github.md",
+        "size": 5132,
+        "mode": 420
+      },
+      {
+        "path": "assets/skills/setup-matt-pocock-skills/issue-tracker-gitlab.md",
+        "size": 4025,
+        "mode": 420
+      },
+      {
+        "path": "assets/skills/setup-matt-pocock-skills/issue-tracker-local.md",
+        "size": 1840,
+        "mode": 420
+      },
+      {
+        "path": "assets/skills/setup-matt-pocock-skills/LICENSE",
+        "size": 1068,
+        "mode": 420
+      },
+      {
+        "path": "assets/skills/setup-matt-pocock-skills/scripts/auto_reconcile.py",
+        "size": 5581,
+        "mode": 420
+      },
+      {
+        "path": "assets/skills/setup-matt-pocock-skills/scripts/test_auto_reconcile.py",
+        "size": 4390,
+        "mode": 420
+      },
+      {
+        "path": "assets/skills/setup-matt-pocock-skills/SKILL.md",
+        "size": 19598,
+        "mode": 420
+      },
+      {
+        "path": "assets/skills/setup-matt-pocock-skills/triage-labels.md",
+        "size": 1072,
+        "mode": 420
+      },
+      {
+        "path": "assets/skills/setup-matt-pocock-skills/work-readme.md",
+        "size": 594,
+        "mode": 420
+      },
+      {
+        "path": "assets/skills/setup-pre-commit/agents/openai.yaml",
+        "size": 102,
+        "mode": 420
+      },
+      {
+        "path": "assets/skills/setup-pre-commit/SKILL.md",
+        "size": 2349,
+        "mode": 420
+      },
+      {
+        "path": "assets/skills/setup-ts-deep-modules/agents/openai.yaml",
+        "size": 154,
+        "mode": 420
+      },
+      {
+        "path": "assets/skills/setup-ts-deep-modules/dependency-cruiser.config.cjs",
+        "size": 3807,
+        "mode": 420
+      },
+      {
+        "path": "assets/skills/setup-ts-deep-modules/SKILL.md",
+        "size": 7648,
+        "mode": 420
+      },
+      {
+        "path": "assets/skills/software-factory/EXAMPLE-TASKS.md",
+        "size": 3811,
+        "mode": 420
+      },
+      {
+        "path": "assets/skills/software-factory/GIT-HOSTS.md",
+        "size": 7790,
+        "mode": 420
+      },
+      {
+        "path": "assets/skills/software-factory/OBSERVABILITY-PLATFORMS.md",
+        "size": 7924,
+        "mode": 420
+      },
+      {
+        "path": "assets/skills/software-factory/RUNNERS.md",
+        "size": 8832,
+        "mode": 420
+      },
+      {
+        "path": "assets/skills/software-factory/SKILL.md",
+        "size": 6099,
+        "mode": 420
+      },
+      {
+        "path": "assets/skills/software-factory/TICKET-TRACKERS.md",
+        "size": 8550,
+        "mode": 420
+      },
+      {
+        "path": "assets/skills/solution-design/SKILL.md",
+        "size": 3016,
+        "mode": 420
+      },
+      {
+        "path": "assets/skills/tdd/agents/openai.yaml",
+        "size": 90,
+        "mode": 420
+      },
+      {
+        "path": "assets/skills/tdd/LICENSE",
+        "size": 1068,
+        "mode": 420
+      },
+      {
+        "path": "assets/skills/tdd/mocking.md",
+        "size": 1540,
+        "mode": 420
+      },
+      {
+        "path": "assets/skills/tdd/SKILL.md",
+        "size": 3686,
+        "mode": 420
+      },
+      {
+        "path": "assets/skills/tdd/tests.md",
+        "size": 2291,
+        "mode": 420
+      },
+      {
+        "path": "assets/skills/teach/agents/openai.yaml",
+        "size": 144,
+        "mode": 420
+      },
+      {
+        "path": "assets/skills/teach/GLOSSARY-FORMAT.md",
+        "size": 2157,
+        "mode": 420
+      },
+      {
+        "path": "assets/skills/teach/LEARNING-RECORD-FORMAT.md",
+        "size": 2793,
+        "mode": 420
+      },
+      {
+        "path": "assets/skills/teach/MISSION-FORMAT.md",
+        "size": 1571,
+        "mode": 420
+      },
+      {
+        "path": "assets/skills/teach/RESOURCES-FORMAT.md",
+        "size": 1956,
+        "mode": 420
+      },
+      {
+        "path": "assets/skills/teach/SKILL.md",
+        "size": 9873,
+        "mode": 420
+      },
+      {
+        "path": "assets/skills/to-questionnaire/agents/openai.yaml",
+        "size": 171,
+        "mode": 420
+      },
+      {
+        "path": "assets/skills/to-questionnaire/SKILL.md",
+        "size": 2958,
+        "mode": 420
+      },
+      {
+        "path": "assets/skills/to-spec/agents/openai.yaml",
+        "size": 140,
+        "mode": 420
+      },
+      {
+        "path": "assets/skills/to-spec/LICENSE",
+        "size": 1068,
+        "mode": 420
+      },
+      {
+        "path": "assets/skills/to-spec/SKILL.md",
+        "size": 3118,
+        "mode": 420
+      },
+      {
+        "path": "assets/skills/to-tickets/agents/openai.yaml",
+        "size": 151,
+        "mode": 420
+      },
+      {
+        "path": "assets/skills/to-tickets/LICENSE",
+        "size": 1068,
+        "mode": 420
+      },
+      {
+        "path": "assets/skills/to-tickets/SKILL.md",
+        "size": 5917,
+        "mode": 420
+      },
+      {
+        "path": "assets/skills/triage/AGENT-BRIEF.md",
+        "size": 8149,
+        "mode": 420
+      },
+      {
+        "path": "assets/skills/triage/agents/openai.yaml",
+        "size": 140,
+        "mode": 420
+      },
+      {
+        "path": "assets/skills/triage/OUT-OF-SCOPE.md",
+        "size": 4772,
+        "mode": 420
+      },
+      {
+        "path": "assets/skills/triage/SKILL.md",
+        "size": 6670,
+        "mode": 420
+      },
+      {
+        "path": "assets/skills/version-retrospective/SKILL.md",
+        "size": 2549,
+        "mode": 420
+      },
+      {
+        "path": "assets/skills/wait-what/agents/openai.yaml",
+        "size": 163,
+        "mode": 420
+      },
+      {
+        "path": "assets/skills/wait-what/SKILL.md",
+        "size": 403,
+        "mode": 420
+      },
+      {
+        "path": "assets/skills/wayfinder/agents/openai.yaml",
+        "size": 149,
+        "mode": 420
+      },
+      {
+        "path": "assets/skills/wayfinder/SKILL.md",
+        "size": 12536,
+        "mode": 420
+      },
+      {
+        "path": "assets/skills/windows-powershell/SKILL.md",
+        "size": 4422,
+        "mode": 420
+      },
+      {
+        "path": "assets/skills/wizard/agents/openai.yaml",
+        "size": 99,
+        "mode": 420
+      },
+      {
+        "path": "assets/skills/wizard/SKILL.md",
+        "size": 4167,
+        "mode": 420
+      },
+      {
+        "path": "assets/skills/wizard/template.sh",
+        "size": 9721,
+        "mode": 420
+      },
+      {
+        "path": "assets/skills/writing-beats/agents/openai.yaml",
+        "size": 147,
+        "mode": 420
+      },
+      {
+        "path": "assets/skills/writing-beats/SKILL.md",
+        "size": 4922,
+        "mode": 420
+      },
+      {
+        "path": "assets/skills/writing-for-agents/agents/openai.yaml",
+        "size": 105,
+        "mode": 420
+      },
+      {
+        "path": "assets/skills/writing-for-agents/LICENSE",
+        "size": 1068,
+        "mode": 420
+      },
+      {
+        "path": "assets/skills/writing-for-agents/SKILL-MECHANICS.md",
+        "size": 2651,
+        "mode": 420
+      },
+      {
+        "path": "assets/skills/writing-for-agents/SKILL.md",
+        "size": 10967,
+        "mode": 420
+      },
+      {
+        "path": "assets/skills/writing-fragments/agents/openai.yaml",
+        "size": 145,
+        "mode": 420
+      },
+      {
+        "path": "assets/skills/writing-fragments/SKILL.md",
+        "size": 3637,
+        "mode": 420
+      },
+      {
+        "path": "assets/skills/writing-shape/agents/openai.yaml",
+        "size": 149,
+        "mode": 420
+      },
+      {
+        "path": "assets/skills/writing-shape/SKILL.md",
+        "size": 6001,
+        "mode": 420
+      },
+      {
+        "path": "cordis.patch.yml",
+        "size": 154,
+        "mode": 420
+      },
+      {
+        "path": "lib/client.js",
+        "size": 251210,
+        "mode": 420
+      },
+      {
+        "path": "lib/client.js.map",
+        "size": 203769,
+        "mode": 420
+      },
+      {
+        "path": "lib/index.js",
+        "size": 32807,
+        "mode": 420
+      },
+      {
+        "path": "lib/lib-BcN9dHAa.js",
+        "size": 21118,
+        "mode": 420
+      },
+      {
+        "path": "lib/todo-progress-guard.js",
+        "size": 71100,
+        "mode": 420
+      },
+      {
+        "path": "lib/types/client.d.ts",
+        "size": 364,
+        "mode": 420
+      },
+      {
+        "path": "lib/types/client.d.ts.map",
+        "size": 145,
+        "mode": 420
+      },
+      {
+        "path": "lib/types/client.js",
+        "size": 340,
+        "mode": 420
+      },
+      {
+        "path": "lib/types/client.js.map",
+        "size": 121,
+        "mode": 420
+      },
+      {
+        "path": "lib/types/client/actions.d.ts",
+        "size": 4581,
+        "mode": 420
+      },
+      {
+        "path": "lib/types/client/actions.d.ts.map",
+        "size": 1505,
+        "mode": 420
+      },
+      {
+        "path": "lib/types/client/actions.js",
+        "size": 72591,
+        "mode": 420
+      },
+      {
+        "path": "lib/types/client/actions.js.map",
+        "size": 26542,
+        "mode": 420
+      },
+      {
+        "path": "lib/types/client/contextual-actions.d.ts",
+        "size": 5005,
+        "mode": 420
+      },
+      {
+        "path": "lib/types/client/contextual-actions.d.ts.map",
+        "size": 1939,
+        "mode": 420
+      },
+      {
+        "path": "lib/types/client/contextual-actions.js",
+        "size": 22247,
+        "mode": 420
+      },
+      {
+        "path": "lib/types/client/contextual-actions.js.map",
+        "size": 17895,
+        "mode": 420
+      },
+      {
+        "path": "lib/types/client/index.d.ts",
+        "size": 1623,
+        "mode": 420
+      },
+      {
+        "path": "lib/types/client/index.d.ts.map",
+        "size": 1943,
+        "mode": 420
+      },
+      {
+        "path": "lib/types/client/index.js",
+        "size": 5528,
+        "mode": 420
+      },
+      {
+        "path": "lib/types/client/index.js.map",
+        "size": 5250,
+        "mode": 420
+      },
+      {
+        "path": "lib/types/client/launcher-layout.d.ts",
+        "size": 3178,
+        "mode": 420
+      },
+      {
+        "path": "lib/types/client/launcher-layout.d.ts.map",
+        "size": 1190,
+        "mode": 420
+      },
+      {
+        "path": "lib/types/client/launcher-layout.js",
+        "size": 7066,
+        "mode": 420
+      },
+      {
+        "path": "lib/types/client/launcher-layout.js.map",
+        "size": 6946,
+        "mode": 420
+      },
+      {
+        "path": "lib/types/client/Launcher.d.ts",
+        "size": 512,
+        "mode": 420
+      },
+      {
+        "path": "lib/types/client/Launcher.d.ts.map",
+        "size": 500,
+        "mode": 420
+      },
+      {
+        "path": "lib/types/client/Launcher.js",
+        "size": 8202,
+        "mode": 420
+      },
+      {
+        "path": "lib/types/client/Launcher.js.map",
+        "size": 8904,
+        "mode": 420
+      },
+      {
+        "path": "lib/types/client/legacy-actions.d.ts",
+        "size": 442,
+        "mode": 420
+      },
+      {
+        "path": "lib/types/client/legacy-actions.d.ts.map",
+        "size": 375,
+        "mode": 420
+      },
+      {
+        "path": "lib/types/client/legacy-actions.js",
+        "size": 3951,
+        "mode": 420
+      },
+      {
+        "path": "lib/types/client/legacy-actions.js.map",
+        "size": 2160,
+        "mode": 420
+      },
+      {
+        "path": "lib/types/client/locales.d.ts",
+        "size": 11022,
+        "mode": 420
+      },
+      {
+        "path": "lib/types/client/locales.d.ts.map",
+        "size": 660,
+        "mode": 420
+      },
+      {
+        "path": "lib/types/client/locales.js",
+        "size": 34291,
+        "mode": 420
+      },
+      {
+        "path": "lib/types/client/locales.js.map",
+        "size": 8333,
+        "mode": 420
+      },
+      {
+        "path": "lib/types/client/Settings.d.ts",
+        "size": 438,
+        "mode": 420
+      },
+      {
+        "path": "lib/types/client/Settings.d.ts.map",
+        "size": 418,
+        "mode": 420
+      },
+      {
+        "path": "lib/types/client/Settings.js",
+        "size": 7631,
+        "mode": 420
+      },
+      {
+        "path": "lib/types/client/Settings.js.map",
+        "size": 9455,
+        "mode": 420
+      },
+      {
+        "path": "lib/types/client/setup-readiness.d.ts",
+        "size": 508,
+        "mode": 420
+      },
+      {
+        "path": "lib/types/client/setup-readiness.d.ts.map",
+        "size": 465,
+        "mode": 420
+      },
+      {
+        "path": "lib/types/client/setup-readiness.js",
+        "size": 5239,
+        "mode": 420
+      },
+      {
+        "path": "lib/types/client/setup-readiness.js.map",
+        "size": 5239,
+        "mode": 420
+      },
+      {
+        "path": "lib/types/config.d.ts",
+        "size": 1532,
+        "mode": 420
+      },
+      {
+        "path": "lib/types/config.d.ts.map",
+        "size": 382,
+        "mode": 420
+      },
+      {
+        "path": "lib/types/config.js",
+        "size": 942,
+        "mode": 420
+      },
+      {
+        "path": "lib/types/config.js.map",
+        "size": 462,
+        "mode": 420
+      },
+      {
+        "path": "lib/types/index.d.ts",
+        "size": 2462,
+        "mode": 420
+      },
+      {
+        "path": "lib/types/index.d.ts.map",
+        "size": 839,
+        "mode": 420
+      },
+      {
+        "path": "lib/types/index.js",
+        "size": 1786,
+        "mode": 420
+      },
+      {
+        "path": "lib/types/index.js.map",
+        "size": 1637,
+        "mode": 420
+      },
+      {
+        "path": "lib/types/skill-provider.d.ts",
+        "size": 958,
+        "mode": 420
+      },
+      {
+        "path": "lib/types/skill-provider.d.ts.map",
+        "size": 379,
+        "mode": 420
+      },
+      {
+        "path": "lib/types/skill-provider.js",
+        "size": 4196,
+        "mode": 420
+      },
+      {
+        "path": "lib/types/skill-provider.js.map",
+        "size": 3617,
+        "mode": 420
+      },
+      {
+        "path": "lib/types/todo-progress-guard.d.ts",
+        "size": 3264,
+        "mode": 420
+      },
+      {
+        "path": "lib/types/todo-progress-guard.d.ts.map",
+        "size": 1324,
+        "mode": 420
+      },
+      {
+        "path": "lib/types/todo-progress-guard.js",
+        "size": 6419,
+        "mode": 420
+      },
+      {
+        "path": "lib/types/todo-progress-guard.js.map",
+        "size": 3844,
+        "mode": 420
+      },
+      {
+        "path": "lib/windows-powershell.js",
+        "size": 3448,
+        "mode": 420
+      },
+      {
+        "path": "package.json",
+        "size": 2296,
+        "mode": 420
+      },
+      {
+        "path": "scripts/build-action-bundle.mjs",
+        "size": 2151,
+        "mode": 420
+      },
+      {
+        "path": "scripts/rebuild-launcher-bundle.mjs",
+        "size": 14130,
+        "mode": 420
+      },
+      {
+        "path": "scripts/verify-client-bundle.mjs",
+        "size": 4406,
+        "mode": 420
+      },
+      {
+        "path": "scripts/verify-launcher-render.mjs",
+        "size": 7031,
+        "mode": 420
+      }
+    ],
+    "entryCount": 474,
+    "bundled": []
+  }
+]

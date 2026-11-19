@@ -3,9 +3,9 @@ import type { CodingAction } from './actions.ts'
 /** Visual-only groups. One action ID may be referenced by several groups. */
 export const LAUNCHER_GROUPS = [
   { id: 'requirements-analysis', label: 'groupRequirementsAnalysis', actionIds: ['requirements-next-step', 'requirement-clarification', 'requirement-analysis', 'product-risk-gate', 'solution-design', 'product-module-gate', 'product-state-gate', 'product-exception-gate', 'product-prd-pages', 'product-consistency-gate', 'product-image-prompt'] },
-  { id: 'development', label: 'groupDevelopment', actionIds: ['discussion', 'spec', 'execute', 'review', 'review-fix', 'compile', 'bug', 'commit', 'add-logs', 'analyze-logs', 'ask', 'plan', 'architecture', 'refactor', 'spring7-upgrade', 'tdd', 'remote-debug', 'health-acceptance'] },
+  { id: 'development', label: 'groupDevelopment', actionIds: ['discussion', 'spec', 'execute', 'review', 'review-fix', 'compile', 'bug', 'commit', 'add-logs', 'analyze-logs', 'plan', 'api-performance-optimization'] },
   { id: 'documents', label: 'groupDocuments', actionIds: ['requirements', 'overview', 'outline', 'database', 'api-docs', 'doc-supplement', 'doc-merge', 'docx', 'xlsx', 'handover-requirement-summary', 'handover-log-guide'] },
-  { id: 'others', label: 'groupOthers', actionIds: ['research', 'domain', 'prototype', 'retro', 'handoff', 'visual', 'graphify-navigation', 'graphify-refresh', 'maintain-document-directory', 'mermaid-draw', 'image', 'continue'] },
+  { id: 'others', label: 'groupOthers', actionIds: ['research', 'domain', 'prototype', 'retro', 'handoff', 'visual', 'graphify-navigation', 'graphify-refresh', 'maintain-document-directory', 'mermaid-draw', 'image', 'continue', 'ask', 'architecture', 'refactor', 'spring7-upgrade', 'tdd', 'remote-debug', 'health-acceptance'] },
 ] as const
 
 export type OptionalGroupId = typeof LAUNCHER_GROUPS[number]['id']

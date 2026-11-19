@@ -335,34 +335,34 @@ test('default groups expand independently, preserve action order and retain over
   const h = harness()
   assert.equal(h.actionButtons('common').length, 8)
   assert.equal(h.actionButtons('development').length, 8)
-  assert.equal(h.overflow('development').props.children, '更多（10）')
+  assert.equal(h.overflow('development').props.children, '更多（11）')
   h.overflow('development').props.onClick()
-  assert.equal(h.actionButtons('development').length, 18)
+  assert.equal(h.actionButtons('development').length, 19)
   assert.equal(h.actionButtons('common').length, 8)
-  const developmentOrder = ['需求讨论', '固化需求', '编码', '代码审查', '修复', '编译', 'Bug排查', '提交代码', '补充排查', '分析日志', '咨询', '拆分工单', '架构优化', '项目重构', '升级 Spring7', '测试驱动开发', '远程调试', '健康验收']
+  const developmentOrder = ['需求讨论', '固化需求', '编码', '代码审查', '修复', '编译', 'Bug排查', '提交代码', '补充排查', '分析日志', '咨询', '拆分工单', '架构优化', '性能优化', '项目重构', '升级 Spring7', '测试驱动开发', '远程调试', '健康验收']
   assert.deepEqual(h.actionButtons('development').map(n => n.props.children), developmentOrder)
   h.overflow('development').props.onClick()
   h.data.messages = [{ role: 'user', text: '/to-spec 固化需求' }, { role: 'assistant', text: '规格已完成，验收标准已确认' }]
   assert.match(h.overflow('development').props.children, /•/, 'hidden recommended tickets remain discoverable')
   const english = harness({ english: true })
-  assert.equal(english.overflow('development').props.children, 'More (10)')
+  assert.equal(english.overflow('development').props.children, 'More (11)')
   assert.match(english.overflow('development').props['aria-label'], /Development/)
 })
 
 test('rows fill the available width and only collapse the buttons that do not fit', () => {
-  const widths = Array(18).fill(50)
+  const widths = Array(19).fill(50)
   const layout = { schemaVersion: 1, commonActionIds: [], visibleGroups: { common: false, 'requirements-analysis': false, development: true, documents: false, others: false } }
   const h = harness({ measured: true, rowWidth: 600, widths, moreWidth: 70, layout })
   h.render(); h.flush(); h.render()
   assert.equal(h.actionButtons('development').length, 9)
-  assert.equal(h.overflow('development').props.children, '更多（9）')
+  assert.equal(h.overflow('development').props.children, '更多（10）')
   h.row.clientWidth = 300
   h.render(); h.flush(); h.render()
   assert.equal(h.actionButtons('development').length, 4)
-  assert.equal(h.overflow('development').props.children, '更多（14）')
+  assert.equal(h.overflow('development').props.children, '更多（15）')
   h.row.clientWidth = 1200
   h.render(); h.flush(); h.render()
-  assert.equal(h.actionButtons('development').length, 18)
+  assert.equal(h.actionButtons('development').length, 19)
   assert.equal(h.overflow('development'), undefined, 'no More when the whole row fits')
 })
 
@@ -607,4 +607,13 @@ test('Spring7 upgrade inserts an editable audit prompt without sending a migrati
   missing.actionButtons('development').find(n => n.props.children === '升级 Spring7').props.onClick()
   await new Promise(resolve => setImmediate(resolve))
   assert.deepEqual(missing.events, [])
+})
+
+test('performance optimization inserts an editable single API skill prompt', async () => {
+  const h = harness()
+  h.overflow('development').props.onClick()
+  h.actionButtons('development').find(n => n.props.children === '性能优化').props.onClick()
+  await new Promise(resolve => setImmediate(resolve))
+  assert.match(h.events[0][1], /^\/api-performance-optimization .*单个接口/)
+  assert.deepEqual(h.events.map(event => event[0]), ['insert', 'persist'])
 })

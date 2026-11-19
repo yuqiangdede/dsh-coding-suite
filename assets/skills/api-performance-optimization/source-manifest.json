@@ -1,0 +1,30 @@
+{
+  "date": "2026-11-19",
+  "provider": "用户在当前对话提供《API Performance Optimization｜单接口性能优化》",
+  "sourceAddress": "当前对话中的用户消息，无公开地址",
+  "author": "原作者未知，提供者为用户",
+  "upstreamPath": "用户消息中的八节执行规程",
+  "upstreamVersion": "未知",
+  "license": "用户要求在本项目中实现；原文外部发布许可未知",
+  "references": ["assets/skills/_shared/DOCUMENT_AUTHORITY.md", "docs/agents/document-layout.md"],
+  "assets": [
+    {
+      "localPath": "assets/skills/api-performance-optimization/SKILL.md",
+      "category": "依据用户提供的规程本地改写",
+      "baseline": "用户消息中的八节执行规程",
+      "changes": "整理成单接口执行 Skill，补充项目文档路由和临时计时清理约定"
+    },
+    {
+      "localPath": "src/client/actions.ts#api-performance-optimization",
+      "category": "依据用户规程本地编写",
+      "baseline": "此前无该预设",
+      "changes": "默认提示词、输入提示和中英文展示"
+    },
+    {
+      "localPath": "src/client/locales.ts#api-performance-optimization",
+      "category": "依据用户规程本地编写",
+      "baseline": "此前无该接收指令",
+      "changes": "中英文接收指令"
+    }
+  ]
+}

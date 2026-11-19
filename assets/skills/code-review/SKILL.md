@@ -22,4 +22,4 @@ Check the repository instructions and locate the originating issue/spec through 
 
 For each actionable finding give priority, file/line, trigger, impact and a specific correction or verification. Rank by user impact and likelihood. Do not inflate the report with speculative smells. If no issues are found, say what was inspected and what evidence was unavailable; a clean review is not proof of correctness. Keep Standards and Spec conclusions distinct.
 
-For complex changes, independent reviewers may examine the two axes in parallel when delegation is available and authorized. Give both the same fixed diff and relevant sources, then reconcile overlapping findings before reporting. A separate agent is useful for independence but is not required for a small review or when delegation is unavailable.
+Run the Standards and Spec axes as parallel sub-agents, each starting with a fresh context window. Give both the same fixed diff and relevant sources, then reconcile overlapping findings before reporting. Follow the host's delegation rules; when delegation is unavailable or unauthorized, review both axes independently in the current context and report that limitation.
