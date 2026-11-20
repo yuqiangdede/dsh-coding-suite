@@ -35,7 +35,7 @@ function readFolderPreferences(): FolderPreferences {
 type SidebarFoldersProps = PropsRuntime<'sidebar.footer.action'> & PropsLocale<'mattSkillLauncher'>
 
 type FolderDrag = { kind: 'move-folder' | 'move-workspace'; id: string }
-type FolderPanel = { kind: 'create'; parent: string | null } | { kind: 'actions' | 'delete'; id: string }
+type FolderPanel = { kind: 'create'; parent: string | null } | { kind: 'actions' | 'delete' | 'rename'; id: string }
 
 interface FolderTargets {
   toolbar: HTMLElement
@@ -112,11 +112,14 @@ const WORKSPACE_FOLDER_STYLE = `
 [data-dsh-csf-tree]{display:flex!important;flex-direction:column}
 [data-dsh-csf-placed]{order:var(--dsh-csf-order);--dsh-workspace-indent:var(--dsh-csf-indent)!important}
 [data-dsh-csf-hidden]{display:none!important}
-.dsh-csf-folder-row{order:var(--dsh-csf-order);padding-inline-start:var(--dsh-csf-indent);min-height:32px;margin:0 6px;font-size:13px;flex-wrap:wrap}
+.dsh-csf-folder-row{position:relative;order:var(--dsh-csf-order);padding-inline-start:var(--dsh-csf-indent);min-height:32px;margin:0 6px;font-size:13px;flex-wrap:wrap}
 .dsh-csf-folder-panel{flex-basis:100%;min-width:0;font-size:12px;padding-block-end:4px}
+.dsh-csf-folder-menu{position:absolute;z-index:2;inset-block-start:100%;inset-inline-end:0;display:grid;min-width:128px;max-width:100%;padding:4px;border:1px solid var(--dsw-alias-border-l3);border-radius:8px;background:var(--dsw-alias-bg-l2,Canvas);box-shadow:0 4px 12px #0004}
+.dsh-csf-folder-menu button{text-align:start}
 .dsh-csf-folder-row .dsh-csf-folder-label{flex:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;text-align:start}
 .dsh-csf-folder-row button{background:transparent;border-color:transparent}
 .dsh-csf-folder-row button:hover{background:var(--dsw-alias-interactive-bg-hover)}
+.dsh-csf-folder-menu button:last-child{border-block-start:1px solid var(--dsw-alias-border-l3)}
 .dsh-csf-folder-row[data-dsh-csf-drop],[data-dsh-csf-workspace-drop]{background:var(--dsw-alias-interactive-bg-hover-accent);outline:1px solid var(--dsw-alias-border-selected);outline-offset:-1px;border-radius:5px}
 .dsh-csf-folder-label[draggable=true]{cursor:grab}
 `
@@ -345,21 +348,30 @@ export function WorkspaceFoldersSidebar({ t, wide, useWorkspaces }: SidebarFolde
     }
   }, [wide, tree, targets?.folders, folderOptions.length, workspacePlacement, order])
   if (!wide || !targets) return null
-  const renderCreate = (parent: string | null) => <form className="dsh-csf-create" onSubmit={event => {
-    event.preventDefault()
-    if (!name.trim()) return
-    const id = 'folder:' + crypto.getRandomValues(new Uint32Array(4)).join('-')
-    if (change({ kind: 'create', id, parent, name }, true)) setPanel(null)
-  }}>
-    <fieldset>
-      <legend>{t(parent === null ? 'folderAddRoot' : 'folderAddChild')}</legend>
-      <label>{t('folderName')}<input autoFocus value={name} maxLength={120} onChange={event => setName(event.target.value)} /></label>
-      <div className="dsh-csf-actions">
-        <button type="submit" disabled={!name.trim()}>{t('folderCreate')}</button>
-        <button type="button" onClick={() => setPanel(null)}>{t('folderCancel')}</button>
-      </div>
-    </fieldset>
-  </form>
+  const renderNameForm = (edit: { kind: 'create'; parent: string | null } | { kind: 'rename'; id: string; original: string },
+    close: (element: HTMLElement) => void) => {
+    const renaming = edit.kind === 'rename'
+    const canSave = name.trim() !== '' && (!renaming || name.trim() !== edit.original)
+    return <form className="dsh-csf-create" onSubmit={event => {
+      event.preventDefault()
+      if (!canSave) return
+      const request: FolderChange = renaming ? { kind: 'rename', id: edit.id, name } : {
+        kind: 'create', id: 'folder:' + crypto.getRandomValues(new Uint32Array(4)).join('-'), parent: edit.parent, name,
+      }
+      if (change(request, !renaming)) close(event.currentTarget)
+    }}>
+      <fieldset>
+        <legend>{t(renaming ? 'folderRename' : edit.parent === null ? 'folderAddRoot' : 'folderAddChild')}</legend>
+        <label>{t('folderName')}<input autoFocus value={name} maxLength={120}
+          onFocus={renaming ? event => event.currentTarget.select() : undefined}
+          onChange={event => setName(event.target.value)} /></label>
+        <div className="dsh-csf-actions">
+          <button type="submit" disabled={!canSave}>{t(renaming ? 'folderSave' : 'folderCreate')}</button>
+          <button type="button" onClick={event => close(event.currentTarget)}>{t('folderCancel')}</button>
+        </div>
+      </fieldset>
+    </form>
+  }
   return <>
     {createPortal(<>
       <style>{WORKSPACE_FOLDER_STYLE}</style>
@@ -376,29 +388,45 @@ export function WorkspaceFoldersSidebar({ t, wide, useWorkspaces }: SidebarFolde
         {t('folderDropToRoot')}</div>,
       targets.folders)}
     {createPortal(<>
-      {creatingRoot && renderCreate(null)}
+      {creatingRoot && renderNameForm({ kind: 'create', parent: null }, () => setPanel(null))}
       {storageError && <p role="alert">{t('folderSaveError')}</p>}
     </>, targets.controls)}
     {tree && createPortal(folderOptions.map(option => {
       const { expanded } = option
       const title = settings.tree?.folders[option.id]?.name
       const active = activeFolder === option.id
+      const close = (row: HTMLElement | null) => {
+        setPanel(null)
+        row?.querySelector<HTMLElement>('.dsh-csf-folder-more')?.focus()
+      }
       return <div key={option.id} className="dsh-csf-folder-row" role="treeitem" aria-label={title}
         aria-expanded={expanded} aria-level={option.depth + 1} data-dsh-csf-hidden={option.hidden ? '' : undefined}
+        onKeyDown={event => {
+          if (!active || event.key !== 'Escape') return
+          event.stopPropagation()
+          close(event.currentTarget)
+        }}
         data-dsh-csf-parent={option.id} data-dsh-csf-drop={dropTarget === option.id ? '' : undefined}
         style={{ '--dsh-csf-order': option.order, '--dsh-csf-indent': (Math.min(option.depth, 7) * 12) + 'px' } as import('react').CSSProperties}>
         <button type="button" className="dsh-csf-folder-label" title={title} draggable
           onClick={() => toggle(option.id)}>
           <span aria-hidden="true">{expanded ? '▾ ▱ ' : '▸ ▱ '}</span>{title}
         </button>
-        <button type="button" aria-label={t('folderActions') + ' ' + title} title={t('folderActions')} aria-expanded={active}
+        <button type="button" className="dsh-csf-folder-more"
+          aria-label={t('folderActions') + ' ' + title} title={t('folderActions')} aria-expanded={active}
           onClick={() => setPanel(active ? null : { kind: 'actions', id: option.id })}>…</button>
-        {active && <div className="dsh-csf-folder-panel">
-          {panel?.kind === 'actions' && <div className="dsh-csf-actions">
-            <button type="button" onClick={() => openCreate(option.id)}>{t('folderAddChild')}</button>
-            <button type="button" onClick={() => setPanel({ kind: 'delete', id: option.id })}>{t('folderDelete')}</button>
-          </div>}
-          {panel?.kind === 'create' && renderCreate(option.id)}
+        {active && panel?.kind === 'actions' && <div className="dsh-csf-folder-menu">
+          <button type="button" autoFocus onClick={() => {
+            setName(title ?? '')
+            setPanel({ kind: 'rename', id: option.id })
+          }}>{t('folderRename')}</button>
+          <button type="button" onClick={() => openCreate(option.id)}>{t('folderAddChild')}</button>
+          <button type="button" onClick={() => setPanel({ kind: 'delete', id: option.id })}>{t('folderDelete')}</button>
+        </div>}
+        {active && panel?.kind !== 'actions' && <div className="dsh-csf-folder-panel">
+          {panel?.kind === 'create' && renderNameForm({ kind: 'create', parent: option.id }, () => setPanel(null))}
+          {panel?.kind === 'rename' && renderNameForm({ kind: 'rename', id: option.id, original: title ?? '' },
+            element => close(element.closest<HTMLElement>('.dsh-csf-folder-row')))}
           {panel?.kind === 'delete' && <>
             <p>{t('folderDeleteHelp')}</p>
             <div className="dsh-csf-actions">

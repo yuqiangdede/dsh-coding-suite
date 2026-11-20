@@ -5,6 +5,8 @@ export declare const zh: {
     readonly folderAddChild: "添加子文件夹";
     readonly folderCreate: "创建";
     readonly folderName: "文件夹名称";
+    readonly folderRename: "重命名";
+    readonly folderSave: "保存";
     readonly folderDropToRoot: "拖到这里移至顶层";
     readonly folderDelete: "删除文件夹";
     readonly folderDeleteHelp: "子文件夹和工作区将移到上一级。";
